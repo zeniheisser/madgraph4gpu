@@ -411,7 +411,6 @@ main( int argc, char** argv )
 #endif
   }
 
-
  // ZW: change pmek to use momenta extracted from LHEF
   // --- 0c. Create matrix element kernel [keep this in 0c for the moment]
   std::unique_ptr<MatrixElementKernelBase> pmek;
@@ -419,7 +418,9 @@ main( int argc, char** argv )
   {
 #ifdef __CUDACC__
     pmek.reset( new MatrixElementKernelDevice( devMomenta, devGs, devMatrixElements, gpublocks, gputhreads ) );
+    std::cout << "\n\n" << devMomenta << "\n\nline 421\n\n";
 #else
+    std::cout << "\n\n" << devMomenta << "\n\nline 423\n\n";
     pmek.reset( new MatrixElementKernelHost( hstMomenta, hstGs, hstMatrixElements, nevt ) );
 #endif
   }
@@ -427,7 +428,9 @@ main( int argc, char** argv )
   {
 #ifdef __CUDACC__
     pmek.reset( new BridgeKernelDevice( hstMomenta, hstGs, hstMatrixElements, gpublocks, gputhreads ) );
+    std::cout << "\n\n" << devMomenta << "\n\nline 431\n\n";
 #else
+    std::cout << "\n\n" << devMomenta << "\n\nline 433\n\n";
     pmek.reset( new BridgeKernelHost( hstMomenta, hstGs, hstMatrixElements, nevt ) );
 #endif
   }
