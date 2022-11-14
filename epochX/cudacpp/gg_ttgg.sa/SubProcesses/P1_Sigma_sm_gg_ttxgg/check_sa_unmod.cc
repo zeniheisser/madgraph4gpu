@@ -354,10 +354,6 @@ main( int argc, char** argv )
   std::unique_ptr<double[]> wavetimes( new double[niter] );
   std::unique_ptr<double[]> wv3atimes( new double[niter] );
 
-
-  // ZW: remove random numper generation prnk and any dependencies on it
-  // !! note: prnk is not necessary to remove for reweighing, but need to
-  // remove prsk, which samples from prnk
   // --- 0c. Create curand or common generator
   const std::string cgenKey = "0c GenCreat";
   timermap.start( cgenKey );
@@ -392,10 +388,6 @@ main( int argc, char** argv )
   }
 #endif
 
-
-  // ZW: remove prsk and dependence on it (make the relevant momenta into those extracted from LHEF)
-  // !! note: prsk is the momentum sampling and it should be removed
-  // so that we instead use our own momenta from LHEF
   // --- 0c. Create rambo sampling kernel [keep this in 0c for the moment]
   std::unique_ptr<SamplingKernelBase> prsk;
   if( rmbsmp == RamboSamplingMode::RamboHost )
@@ -411,8 +403,6 @@ main( int argc, char** argv )
 #endif
   }
 
-
- // ZW: change pmek to use momenta extracted from LHEF
   // --- 0c. Create matrix element kernel [keep this in 0c for the moment]
   std::unique_ptr<MatrixElementKernelBase> pmek;
   if( !bridge )
@@ -489,7 +479,6 @@ main( int argc, char** argv )
     const std::string riniKey = "2a RamboIni";
     timermap.start( riniKey );
     prsk->getMomentaInitial();
-    // ZW: see how prsk is used to format momenta? and then input new momenta in the correct way
     //std::cout << "Got initial momenta" << std::endl;
 
     // --- 2b. Fill in momenta of final state particles using the RAMBO algorithm on the device
@@ -500,7 +489,6 @@ main( int argc, char** argv )
     //std::cout << "Got final momenta" << std::endl;
 
 #ifdef __CUDACC__
-  // ZW: maybe overwrite which momenta are used here?
     if( rmbsmp == RamboSamplingMode::RamboDevice )
     {
       // --- 2c. CopyDToH Weights
@@ -538,7 +526,6 @@ main( int argc, char** argv )
     // 3b. Copy MEs back from device to host
 
     // --- 0d. TransC2F
-    // ZW: i think we should have bridge=true here
     if( bridge )
     {
       const std::string tc2fKey = "0d TransC2F";
@@ -547,16 +534,12 @@ main( int argc, char** argv )
     }
 
 #ifdef __CUDACC__
-  // ZW: here use LHEF Gs instead of static one
     // --- 2d. CopyHToD Momenta
     const std::string gKey = "0.. CpHTDg";
     rambtime += timermap.start( gKey ); // FIXME! NOT A RAMBO TIMER!
     copyDeviceFromHost( devGs, hstGs );
 #endif
 
-
-  // ZW: here i think all should be the same, as long as we've made sure
-  // that the sets of momenta and Gs are properly copied
     // --- 0e. SGoodHel
     if( iiter == 0 )
     {

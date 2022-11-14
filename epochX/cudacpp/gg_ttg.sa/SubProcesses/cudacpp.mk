@@ -59,6 +59,7 @@ endif
 
 # Note: AR, CXX and FC are implicitly defined if not set externally
 # See https://www.gnu.org/software/make/manual/html_node/Implicit-Variables.html
+FC = gfortran
 
 #-------------------------------------------------------------------------------
 

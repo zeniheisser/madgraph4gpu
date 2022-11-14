@@ -76,6 +76,8 @@ namespace mg5amcCpu
     // Destructor
     virtual ~RamboSamplingKernelHost() {}
 
+
+    // ZW: see how momenta are formatted?
     // Get momenta of initial state particles
     void getMomentaInitial() override final;
 
