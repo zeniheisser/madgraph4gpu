@@ -329,6 +329,8 @@ main( int argc, char** argv )
 #ifndef __CUDACC__
   HostBufferMomenta hstMomenta( nevt );
 #else
+  // ZW: change devMomenta from being output by
+  // prsk to being the one output by PEP
   PinnedHostBufferMomenta hstMomenta( nevt );
   DeviceBufferMomenta devMomenta( nevt );
 #endif
@@ -418,9 +420,7 @@ main( int argc, char** argv )
   {
 #ifdef __CUDACC__
     pmek.reset( new MatrixElementKernelDevice( devMomenta, devGs, devMatrixElements, gpublocks, gputhreads ) );
-    std::cout << "\n\n" << devMomenta << "\n\nline 421\n\n";
 #else
-    std::cout << "\n\n" << devMomenta << "\n\nline 423\n\n";
     pmek.reset( new MatrixElementKernelHost( hstMomenta, hstGs, hstMatrixElements, nevt ) );
 #endif
   }
@@ -428,9 +428,7 @@ main( int argc, char** argv )
   {
 #ifdef __CUDACC__
     pmek.reset( new BridgeKernelDevice( hstMomenta, hstGs, hstMatrixElements, gpublocks, gputhreads ) );
-    std::cout << "\n\n" << devMomenta << "\n\nline 431\n\n";
 #else
-    std::cout << "\n\n" << devMomenta << "\n\nline 433\n\n";
     pmek.reset( new BridgeKernelHost( hstMomenta, hstGs, hstMatrixElements, nevt ) );
 #endif
   }
