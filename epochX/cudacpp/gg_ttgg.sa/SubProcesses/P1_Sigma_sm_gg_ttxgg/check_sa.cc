@@ -414,10 +414,13 @@ main( int argc, char** argv )
   }
 
  // ZW: change pmek to use momenta extracted from LHEF
+ // basically just want to change devMomenta to PEPMomenta
+ // but PEPMomenta needs to be passed to the GPU
   // --- 0c. Create matrix element kernel [keep this in 0c for the moment]
   std::unique_ptr<MatrixElementKernelBase> pmek;
   if( !bridge )
   {
+    std::cout << "\nwe are NOT in bridge territory\n";
 #ifdef __CUDACC__
     pmek.reset( new MatrixElementKernelDevice( devMomenta, devGs, devMatrixElements, gpublocks, gputhreads ) );
 #else
@@ -425,7 +428,7 @@ main( int argc, char** argv )
 #endif
   }
   else
-  {
+  { std::cout << "\nwe are in bridge territory\n";
 #ifdef __CUDACC__
     pmek.reset( new BridgeKernelDevice( hstMomenta, hstGs, hstMatrixElements, gpublocks, gputhreads ) );
 #else
