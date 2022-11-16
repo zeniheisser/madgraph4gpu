@@ -422,6 +422,7 @@ main( int argc, char** argv )
   {
     std::cout << "\nwe are NOT in bridge territory\n";
 #ifdef __CUDACC__
+    // ZW: this is the one we use in a regular ./gcheck 32 32 32
     pmek.reset( new MatrixElementKernelDevice( devMomenta, devGs, devMatrixElements, gpublocks, gputhreads ) );
 #else
     pmek.reset( new MatrixElementKernelHost( hstMomenta, hstGs, hstMatrixElements, nevt ) );
@@ -507,6 +508,7 @@ main( int argc, char** argv )
   // ZW: maybe overwrite which momenta are used here?
     if( rmbsmp == RamboSamplingMode::RamboDevice )
     {
+      std::cout << "\n\nrmbsmp is RamboSamplingMode RamboDevice";
       // --- 2c. CopyDToH Weights
       const std::string cwgtKey = "2c CpDTHwgt";
       rambtime += timermap.start( cwgtKey );
@@ -519,6 +521,7 @@ main( int argc, char** argv )
     }
     else // only if ( ! bridge ) ???
     {
+      std::cout << "\n\nrmbsmp is NOT RamboSamplingMode RamboDevice";
       // --- 2c. CopyHToD Weights
       const std::string cwgtKey = "2c CpHTDwgt";
       rambtime += timermap.start( cwgtKey );

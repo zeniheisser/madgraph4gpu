@@ -53,6 +53,9 @@ namespace mg5amcCpu
 
   //--------------------------------------------------------------------------
 
+  // ZW: check how momenta are sent to device and copy EXACTLY that to work
+  // with PEPmomenta instead
+
   void
   RamboSamplingKernelHost::getMomentaInitial()
   {
@@ -129,6 +132,9 @@ namespace mg5amcCpu
 #endif
 
   //--------------------------------------------------------------------------
+
+  // ZW: check how momenta are sent to device and copy EXACTLY that to work
+  // with PEPmomenta instead
 
 #ifdef __CUDACC__
   __global__ void
