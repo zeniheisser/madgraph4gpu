@@ -508,7 +508,7 @@ main( int argc, char** argv )
   // ZW: maybe overwrite which momenta are used here?
     if( rmbsmp == RamboSamplingMode::RamboDevice )
     {
-      std::cout << "\n\nrmbsmp is RamboSamplingMode RamboDevice";
+      //std::cout << "\n\nrmbsmp is RamboSamplingMode RamboDevice";
       // --- 2c. CopyDToH Weights
       const std::string cwgtKey = "2c CpDTHwgt";
       rambtime += timermap.start( cwgtKey );
@@ -521,7 +521,7 @@ main( int argc, char** argv )
     }
     else // only if ( ! bridge ) ???
     {
-      std::cout << "\n\nrmbsmp is NOT RamboSamplingMode RamboDevice";
+      //std::cout << "\n\nrmbsmp is NOT RamboSamplingMode RamboDevice";
       // --- 2c. CopyHToD Weights
       const std::string cwgtKey = "2c CpHTDwgt";
       rambtime += timermap.start( cwgtKey );
@@ -597,6 +597,8 @@ main( int argc, char** argv )
       wavetime += timermap.stop(); // calc plus copy
     }
 #endif
+
+    std::cout << "\n\nno of events is " << nevt << "\n\n";
 
     // === STEP 4 FINALISE LOOP
     // --- 4@ Update event statistics
