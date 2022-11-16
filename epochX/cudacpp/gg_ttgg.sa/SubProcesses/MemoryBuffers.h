@@ -394,13 +394,12 @@ namespace mg5amcCpu
       sstr << "Size (#elements) mismatch in copyDeviceFromHost: dst=" << dst.size() << ", src=" << src.size();
       throw std::runtime_error( sstr.str() );
     }
-    // ZW: ignoring this for now
-    //if( dst.bytes() != src.bytes() )
-    //{
-      //std::ostringstream sstr;
-      //sstr << "Size (#bytes) mismatch in copyDeviceFromHost: dst=" << dst.bytes() << ", src=" << src.bytes();
-      //throw std::runtime_error( sstr.str() );
-    //}
+    if( dst.bytes() != src.bytes() )
+    {
+      std::ostringstream sstr;
+      sstr << "Size (#bytes) mismatch in copyDeviceFromHost: dst=" << dst.bytes() << ", src=" << src.bytes();
+      throw std::runtime_error( sstr.str() );
+    }
     // NB (PR #45): cudaMemcpy involves an intermediate memcpy to pinned memory if host array is a not a pinned host array
     checkCuda( cudaMemcpy( dst.data(), src.data(), src.bytes(), cudaMemcpyHostToDevice ) );
   }
