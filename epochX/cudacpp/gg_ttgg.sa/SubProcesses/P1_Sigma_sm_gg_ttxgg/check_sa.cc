@@ -598,7 +598,7 @@ main( int argc, char** argv )
     }
 #endif
 
-    std::cout << "\n\nno of events is " << nevt << "\n\n";
+    //std::cout << "\n\nno of events is " << nevt << "\n\n";
 
     // === STEP 4 FINALISE LOOP
     // --- 4@ Update event statistics
