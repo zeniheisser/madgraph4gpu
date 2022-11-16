@@ -30,6 +30,8 @@
 #include "RandomNumberKernels.h"
 #include "epoch_process_id.h"
 #include "timermap.h"
+#include "PEP.hpp"
+
 #define STRINGIFY( s ) #s
 #define XSTRINGIFY( s ) STRINGIFY( s )
 
@@ -316,13 +318,29 @@ main( int argc, char** argv )
   DeviceBufferGs devGs( nevt );
 #endif
 
-  // Hardcode Gs for now (eventually they should come from Fortran MadEvent)
+  std::vector<double> eventVector = PEP::eventExtraction(eventFileName);
+  /* // Hardcode Gs for now (eventually they should come from Fortran MadEvent)
   for( unsigned int i = 0; i < nevt; ++i )
   {
     constexpr fptype fixedG = 1.2177157847767195; // fixed G for aS=0.118 (hardcoded for now in check_sa.cc, fcheck_sa.f, runTest.cc)
     hstGs[i] = fixedG;
     //if ( i > 0 ) hstGs[i] = 0; // try hardcoding G only for event 0
     //hstGs[i] = i;
+  } */
+
+  // ZW: Take Gs from LHE
+  for( unsigned int i = 0; i < nevt; ++i )
+  {
+    hstGs[i] = eventVector[4 * 6 * nevt + i];
+    //if ( i > 0 ) hstGs[i] = 0; // try hardcoding G only for event 0
+    //hstGs[i] = i;
+  }
+
+  std::vector<double> momVector(4 * 6 * nevt);
+
+  for( unsigned int i = 0; i < 4 * 6 * nevt; ++i)
+  {
+    momVector[i] = eventVector[i];
   }
 
   // Memory buffers for momenta
@@ -333,6 +351,7 @@ main( int argc, char** argv )
   // prsk to being the one output by PEP
   PinnedHostBufferMomenta hstMomenta( nevt );
   DeviceBufferMomenta devMomenta( nevt );
+  DeviceBufferMomenta nuDevMomenta( nevt );
 #endif
 
   // Memory buffers for sampling weights
@@ -412,6 +431,8 @@ main( int argc, char** argv )
     throw std::logic_error( "RamboDevice is not supported on CPUs" ); // INTERNAL ERROR (no path to this statement)
 #endif
   }
+
+  copyDeviceFromHost( devMomenta, momVector );
 
  // ZW: change pmek to use momenta extracted from LHEF
  // basically just want to change devMomenta to PEPMomenta
