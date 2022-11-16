@@ -432,9 +432,12 @@ main( int argc, char** argv )
 #endif
   }
 
+
+  // ZW: attempt to copy momenta directly,
+  // does not work
   //copyDeviceFromHost( devMomenta, momVector );
-  unsigned int memSize = sizeof(std::vector<double>) + ( sizeof( double ) * momVector.size() );
-  checkCuda( cudaMemcpy( devMomenta, momVector, memSize, cudaMemcpyHostToDevice ) );
+  //unsigned int memSize = sizeof(std::vector<double>) + ( sizeof( double ) * momVector.size() );
+  //checkCuda( cudaMemcpy( devMomenta, momVector, memSize, cudaMemcpyHostToDevice ) );
 
  // ZW: change pmek to use momenta extracted from LHEF
  // basically just want to change devMomenta to PEPMomenta
