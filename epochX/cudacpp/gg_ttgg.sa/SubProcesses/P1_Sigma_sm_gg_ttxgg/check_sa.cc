@@ -332,8 +332,8 @@ main( int argc, char** argv )
   // ZW: Take Gs from LHE
   for( unsigned int i = 0; i < nevt; ++i )
   {
-    hstGs[i] = eventVector[4 * 6 * nevt + i];
-    //if ( i > 0 ) hstGs[i] = 0; // try hardcoding G only for event 0
+    //hstGs[i] = eventVector[4 * 6 * nevt + i];
+    if ( i > 0 ) hstGs[i] = 0; // try hardcoding G only for event 0
     //hstGs[i] = i;
   }
 
