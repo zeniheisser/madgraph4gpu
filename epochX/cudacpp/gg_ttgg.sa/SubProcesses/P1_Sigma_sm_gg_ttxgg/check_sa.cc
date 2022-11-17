@@ -319,7 +319,7 @@ main( int argc, char** argv )
   DeviceBufferGs devGs( nevt );
 #endif
 
-  std::vector<double> eventVector = PEP::eventExtraction("gg2ttgg_1024.lhe");
+  //std::vector<double> eventVector = PEP::eventExtraction("gg2ttgg_1024.lhe");
   /* // Hardcode Gs for now (eventually they should come from Fortran MadEvent)
   for( unsigned int i = 0; i < nevt; ++i )
   {
