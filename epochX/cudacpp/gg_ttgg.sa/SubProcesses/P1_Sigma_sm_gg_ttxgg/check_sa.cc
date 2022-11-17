@@ -347,9 +347,8 @@ main( int argc, char** argv )
   // prsk to being the one output by PEP
   PinnedHostBufferMomenta hstMomenta( nevt );
   DeviceBufferMomenta devMomenta( nevt );
+  HostBufferMomenta extrMomenta( nevt );
 #endif
-
-    HostBufferMomenta extrMomenta( nevt );
 
   // Memory buffers for sampling weights
 #ifndef __CUDACC__
@@ -372,10 +371,12 @@ main( int argc, char** argv )
   std::unique_ptr<double[]> wavetimes( new double[niter] );
   std::unique_ptr<double[]> wv3atimes( new double[niter] );
   
-  for( unsigned int i = 0; i < 4 * 6 * nevt; ++i)
-  {
-    extrMomenta.data()[i] = eventVector[i];
-  }
+  #ifdef __CUDACC__
+    for( unsigned int i = 0; i < 4 * 6 * nevt; ++i)
+    {
+      extrMomenta.data()[i] = eventVector[i];
+    }
+  #endif
 
   // ZW: remove random numper generation prnk and any dependencies on it
   // !! note: prnk is not necessary to remove for reweighing, but need to
