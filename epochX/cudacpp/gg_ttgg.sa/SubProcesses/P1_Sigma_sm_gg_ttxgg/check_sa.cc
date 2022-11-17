@@ -294,7 +294,7 @@ main( int argc, char** argv )
 
   // Read param_card and set parameters
   process.initProc( "../../Cards/param_card.dat" );
-  const fptype energy = 1500; // historical default, Ecms = 1500 GeV = 1.5 TeV (above the Z peak)
+  const fptype energy = 13000; // historical default, Ecms = 1500 GeV = 1.5 TeV (above the Z peak)
   //const fptype energy = 91.2; // Ecms = 91.2 GeV (Z peak)
   //const fptype energy = 0.100; // Ecms = 100 MeV (well below the Z peak, pure em scattering)
   const int meGeVexponent = -( 2 * mgOnGpu::npar - 8 );
@@ -573,12 +573,12 @@ main( int argc, char** argv )
 
     // --- 0d. TransC2F
     // ZW: i think we should have bridge=true here
-    if( bridge )
-    {
-      const std::string tc2fKey = "0d TransC2F";
-      timermap.start( tc2fKey );
-      dynamic_cast<BridgeKernelBase*>( pmek.get() )->transposeInputMomentaC2F();
-    }
+    //if( bridge )
+    /{
+    const std::string tc2fKey = "0d TransC2F";
+    timermap.start( tc2fKey );
+    dynamic_cast<BridgeKernelBase*>( pmek.get() )->transposeInputMomentaC2F();
+    /}
 
 #ifdef __CUDACC__
   // ZW: here use LHEF Gs instead of static one
