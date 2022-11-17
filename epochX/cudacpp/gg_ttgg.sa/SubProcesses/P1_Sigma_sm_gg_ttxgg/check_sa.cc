@@ -315,7 +315,7 @@ main( int argc, char** argv )
   HostBufferGs hstGs( nevt );
 #else
   PinnedHostBufferGs hstGs( nevt );
-  HostBufferGs extrGs( nevt );
+  PinnedHostBufferGs extrGs( nevt );
   DeviceBufferGs devGs( nevt );
 #endif
 
@@ -352,7 +352,7 @@ main( int argc, char** argv )
   // prsk to being the one output by PEP
   PinnedHostBufferMomenta hstMomenta( nevt );
   DeviceBufferMomenta devMomenta( nevt );
-  HostBufferMomenta extrMomenta( nevt );
+  PinnedHostBufferMomenta extrMomenta( nevt );
 #endif
 
   // Memory buffers for sampling weights
@@ -456,7 +456,7 @@ main( int argc, char** argv )
 #endif
   }
   else
-  { std::cout << "\nwe are in bridge territory\n";
+  {
 #ifdef __CUDACC__
     pmek.reset( new BridgeKernelDevice( hstMomenta, hstGs, hstMatrixElements, gpublocks, gputhreads ) );
 #else
@@ -575,9 +575,9 @@ main( int argc, char** argv )
     // ZW: i think we should have bridge=true here
     if( bridge )
     {
-    const std::string tc2fKey = "0d TransC2F";
-    timermap.start( tc2fKey );
-    dynamic_cast<BridgeKernelBase*>( pmek.get() )->transposeInputMomentaC2F();
+      const std::string tc2fKey = "0d TransC2F";
+      timermap.start( tc2fKey );
+      dynamic_cast<BridgeKernelBase*>( pmek.get() )->transposeInputMomentaC2F();
     }
 
 #ifdef __CUDACC__

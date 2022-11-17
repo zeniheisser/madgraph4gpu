@@ -385,6 +385,8 @@ cu_main=
 fcu_main=
 endif
 
+testmain=$(BUILDDIR)/runTest.exe
+
 all.$(TAG): $(BUILDDIR)/.build.$(TAG) $(LIBDIR)/lib$(MG5AMC_COMMONLIB).so $(cu_main) $(cxx_main) $(testmain) $(fcu_main) $(fcxx_main)
 
 # Target (and build options): debug
@@ -540,7 +542,78 @@ $(fcu_main): $(BUILDDIR)/fcheck_sa.o $(BUILDDIR)/fsampler_cu.o $(LIBDIR)/lib$(MG
 endif
 
 #-------------------------------------------------------------------------------
-#-----------------------------------------------------------------
+
+# Target (and build rules): test objects and test executable
+$(BUILDDIR)/testxxx.o: $(GTESTLIBS)
+$(BUILDDIR)/testxxx.o: INCFLAGS += -I$(TESTDIR)/googletest/googletest/include
+$(BUILDDIR)/testxxx.o: testxxx_cc_ref.txt
+$(testmain): $(BUILDDIR)/testxxx.o
+$(testmain): cxx_objects_exe += $(BUILDDIR)/testxxx.o # Comment out this line to skip the C++ test of xxx functions
+
+ifneq ($(NVCC),)
+$(BUILDDIR)/testxxx_cu.o: $(GTESTLIBS)
+$(BUILDDIR)/testxxx_cu.o: INCFLAGS += -I$(TESTDIR)/googletest/googletest/include
+$(BUILDDIR)/testxxx_cu.o: testxxx_cc_ref.txt
+$(testmain): $(BUILDDIR)/testxxx_cu.o
+$(testmain): cu_objects_exe += $(BUILDDIR)/testxxx_cu.o # Comment out this line to skip the CUDA test of xxx functions
+endif
+
+$(BUILDDIR)/testmisc.o: $(GTESTLIBS)
+$(BUILDDIR)/testmisc.o: INCFLAGS += -I$(TESTDIR)/googletest/googletest/include
+$(testmain): $(BUILDDIR)/testmisc.o
+$(testmain): cxx_objects_exe += $(BUILDDIR)/testmisc.o # Comment out this line to skip the C++ miscellaneous tests
+
+ifneq ($(NVCC),)
+$(BUILDDIR)/testmisc_cu.o: $(GTESTLIBS)
+$(BUILDDIR)/testmisc_cu.o: INCFLAGS += -I$(TESTDIR)/googletest/googletest/include
+$(testmain): $(BUILDDIR)/testmisc_cu.o
+$(testmain): cu_objects_exe += $(BUILDDIR)/testmisc_cu.o # Comment out this line to skip the CUDA miscellaneous tests
+endif
+
+$(BUILDDIR)/runTest.o: $(GTESTLIBS)
+$(BUILDDIR)/runTest.o: INCFLAGS += -I$(TESTDIR)/googletest/googletest/include
+$(testmain): $(BUILDDIR)/runTest.o
+$(testmain): cxx_objects_exe += $(BUILDDIR)/runTest.o
+
+ifneq ($(NVCC),)
+$(BUILDDIR)/runTest_cu.o: $(GTESTLIBS)
+$(BUILDDIR)/runTest_cu.o: INCFLAGS += -I$(TESTDIR)/googletest/googletest/include
+ifneq ($(shell $(CXX) --version | grep ^Intel),)
+$(testmain): LIBFLAGS += -lintlc # compile with icpx and link with nvcc (undefined reference to `_intel_fast_memcpy')
+$(testmain): LIBFLAGS += -lsvml # compile with icpx and link with nvcc (undefined reference to `__svml_cos4_l9')
+else ifneq ($(shell $(CXX) --version | grep ^nvc++),) # support nvc++ #531
+$(testmain): LIBFLAGS += -L$(patsubst %bin/nvc++,%lib,$(subst ccache ,,$(CXX))) -lnvhpcatm -lnvcpumath -lnvc
+endif
+$(testmain): $(BUILDDIR)/runTest_cu.o
+$(testmain): cu_objects_exe  += $(BUILDDIR)/runTest_cu.o
+endif
+
+$(testmain): $(GTESTLIBS)
+$(testmain): INCFLAGS += -I$(TESTDIR)/googletest/googletest/include
+$(testmain): LIBFLAGS += -L$(GTESTLIBDIR) -lgtest -lgtest_main
+ifneq ($(shell $(CXX) --version | grep ^clang),)
+$(testmain): LIBFLAGS += -L$(patsubst %bin/clang++,%lib,$(shell which $(firstword $(subst ccache ,,$(CXX))) | tail -1))
+endif
+
+ifeq ($(NVCC),) # link only runTest.o
+$(testmain): LIBFLAGS += $(CXXLIBFLAGSRPATH) # avoid the need for LD_LIBRARY_PATH
+$(testmain): $(LIBDIR)/lib$(MG5AMC_COMMONLIB).so $(cxx_objects_lib) $(cxx_objects_exe) $(GTESTLIBS)
+	$(CXX) -o $@ $(cxx_objects_lib) $(cxx_objects_exe) -ldl -pthread $(LIBFLAGS) $(CULIBFLAGS)
+else # link both runTest.o and runTest_cu.o
+$(testmain): LIBFLAGS += $(CULIBFLAGSRPATH) # avoid the need for LD_LIBRARY_PATH
+$(testmain): $(LIBDIR)/lib$(MG5AMC_COMMONLIB).so $(cxx_objects_lib) $(cxx_objects_exe) $(cu_objects_lib) $(cu_objects_exe) $(GTESTLIBS)
+	$(NVCC) -o $@ $(cxx_objects_lib) $(cxx_objects_exe) $(cu_objects_lib) $(cu_objects_exe) -ldl $(LIBFLAGS) -lcuda -lgomp $(CULIBFLAGS)
+endif
+
+# Use flock (Linux only, no Mac) to allow 'make -j' if googletest has not yet been downloaded https://stackoverflow.com/a/32666215
+$(GTESTLIBS):
+ifneq ($(shell which flock 2>/dev/null),)
+	flock $(BUILDDIR)/.make_test.lock $(MAKE) -C $(TESTDIR)
+else
+	$(MAKE) -C $(TESTDIR)
+endif
+
+#-------------------------------------------------------------------------------
 
 # Target: build all targets in all AVX modes (each AVX mode in a separate build directory)
 # Split the avxall target into five separate targets to allow parallel 'make -j avxall' builds
@@ -651,9 +724,14 @@ endif
 # Target: check (run the C++ test executable)
 # [NB THIS IS WHAT IS USED IN THE GITHUB CI!]
 ifneq ($(NVCC),)
-check:  cmpFcheck cmpFGcheck
+check: runTest cmpFcheck cmpFGcheck
 else
+check: runTest cmpFcheck
 endif
+
+# Target: runTest (run the C++ test executable runTest.exe)
+runTest: all.$(TAG)
+	$(RUNTIME) $(BUILDDIR)/runTest.exe
 
 # Target: runCheck (run the C++ standalone executable check.exe, with a small number of events)
 runCheck: all.$(TAG)
