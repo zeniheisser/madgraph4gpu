@@ -574,11 +574,11 @@ main( int argc, char** argv )
     // --- 0d. TransC2F
     // ZW: i think we should have bridge=true here
     //if( bridge )
-    /{
+    //{
     const std::string tc2fKey = "0d TransC2F";
     timermap.start( tc2fKey );
     dynamic_cast<BridgeKernelBase*>( pmek.get() )->transposeInputMomentaC2F();
-    /}
+    //}
 
 #ifdef __CUDACC__
   // ZW: here use LHEF Gs instead of static one
