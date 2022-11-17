@@ -339,10 +339,7 @@ main( int argc, char** argv )
 
   std::vector<double> momVector(4 * 6 * nevt);
 
-  for( unsigned int i = 0; i < 4 * 6 * nevt; ++i)
-  {
-    extrMomenta.data()[i] = eventVector[i];
-  }
+
 
   // Memory buffers for momenta
 #ifndef __CUDACC__
@@ -375,7 +372,11 @@ main( int argc, char** argv )
   std::unique_ptr<double[]> rambtimes( new double[niter] );
   std::unique_ptr<double[]> wavetimes( new double[niter] );
   std::unique_ptr<double[]> wv3atimes( new double[niter] );
-
+  
+  for( unsigned int i = 0; i < 4 * 6 * nevt; ++i)
+  {
+    extrMomenta.data()[i] = eventVector[i];
+  }
 
   // ZW: remove random numper generation prnk and any dependencies on it
   // !! note: prnk is not necessary to remove for reweighing, but need to
