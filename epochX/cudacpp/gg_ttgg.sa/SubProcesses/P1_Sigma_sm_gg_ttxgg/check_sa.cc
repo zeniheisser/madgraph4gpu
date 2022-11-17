@@ -575,7 +575,7 @@ main( int argc, char** argv )
     // --- 0d. TransC2F
     // ZW: i think we should have bridge=true here
     bool bridgetrue = true;
-    if( bridge )
+    if( bridgetrue )
     {
       const std::string tc2fKey = "0d TransC2F";
       timermap.start( tc2fKey );
