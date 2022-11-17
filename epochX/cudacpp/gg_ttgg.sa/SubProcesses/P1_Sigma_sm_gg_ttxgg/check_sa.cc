@@ -574,12 +574,16 @@ main( int argc, char** argv )
 
     // --- 0d. TransC2F
     // ZW: i think we should have bridge=true here
+    std::cout << "\n\ndo we get to step 3?\n\n";
     bool bridgetrue = true;
     if( bridgetrue )
     {
+      std::cout << "\n\ndo we get inside the transposition step\n\n";
       const std::string tc2fKey = "0d TransC2F";
       timermap.start( tc2fKey );
+      std::cout << "\n\nare we going to the timermap.start?\n\n";
       dynamic_cast<BridgeKernelBase*>( pmek.get() )->transposeInputMomentaC2F();
+      std::cout << "\n\ndo we get past the transposition call\n\n";
     }
 
 #ifdef __CUDACC__
