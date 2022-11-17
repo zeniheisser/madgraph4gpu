@@ -343,9 +343,10 @@ main( int argc, char** argv )
 #else
   // ZW: change devMomenta from being output by
   // prsk to being the one output by PEP
+  std::cout << "\n\nare we even in ifdef cuda?\n\n";
   PinnedHostBufferMomenta hstMomenta( nevt );
   DeviceBufferMomenta devMomenta( nevt );
-  PinnedHostBufferMomenta extrMomenta( nevt );
+  //PinnedHostBufferMomenta extrMomenta( nevt );
 #endif
 
   // Memory buffers for sampling weights
@@ -369,10 +370,10 @@ main( int argc, char** argv )
   std::unique_ptr<double[]> wavetimes( new double[niter] );
   std::unique_ptr<double[]> wv3atimes( new double[niter] );
   
-  for( unsigned int i = 0; i < 4 * 6 * nevt; ++i)
-  {
-    extrMomenta.data()[i] = eventVector[i];
-  }
+  //for( unsigned int i = 0; i < 4 * 6 * nevt; ++i)
+  //{
+    //extrMomenta.data()[i] = eventVector[i];
+  //}
 
   // ZW: remove random numper generation prnk and any dependencies on it
   // !! note: prnk is not necessary to remove for reweighing, but need to
@@ -433,7 +434,7 @@ main( int argc, char** argv )
 
   // ZW: attempt to copy momenta directly,
   // does not work(?)
-  copyDeviceFromHost( devMomenta, extrMomenta );
+  //copyDeviceFromHost( devMomenta, extrMomenta );
   //unsigned int memSize = sizeof(std::vector<double>) + ( sizeof( double ) * momVector.size() );
   //checkCuda( cudaMemcpy( devMomenta, momVector, memSize, cudaMemcpyHostToDevice ) );
 
