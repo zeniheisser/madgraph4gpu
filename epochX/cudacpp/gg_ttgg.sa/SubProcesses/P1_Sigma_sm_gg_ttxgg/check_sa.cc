@@ -315,14 +315,24 @@ main( int argc, char** argv )
   HostBufferGs hstGs( nevt );
 #else
   PinnedHostBufferGs hstGs( nevt );
+  PinnedHostBufferGs extrGs( nevt );
   DeviceBufferGs devGs( nevt );
 #endif
 
-  // Hardcode Gs for now (eventually they should come from Fortran MadEvent)
+  std::vector<double> eventVector = PEP::eventExtraction("gg2ttgg_1024.lhe");
+  /* // Hardcode Gs for now (eventually they should come from Fortran MadEvent)
   for( unsigned int i = 0; i < nevt; ++i )
   {
     constexpr fptype fixedG = 1.2177157847767195; // fixed G for aS=0.118 (hardcoded for now in check_sa.cc, fcheck_sa.f, runTest.cc)
     hstGs[i] = fixedG;
+    //if ( i > 0 ) hstGs[i] = 0; // try hardcoding G only for event 0
+    //hstGs[i] = i;
+  } */
+
+  // ZW: Take Gs from LHE
+  for( unsigned int i = 0; i < nevt; ++i )
+  {
+    hstGs[i] = eventVector[4 * 6 * nevt + i];
     //if ( i > 0 ) hstGs[i] = 0; // try hardcoding G only for event 0
     //hstGs[i] = i;
   }
@@ -331,8 +341,11 @@ main( int argc, char** argv )
 #ifndef __CUDACC__
   HostBufferMomenta hstMomenta( nevt );
 #else
+  // ZW: change devMomenta from being output by
+  // prsk to being the one output by PEP
   PinnedHostBufferMomenta hstMomenta( nevt );
   DeviceBufferMomenta devMomenta( nevt );
+  PinnedHostBufferMomenta extrMomenta( nevt );
 #endif
 
   // Memory buffers for sampling weights
@@ -355,7 +368,11 @@ main( int argc, char** argv )
   std::unique_ptr<double[]> rambtimes( new double[niter] );
   std::unique_ptr<double[]> wavetimes( new double[niter] );
   std::unique_ptr<double[]> wv3atimes( new double[niter] );
-
+  
+  for( unsigned int i = 0; i < 4 * 6 * nevt; ++i)
+  {
+    extrMomenta.data()[i] = eventVector[i];
+  }
 
   // ZW: remove random numper generation prnk and any dependencies on it
   // !! note: prnk is not necessary to remove for reweighing, but need to
@@ -414,12 +431,22 @@ main( int argc, char** argv )
   }
 
 
+  // ZW: attempt to copy momenta directly,
+  // does not work(?)
+  copyDeviceFromHost( devMomenta, extrMomenta );
+  //unsigned int memSize = sizeof(std::vector<double>) + ( sizeof( double ) * momVector.size() );
+  //checkCuda( cudaMemcpy( devMomenta, momVector, memSize, cudaMemcpyHostToDevice ) );
+
  // ZW: change pmek to use momenta extracted from LHEF
+ // basically just want to change devMomenta to PEPMomenta
+ // but PEPMomenta needs to be passed to the GPU
   // --- 0c. Create matrix element kernel [keep this in 0c for the moment]
   std::unique_ptr<MatrixElementKernelBase> pmek;
   if( !bridge )
   {
+    std::cout << "\nwe are NOT in bridge territory\n";
 #ifdef __CUDACC__
+    // ZW: this is the one we use in a regular ./gcheck 32 32 32
     pmek.reset( new MatrixElementKernelDevice( devMomenta, devGs, devMatrixElements, gpublocks, gputhreads ) );
 #else
     pmek.reset( new MatrixElementKernelHost( hstMomenta, hstGs, hstMatrixElements, nevt ) );
