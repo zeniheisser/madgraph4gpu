@@ -347,7 +347,7 @@ main( int argc, char** argv )
   // prsk to being the one output by PEP
   PinnedHostBufferMomenta hstMomenta( nevt );
   DeviceBufferMomenta devMomenta( nevt );
-  HostBufferMomenta extrMomenta( nevt );
+  PinnedHostBufferMomenta extrMomenta( nevt );
 #endif
 
   // Memory buffers for sampling weights
