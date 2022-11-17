@@ -3,7 +3,7 @@
 
 int main(){
 
-std::string eventFileName = "gg2ttgg_10k.lhe";
+std::string eventFileName = "gg2ttgg_1024.lhe";
 
 
 

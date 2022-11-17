@@ -315,6 +315,7 @@ main( int argc, char** argv )
   HostBufferGs hstGs( nevt );
 #else
   PinnedHostBufferGs hstGs( nevt );
+  HostBufferGs extrGs( nevt );
   DeviceBufferGs devGs( nevt );
 #endif
 
@@ -340,7 +341,7 @@ main( int argc, char** argv )
 
   for( unsigned int i = 0; i < 4 * 6 * nevt; ++i)
   {
-    momVector[i] = eventVector[i];
+    extrMomenta.data()[i] = eventVector[i];
   }
 
   // Memory buffers for momenta
@@ -351,7 +352,7 @@ main( int argc, char** argv )
   // prsk to being the one output by PEP
   PinnedHostBufferMomenta hstMomenta( nevt );
   DeviceBufferMomenta devMomenta( nevt );
-  DeviceBufferMomenta nuDevMomenta( nevt );
+  HostBufferMomenta extrMomenta( nevt );
 #endif
 
   // Memory buffers for sampling weights
@@ -434,8 +435,8 @@ main( int argc, char** argv )
 
 
   // ZW: attempt to copy momenta directly,
-  // does not work
-  //copyDeviceFromHost( devMomenta, momVector );
+  // does not work(?)
+  copyDeviceFromHost( devMomenta, extrMomenta );
   //unsigned int memSize = sizeof(std::vector<double>) + ( sizeof( double ) * momVector.size() );
   //checkCuda( cudaMemcpy( devMomenta, momVector, memSize, cudaMemcpyHostToDevice ) );
 
