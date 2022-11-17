@@ -315,11 +315,13 @@ main( int argc, char** argv )
   HostBufferGs hstGs( nevt );
 #else
   PinnedHostBufferGs hstGs( nevt );
-  PinnedHostBufferGs extrGs( nevt );
   DeviceBufferGs devGs( nevt );
 #endif
 
-  //std::vector<double> eventVector = PEP::eventExtraction("gg2ttgg_1024.lhe");
+  //HostBufferGs extrGs( nevt );
+
+
+  std::vector<double> eventVector = PEP::eventExtraction("gg2ttgg_1024.lhe");
   /* // Hardcode Gs for now (eventually they should come from Fortran MadEvent)
   for( unsigned int i = 0; i < nevt; ++i )
   {
@@ -332,8 +334,8 @@ main( int argc, char** argv )
   // ZW: Take Gs from LHE
   for( unsigned int i = 0; i < nevt; ++i )
   {
-    //hstGs[i] = eventVector[4 * 6 * nevt + i];
-    if ( i > 0 ) hstGs[i] = 0; // try hardcoding G only for event 0
+    hstGs[i] = eventVector[4 * 6 * nevt + i];
+    //if ( i > 0 ) hstGs[i] = 0; // try hardcoding G only for event 0
     //hstGs[i] = i;
   }
 
@@ -343,11 +345,11 @@ main( int argc, char** argv )
 #else
   // ZW: change devMomenta from being output by
   // prsk to being the one output by PEP
-  std::cout << "\n\nare we even in ifdef cuda?\n\n";
   PinnedHostBufferMomenta hstMomenta( nevt );
   DeviceBufferMomenta devMomenta( nevt );
-  //PinnedHostBufferMomenta extrMomenta( nevt );
 #endif
+
+    HostBufferMomenta extrMomenta( nevt );
 
   // Memory buffers for sampling weights
 #ifndef __CUDACC__
@@ -370,10 +372,10 @@ main( int argc, char** argv )
   std::unique_ptr<double[]> wavetimes( new double[niter] );
   std::unique_ptr<double[]> wv3atimes( new double[niter] );
   
-  //for( unsigned int i = 0; i < 4 * 6 * nevt; ++i)
-  //{
-    //extrMomenta.data()[i] = eventVector[i];
-  //}
+  for( unsigned int i = 0; i < 4 * 6 * nevt; ++i)
+  {
+    extrMomenta.data()[i] = eventVector[i];
+  }
 
   // ZW: remove random numper generation prnk and any dependencies on it
   // !! note: prnk is not necessary to remove for reweighing, but need to
@@ -434,7 +436,9 @@ main( int argc, char** argv )
 
   // ZW: attempt to copy momenta directly,
   // does not work(?)
-  //copyDeviceFromHost( devMomenta, extrMomenta );
+#ifdef __CUDACC__
+  copyDeviceFromHost( devMomenta, extrMomenta );
+#endif
   //unsigned int memSize = sizeof(std::vector<double>) + ( sizeof( double ) * momVector.size() );
   //checkCuda( cudaMemcpy( devMomenta, momVector, memSize, cudaMemcpyHostToDevice ) );
 
