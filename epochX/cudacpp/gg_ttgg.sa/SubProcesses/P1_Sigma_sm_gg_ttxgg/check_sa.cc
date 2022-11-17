@@ -30,6 +30,8 @@
 #include "RandomNumberKernels.h"
 #include "epoch_process_id.h"
 #include "timermap.h"
+#include "PEP.hpp"
+
 #define STRINGIFY( s ) #s
 #define XSTRINGIFY( s ) STRINGIFY( s )
 

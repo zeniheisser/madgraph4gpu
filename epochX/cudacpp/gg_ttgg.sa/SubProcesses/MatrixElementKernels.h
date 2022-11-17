@@ -102,6 +102,10 @@ namespace mg5amcCpu
   //--------------------------------------------------------------------------
 
 #ifdef __CUDACC__
+  // ZW: this is the object we need to pass something different to
+  // in check_sa.cc
+  // instead of passing devMomenta, we want to pass our new momenta
+  // but we still need to pass our momenta to the device
   // A class encapsulating matrix element calculations on a GPU device
   class MatrixElementKernelDevice : public MatrixElementKernelBase, public NumberOfEvents
   {

@@ -382,6 +382,8 @@ namespace mg5amcCpu
 
   //--------------------------------------------------------------------------
 
+
+  // ZW: use this function to copy momenta extracted by PEP into the devMomenta object(?)
 #ifdef __CUDACC__
   template<class Tdst, class Tsrc>
   void copyDeviceFromHost( Tdst& dst, const Tsrc& src ) // keep the same order of arguments as in memcpy
