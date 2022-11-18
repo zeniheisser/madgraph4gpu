@@ -442,8 +442,8 @@ main( int argc, char** argv )
 #ifdef __CUDACC__
   //std::cout << "\n\ndo we actually try to copy from host to device?\n\n";
   //checkCuda( cudaMemcpy( devMomenta, extrMomenta, memSize, cudaMemcpyHostToDevice ) );
-  copyDeviceFromHost( devMomenta, extrMomenta );
   copyHostFromDevice( checkMomenta, devMomenta );
+  copyDeviceFromHost( devMomenta, extrMomenta );
 #endif
   //unsigned int memSize = sizeof(std::vector<double>) + ( sizeof( double ) * momVector.size() );
   //checkCuda( cudaMemcpy( devMomenta, momVector, memSize, cudaMemcpyHostToDevice ) );
