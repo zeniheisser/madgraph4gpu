@@ -376,6 +376,7 @@ main( int argc, char** argv )
     for( unsigned int i = 0; i < 4 * 6 * nevt; ++i)
     {
       extrMomenta.data()[i] = eventVector[i];
+      hstMomenta.data()[i] = extrMomenta.data()[i];
       //std::cout << "\n\n    " << eventVector[i] << "   and   " << extrMomenta.data()[i] << "\n\n";
     }
   #endif
@@ -443,7 +444,6 @@ main( int argc, char** argv )
   //std::cout << "\n\ndo we actually try to copy from host to device?\n\n";
   //checkCuda( cudaMemcpy( devMomenta, extrMomenta, memSize, cudaMemcpyHostToDevice ) );
   //copyHostFromDevice( checkMomenta, devMomenta );
-  hstMomenta = extrMomenta;
   copyDeviceFromHost( devMomenta, extrMomenta );
 #endif
   //unsigned int memSize = sizeof(std::vector<double>) + ( sizeof( double ) * momVector.size() );
