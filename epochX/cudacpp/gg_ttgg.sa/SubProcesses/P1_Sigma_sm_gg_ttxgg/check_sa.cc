@@ -584,6 +584,7 @@ main( int argc, char** argv )
       std::cout << "\n\nare we going to the timermap.start?\n\n";
       dynamic_cast<BridgeKernelBase*>( pmek.get() )->transposeInputMomentaC2F();
       std::cout << "\n\ndo we get past the transposition call\n\n";
+      // ZW: we seg fault in line 585 when transposing momenta (why?)
     }
 
 #ifdef __CUDACC__
