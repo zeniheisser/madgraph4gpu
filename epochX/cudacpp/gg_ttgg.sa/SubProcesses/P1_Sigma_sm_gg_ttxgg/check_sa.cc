@@ -866,12 +866,8 @@ main( int argc, char** argv )
               << "NumThreadsPerBlock          = " << gputhreads << std::endl
               << "NumIterations               = " << niter << std::endl
               << std::string( SEP79, '-' ) << std::endl;
-    std::cout << "Workflow summary            = " << wrkflwtxt << std::endl
+    std::cout << "Workflow summary            = " << wrkflwtxt << std::endl;
 
-
-    jsonFile << "}" << std::endl;
-    jsonFile << "]";
-    jsonFile.close();
   }
 
   // *** STOP THE NEW TIMERS ***
