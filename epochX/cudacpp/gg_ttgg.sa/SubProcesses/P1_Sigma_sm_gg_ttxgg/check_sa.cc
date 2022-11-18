@@ -461,6 +461,7 @@ main( int argc, char** argv )
  // basically just want to change devMomenta to PEPMomenta
  // but PEPMomenta needs to be passed to the GPU
   // --- 0c. Create matrix element kernel [keep this in 0c for the moment]
+  std::cout << "\n" << hstMomenta.data()[333] << "\n";
   std::unique_ptr<MatrixElementKernelBase> pmek;
   if( !bridge )
   {
@@ -480,6 +481,8 @@ main( int argc, char** argv )
     pmek.reset( new BridgeKernelHost( hstMomenta, hstGs, hstMatrixElements, nevt ) );
 #endif
   }
+  std::cout << "\n" << hstMomenta.data()[333] << "\n";
+
 
   // --- 0c. Create cross section kernel [keep this in 0c for the moment]
   EventStatistics hstStats;
@@ -590,6 +593,7 @@ main( int argc, char** argv )
     // ZW: i think we should have bridge=true here
     //std::cout << "\n\ndo we get to step 3?\n\n";
     //bool bridgetrue = true;
+    std::cout << "\n" << hstMomenta.data()[333] << "\n";
     if( bridge )
     {
       std::cout << "\n\ndo we get inside the transposition step\n\n";
@@ -600,6 +604,8 @@ main( int argc, char** argv )
       std::cout << "\n\ndo we get past the transposition call\n\n";
       // ZW: we seg fault in line 585 when transposing momenta (why?)
     }
+  std::cout << "\n" << hstMomenta.data()[333] << "\n";
+
 
 #ifdef __CUDACC__
   // ZW: here use LHEF Gs instead of static one
