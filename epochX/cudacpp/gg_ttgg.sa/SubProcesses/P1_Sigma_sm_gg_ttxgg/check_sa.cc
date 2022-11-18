@@ -575,8 +575,8 @@ main( int argc, char** argv )
     // --- 0d. TransC2F
     // ZW: i think we should have bridge=true here
     std::cout << "\n\ndo we get to step 3?\n\n";
-    bool bridgetrue = true;
-    if( bridgetrue )
+    //bool bridgetrue = true;
+    if( bridge )
     {
       std::cout << "\n\ndo we get inside the transposition step\n\n";
       const std::string tc2fKey = "0d TransC2F";
