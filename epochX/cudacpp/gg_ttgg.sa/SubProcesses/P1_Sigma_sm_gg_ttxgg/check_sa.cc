@@ -498,7 +498,7 @@ main( int argc, char** argv )
     // *** START THE OLD-STYLE TIMER FOR RANDOM GEN ***
     double genrtime = 0;
 
-    // --- 1a. Seed rnd generator (to get same results on host and device in curand)
+/*     // --- 1a. Seed rnd generator (to get same results on host and device in curand)
     // [NB This should not be necessary using the host API: "Generation functions
     // can be called multiple times on the same generator to generate successive
     // blocks of results. For pseudorandom generators, multiple calls to generation
@@ -513,8 +513,8 @@ main( int argc, char** argv )
     const std::string rngnKey = "1b GenRnGen";
     timermap.start( rngnKey );
     prnk->generateRnarray();
-    //std::cout << "Got random numbers" << std::endl;
-
+    //std::cout << "Got random numbers" << std::endl; */
+/* 
 #ifdef __CUDACC__
     if( rndgen != RandomNumberMode::CurandDevice && rmbsmp == RamboSamplingMode::RamboDevice )
     {
@@ -523,9 +523,9 @@ main( int argc, char** argv )
       genrtime += timermap.start( htodKey );
       copyDeviceFromHost( devRnarray, hstRnarray );
     }
-#endif
+#endif */
 
-    // *** STOP THE OLD-STYLE TIMER FOR RANDOM GEN ***
+/*     // *** STOP THE OLD-STYLE TIMER FOR RANDOM GEN ***
     genrtime += timermap.stop();
 
     // === STEP 2 OF 3
@@ -547,7 +547,7 @@ main( int argc, char** argv )
     rambtime += timermap.start( rfinKey );
     //prsk->getMomentaFinal();
     //std::cout << "Got final momenta" << std::endl;
-
+ */
 /* #ifdef __CUDACC__
   // ZW: maybe overwrite which momenta are used here?
     if( rmbsmp == RamboSamplingMode::RamboDevice )
