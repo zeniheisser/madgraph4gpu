@@ -577,7 +577,7 @@ main( int argc, char** argv )
 #endif */
 
     // *** STOP THE OLD-STYLE TIMER FOR RAMBO ***
-    rambtime += timermap.stop();
+    //rambtime += timermap.stop();
 
     // === STEP 3 OF 3
     // Evaluate matrix elements for all nevt events
@@ -605,7 +605,7 @@ main( int argc, char** argv )
   // ZW: here use LHEF Gs instead of static one
     // --- 2d. CopyHToD Momenta
     const std::string gKey = "0.. CpHTDg";
-    rambtime += timermap.start( gKey ); // FIXME! NOT A RAMBO TIMER!
+    //rambtime += timermap.start( gKey ); // FIXME! NOT A RAMBO TIMER!
     copyDeviceFromHost( devGs, hstGs );
 #endif
 
@@ -656,7 +656,7 @@ main( int argc, char** argv )
     const std::string loopKey = "4a DumpLoop";
     timermap.start( loopKey );
     genrtimes[iiter] = genrtime;
-    rambtimes[iiter] = rambtime;
+    //rambtimes[iiter] = rambtime;
     wavetimes[iiter] = wavetime;
     wv3atimes[iiter] = wv3atime;
 
@@ -703,69 +703,7 @@ main( int argc, char** argv )
   // *** END MAIN LOOP ON #ITERATIONS ***
   // **************************************
 
-  // === STEP 8 ANALYSIS
-  // --- 8a Analysis: compute stats after the loop
-  const std::string statKey = "8a CompStat";
-  timermap.start( statKey );
-
-  double sumgtim = 0;
-  //double sqsgtim = 0;
-  double mingtim = genrtimes[0];
-  double maxgtim = genrtimes[0];
-  for( unsigned int iiter = 0; iiter < niter; ++iiter )
-  {
-    sumgtim += genrtimes[iiter];
-    //sqsgtim += genrtimes[iiter]*genrtimes[iiter];
-    mingtim = std::min( mingtim, genrtimes[iiter] );
-    maxgtim = std::max( maxgtim, genrtimes[iiter] );
-  }
-
-  double sumrtim = 0;
-  //double sqsrtim = 0;
-  double minrtim = rambtimes[0];
-  double maxrtim = rambtimes[0];
-  for( unsigned int iiter = 0; iiter < niter; ++iiter )
-  {
-    sumrtim += rambtimes[iiter];
-    //sqsrtim += rambtimes[iiter]*rambtimes[iiter];
-    minrtim = std::min( minrtim, rambtimes[iiter] );
-    maxrtim = std::max( maxrtim, rambtimes[iiter] );
-  }
-
-  double sumwtim = 0;
-  //double sqswtim = 0;
-  double minwtim = wavetimes[0];
-  double maxwtim = wavetimes[0];
-  for( unsigned int iiter = 0; iiter < niter; ++iiter )
-  {
-    sumwtim += wavetimes[iiter];
-    //sqswtim += wavetimes[iiter]*wavetimes[iiter];
-    minwtim = std::min( minwtim, wavetimes[iiter] );
-    maxwtim = std::max( maxwtim, wavetimes[iiter] );
-  }
-  double meanwtim = sumwtim / niter;
-  //double stdwtim = std::sqrt( sqswtim / niter - meanwtim * meanwtim );
-
-  double sumw3atim = 0;
-  //double sqsw3atim = 0;
-  double minw3atim = wv3atimes[0];
-  double maxw3atim = wv3atimes[0];
-  for( unsigned int iiter = 0; iiter < niter; ++iiter )
-  {
-    sumw3atim += wv3atimes[iiter];
-    //sqsw3atim += wv3atimes[iiter]*wv3atimes[iiter];
-    minw3atim = std::min( minw3atim, wv3atimes[iiter] );
-    maxw3atim = std::max( maxw3atim, wv3atimes[iiter] );
-  }
-  double meanw3atim = sumw3atim / niter;
-  //double stdw3atim = std::sqrt( sqsw3atim / niter - meanw3atim * meanw3atim );
-
-  const unsigned int nevtALL = hstStats.nevtALL; // total number of ALL events in all iterations
-  if( nevtALL != niter * nevt )
-    std::cout << "ERROR! nevtALL mismatch " << nevtALL << " != " << niter * nevt << std::endl; // SANITY CHECK
-  int nabn = hstStats.nevtABN;
-  int nzero = hstStats.nevtZERO;
-
+ 
   // === STEP 9 FINALISE
 
   std::string rndgentxt;
