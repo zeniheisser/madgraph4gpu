@@ -442,7 +442,7 @@ main( int argc, char** argv )
 #ifdef __CUDACC__
   //std::cout << "\n\ndo we actually try to copy from host to device?\n\n";
   //checkCuda( cudaMemcpy( devMomenta, extrMomenta, memSize, cudaMemcpyHostToDevice ) );
-  copyHostFromDevice( checkMomenta, devMomenta );
+  //copyHostFromDevice( checkMomenta, devMomenta );
   copyDeviceFromHost( devMomenta, extrMomenta );
 #endif
   //unsigned int memSize = sizeof(std::vector<double>) + ( sizeof( double ) * momVector.size() );
@@ -547,7 +547,7 @@ main( int argc, char** argv )
     //prsk->getMomentaFinal();
     //std::cout << "Got final momenta" << std::endl;
 
-#ifdef __CUDACC__
+/* #ifdef __CUDACC__
   // ZW: maybe overwrite which momenta are used here?
     if( rmbsmp == RamboSamplingMode::RamboDevice )
     {
@@ -573,7 +573,7 @@ main( int argc, char** argv )
       rambtime += timermap.start( cmomKey );
       copyDeviceFromHost( devMomenta, hstMomenta );
     }
-#endif
+#endif */
 
     // *** STOP THE OLD-STYLE TIMER FOR RAMBO ***
     rambtime += timermap.stop();
