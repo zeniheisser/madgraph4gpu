@@ -375,6 +375,7 @@ main( int argc, char** argv )
     for( unsigned int i = 0; i < 4 * 6 * nevt; ++i)
     {
       extrMomenta.data()[i] = eventVector[i];
+      std::cout << "\n\n    " << eventVector[i] << "   and   " << extrMomenta.data()[i] << "\n\n";
     }
   #endif
 
@@ -438,7 +439,7 @@ main( int argc, char** argv )
   // ZW: attempt to copy momenta directly,
   // does not work(?)
 #ifdef __CUDACC__
-  std::cout << "\n\ndo we actually try to copy from host to device?\n\n";
+  //std::cout << "\n\ndo we actually try to copy from host to device?\n\n";
   copyDeviceFromHost( devMomenta, extrMomenta );
 #endif
   //unsigned int memSize = sizeof(std::vector<double>) + ( sizeof( double ) * momVector.size() );
@@ -451,7 +452,7 @@ main( int argc, char** argv )
   std::unique_ptr<MatrixElementKernelBase> pmek;
   if( !bridge )
   {
-    std::cout << "\nwe are NOT in bridge territory\n";
+    //std::cout << "\nwe are NOT in bridge territory\n";
 #ifdef __CUDACC__
     // ZW: this is the one we use in a regular ./gcheck 32 32 32
     pmek.reset( new MatrixElementKernelDevice( devMomenta, devGs, devMatrixElements, gpublocks, gputhreads ) );
@@ -575,7 +576,7 @@ main( int argc, char** argv )
 
     // --- 0d. TransC2F
     // ZW: i think we should have bridge=true here
-    std::cout << "\n\ndo we get to step 3?\n\n";
+    //std::cout << "\n\ndo we get to step 3?\n\n";
     //bool bridgetrue = true;
     if( bridge )
     {
