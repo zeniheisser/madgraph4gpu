@@ -440,7 +440,7 @@ main( int argc, char** argv )
   // does not work(?)
 #ifdef __CUDACC__
   //std::cout << "\n\ndo we actually try to copy from host to device?\n\n";
-  copyDeviceFromHost( devMomenta, extrMomenta );
+  //copyDeviceFromHost( devMomenta, extrMomenta );
 #endif
   //unsigned int memSize = sizeof(std::vector<double>) + ( sizeof( double ) * momVector.size() );
   //checkCuda( cudaMemcpy( devMomenta, momVector, memSize, cudaMemcpyHostToDevice ) );
