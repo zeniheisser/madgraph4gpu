@@ -445,13 +445,13 @@ main( int argc, char** argv )
   //unsigned int memSize = sizeof(std::vector<double>) + ( sizeof( double ) * momVector.size() );
   //checkCuda( cudaMemcpy( devMomenta, momVector, memSize, cudaMemcpyHostToDevice ) );
 
-#ifdef __CUDACC__
+/* #ifdef __CUDACC__
     std::cout << "\nwe are about to try to check if we've copied stuff\n";
     for( unsigned int i = 0; i < 4 * 6 * nevt; ++i)
     {
       std::cout << extrMomenta.data()[i] << "   and   " << devMomenta.data()[i] << "\n";
     }
-#endif
+#endif */
 
  // ZW: change pmek to use momenta extracted from LHEF
  // basically just want to change devMomenta to PEPMomenta
