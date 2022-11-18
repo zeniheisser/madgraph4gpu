@@ -440,11 +440,10 @@ main( int argc, char** argv )
   // ZW: attempt to copy momenta directly,
   // does not work(?)
 #ifdef __CUDACC__
-  //copyHostFromDevice( checkMomenta, devMomenta );
   //std::cout << "\n\ndo we actually try to copy from host to device?\n\n";
-  unsigned int memSize = sizeof(std::vector<double>) + ( sizeof( double ) * momVector.size() );
-  checkCuda( cudaMemcpy( devMomenta, momVector, memSize, cudaMemcpyHostToDevice ) );
-  copyDeviceFromHost( devMomenta, extrMomenta );
+  checkCuda( cudaMemcpy( devMomenta, extrMomenta, memSize, cudaMemcpyHostToDevice ) );
+  //copyDeviceFromHost( devMomenta, extrMomenta );
+  copyHostFromDevice( checkMomenta, devMomenta );
 #endif
   //unsigned int memSize = sizeof(std::vector<double>) + ( sizeof( double ) * momVector.size() );
   //checkCuda( cudaMemcpy( devMomenta, momVector, memSize, cudaMemcpyHostToDevice ) );
