@@ -448,13 +448,13 @@ main( int argc, char** argv )
   //unsigned int memSize = sizeof(std::vector<double>) + ( sizeof( double ) * momVector.size() );
   //checkCuda( cudaMemcpy( devMomenta, momVector, memSize, cudaMemcpyHostToDevice ) );
 
-#ifdef __CUDACC__
+/* #ifdef __CUDACC__
     std::cout << "\nwe are about to try to check if we've copied stuff\n";
     for( unsigned int i = 0; i < 4 * 6 * nevt; ++i)
     {
       std::cout << extrMomenta.data()[i] << "   and   " << checkMomenta.data()[i] << "\n";
     }
-#endif
+#endif */
 
  // ZW: change pmek to use momenta extracted from LHEF
  // basically just want to change devMomenta to PEPMomenta
@@ -536,7 +536,7 @@ main( int argc, char** argv )
     // --- 2a. Fill in momenta of initial state particles on the device
     const std::string riniKey = "2a RamboIni";
     timermap.start( riniKey );
-    prsk->getMomentaInitial();
+    //prsk->getMomentaInitial();
     // ZW: see how prsk is used to format momenta? and then input new momenta in the correct way
     //std::cout << "Got initial momenta" << std::endl;
 
@@ -544,7 +544,7 @@ main( int argc, char** argv )
     // (i.e. map random numbers to final-state particle momenta for each of nevt events)
     const std::string rfinKey = "2b RamboFin";
     rambtime += timermap.start( rfinKey );
-    prsk->getMomentaFinal();
+    //prsk->getMomentaFinal();
     //std::cout << "Got final momenta" << std::endl;
 
 #ifdef __CUDACC__
