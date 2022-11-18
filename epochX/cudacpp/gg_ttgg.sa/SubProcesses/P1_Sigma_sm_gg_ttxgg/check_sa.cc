@@ -347,7 +347,7 @@ main( int argc, char** argv )
   // prsk to being the one output by PEP
   PinnedHostBufferMomenta hstMomenta( nevt );
   DeviceBufferMomenta devMomenta( nevt );
-  PinnedHostBufferMomenta extrMomenta( nevt );
+  HostBufferMomenta extrMomenta( nevt );
 #endif
 
   // Memory buffers for sampling weights
@@ -440,18 +440,18 @@ main( int argc, char** argv )
   // does not work(?)
 #ifdef __CUDACC__
   //std::cout << "\n\ndo we actually try to copy from host to device?\n\n";
-  //copyDeviceFromHost( devMomenta, extrMomenta );
+  copyDeviceFromHost( devMomenta, extrMomenta );
 #endif
   //unsigned int memSize = sizeof(std::vector<double>) + ( sizeof( double ) * momVector.size() );
   //checkCuda( cudaMemcpy( devMomenta, momVector, memSize, cudaMemcpyHostToDevice ) );
 
-#ifdef __CUDACC__
+/* #ifdef __CUDACC__
     std::cout << "\nwe are about to try to check if we've copied stuff\n";
     for( unsigned int i = 0; i < 4 * 6 * nevt; ++i)
     {
       std::cout << extrMomenta.data()[i] << "   and   " << devMomenta.data()[i] << "\n";
     }
-#endif
+#endif */
 
  // ZW: change pmek to use momenta extracted from LHEF
  // basically just want to change devMomenta to PEPMomenta
