@@ -395,8 +395,8 @@ main( int argc, char** argv )
           for( unsigned int ieppM = 0; ieppM < neppM; ieppM++ )
             {
               unsigned int ievt = ipagM * neppM + ieppM;
-              unsigned int cpos = ipagM * npar * np4 * neppM + ipar * np4 * neppM + ip4 * neppM + ieppM;
-              unsigned int fpos = ievt * npar * np4 + ipar * np4 + ip4;
+              unsigned int cpos = ipagM * 6 * 4 * neppM + ipar * 4 * neppM + ip4 * neppM + ieppM;
+              unsigned int fpos = ievt * 6 * 4 + ipar * 4 + ip4;
               extrMomenta.data()[cpos] = eventVector[fpos]; // F2C (Fortran to C)
             }
   #endif
