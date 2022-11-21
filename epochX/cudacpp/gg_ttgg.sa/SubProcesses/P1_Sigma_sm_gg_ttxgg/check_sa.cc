@@ -339,6 +339,22 @@ main( int argc, char** argv )
     //hstGs[i] = i;
   }
 
+  // ZW: change eventVector ordering so that the momentum order for
+  // each particle is (E, px, py, pz) instead of the LHEF convention
+  // which is (px, py, pz, E)
+  for( unsigned int ievt = 0; ievt < nevt; ++ievt )
+  {
+    for( unsigned int iprt = 0; iprt < 6; ++iprt)
+    {
+      auto energ = eventVector[4*6*ievt + 4*iprt + 3];
+      for( unsigned int imom = 0; imom < 3; ++imom)
+      {
+        eventVector[4*6*ievt + 4*iprt + 3 - imom] = eventVector[4*6*ievt + 4*iprt + 2 - imom];
+      }
+      eventVector[4*6*ievt + 4*iprt] = energ;
+    }
+  }
+
   // Memory buffers for momenta
 #ifndef __CUDACC__
   HostBufferMomenta hstMomenta( nevt );
