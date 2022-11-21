@@ -390,8 +390,8 @@ main( int argc, char** argv )
   #ifdef __CUDACC__
     auto npagM = nevt / neppM;
     for( unsigned int ipagM = 0; ipagM < npagM; ipagM++ )
-      for( unsigned int ip4 = 0; ip4 < np4; ip4++ )
-        for( unsigned int ipar = 0; ipar < npar; ipar++ )
+      for( unsigned int ip4 = 0; ip4 < 4 ; ip4++ )
+        for( unsigned int ipar = 0; ipar < 6 ; ipar++ )
           for( unsigned int ieppM = 0; ieppM < neppM; ieppM++ )
             {
               unsigned int ievt = ipagM * neppM + ieppM;
