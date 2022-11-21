@@ -372,6 +372,9 @@ main( int argc, char** argv )
   std::unique_ptr<double[]> wavetimes( new double[niter] );
   std::unique_ptr<double[]> wv3atimes( new double[niter] );
   
+  std::cout << "\n\n" << hstMomenta[333] << "\n\n";
+
+
   #ifdef __CUDACC__
     for( unsigned int i = 0; i < 4 * 6 * nevt; ++i)
     {
@@ -380,6 +383,35 @@ main( int argc, char** argv )
       //std::cout << "\n\n    " << eventVector[i] << "   and   " << extrMomenta.data()[i] << "\n\n";
     }
   #endif
+
+  std::cout << "\n\n" << hstMomenta[333] << "\n\n";
+
+  // ZW: transpose extrMomenta explicitly
+  #ifdef __CUDACC__
+    auto npagM = nevt / neppM;
+    for( unsigned int ipagM = 0; ipagM < npagM; ipagM++ )
+      for( unsigned int ip4 = 0; ip4 < np4; ip4++ )
+        for( unsigned int ipar = 0; ipar < npar; ipar++ )
+          for( unsigned int ieppM = 0; ieppM < neppM; ieppM++ )
+            {
+              unsigned int ievt = ipagM * neppM + ieppM;
+              unsigned int cpos = ipagM * npar * np4 * neppM + ipar * np4 * neppM + ip4 * neppM + ieppM;
+              unsigned int fpos = ievt * npar * np4 + ipar * np4 + ip4;
+              extrMomenta.data()[cpos] = eventVector[fpos]; // F2C (Fortran to C)
+            }
+  #endif
+
+#ifdef __CUDACC__
+    for( unsigned int i = 0; i < 4 * 6 * nevt; ++i)
+    {
+      hstMomenta.data()[i] = extrMomenta.data()[i];
+      //std::cout << "\n\n    " << eventVector[i] << "   and   " << extrMomenta.data()[i] << "\n\n";
+    }
+#endif
+
+  std::cout << "\n\n" << hstMomenta[333] << "\n\n";
+
+
 
   // ZW: remove random numper generation prnk and any dependencies on it
   // !! note: prnk is not necessary to remove for reweighing, but need to
@@ -461,11 +493,11 @@ main( int argc, char** argv )
  // basically just want to change devMomenta to PEPMomenta
  // but PEPMomenta needs to be passed to the GPU
   // --- 0c. Create matrix element kernel [keep this in 0c for the moment]
-  std::cout << "\n" << hstMomenta.data()[333] << "\n";
+  //std::cout << "\n" << hstMomenta.data()[333] << "\n";
   std::unique_ptr<MatrixElementKernelBase> pmek;
   if( !bridge )
   {
-    //std::cout << "\nwe are NOT in bridge territory\n";
+    std::cout << "\nwe are NOT in bridge territory\n";
 #ifdef __CUDACC__
     // ZW: this is the one we use in a regular ./gcheck 32 32 32
     pmek.reset( new MatrixElementKernelDevice( devMomenta, devGs, devMatrixElements, gpublocks, gputhreads ) );
@@ -475,13 +507,14 @@ main( int argc, char** argv )
   }
   else
   {
+    std::cout << "\nwe ARE in bridge territory\n";
 #ifdef __CUDACC__
     pmek.reset( new BridgeKernelDevice( hstMomenta, hstGs, hstMatrixElements, gpublocks, gputhreads ) );
 #else
     pmek.reset( new BridgeKernelHost( hstMomenta, hstGs, hstMatrixElements, nevt ) );
 #endif
   }
-  std::cout << "\n" << hstMomenta.data()[333] << "\n";
+  //std::cout << "\n" << hstMomenta.data()[333] << "\n";
 
 
   // --- 0c. Create cross section kernel [keep this in 0c for the moment]
@@ -593,7 +626,6 @@ main( int argc, char** argv )
     // ZW: i think we should have bridge=true here
     //std::cout << "\n\ndo we get to step 3?\n\n";
     //bool bridgetrue = true;
-    std::cout << "\n" << hstMomenta.data()[333] << "\n";
     if( bridge )
     {
       std::cout << "\n\ndo we get inside the transposition step\n\n";
@@ -604,7 +636,11 @@ main( int argc, char** argv )
       std::cout << "\n\ndo we get past the transposition call\n\n";
       // ZW: we seg fault in line 585 when transposing momenta (why?)
     }
-  std::cout << "\n" << hstMomenta.data()[333] << "\n";
+
+  // ZW: explicitly implementing transposition in this file,
+  // as a 1st check to see that we can reconstruct
+  // a scattering amplitude on the device
+
 
 
 #ifdef __CUDACC__
