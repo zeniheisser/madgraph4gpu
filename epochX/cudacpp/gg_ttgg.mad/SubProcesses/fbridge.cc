@@ -41,6 +41,7 @@ extern "C"
    */
   void fbridgecreate_( CppObjectInFortran** ppbridge, const int* pnevtF, const int* pnparF, const int* pnp4F )
   {
+    std::cout << "\n\n\n\nwe just created a bridge in C++\n\n\n\n";
 #ifdef __CUDACC__
     CudaRuntime::setUp();
 #endif
@@ -61,6 +62,7 @@ extern "C"
    */
   void fbridgedelete_( CppObjectInFortran** ppbridge )
   {
+    std::cout << "\n\n\n\nnow we deleted a bridge in C++\n\n\n\n";
     Bridge<FORTRANFPTYPE>* pbridge = dynamic_cast<Bridge<FORTRANFPTYPE>*>( *ppbridge );
     if( pbridge == 0 ) throw std::runtime_error( "fbridgedelete_: invalid Bridge address" );
     delete pbridge;
@@ -85,6 +87,7 @@ extern "C"
                          FORTRANFPTYPE* mes,
                          const unsigned int* pchannelId )
   {
+    std::cout << "\n\n\n\nWE JUST CALLED THE BRIDGE SEQUENCE IN C++\n\n\n\n";
     Bridge<FORTRANFPTYPE>* pbridge = dynamic_cast<Bridge<FORTRANFPTYPE>*>( *ppbridge );
     if( pbridge == 0 ) throw std::runtime_error( "fbridgesequence_: invalid Bridge address" );
 #ifdef __CUDACC__
