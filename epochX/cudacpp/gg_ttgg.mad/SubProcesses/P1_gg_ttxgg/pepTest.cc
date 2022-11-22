@@ -1,0 +1,943 @@
+#include <unistd.h>
+
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <cstring>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <memory>
+#include <numeric>
+#include <string>
+
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
+#include "mgOnGpuConfig.h"
+
+#include "BridgeKernels.h"
+#include "CPPProcess.h"
+#include "CrossSectionKernels.h"
+#include "MatrixElementKernels.h"
+#include "MemoryAccessMatrixElements.h"
+#include "MemoryAccessMomenta.h"
+#include "MemoryAccessRandomNumbers.h"
+#include "MemoryAccessWeights.h"
+#include "MemoryBuffers.h"
+#include "RamboSamplingKernels.h"
+#include "RandomNumberKernels.h"
+#include "epoch_process_id.h"
+#include "timermap.h"
+#include "PEP.hpp"
+
+#define STRINGIFY( s ) #s
+#define XSTRINGIFY( s ) STRINGIFY( s )
+
+#define SEP79 79
+
+bool
+is_number( const char* s )
+{
+  const char* t = s;
+  while( *t != '\0' && isdigit( *t ) )
+    ++t;
+  return (int)strlen( s ) == t - s;
+}
+
+int
+usage( char* argv0, int ret = 1 )
+{
+  std::cout << "Usage: " << argv0
+            << " [--verbose|-v] [--debug|-d] [--performance|-p] [--json|-j] [--curhst|--curdev|--common] [--rmbhst|--rmbdev] [--bridge]"
+            << " [#gpuBlocksPerGrid #gpuThreadsPerBlock] #iterations" << std::endl;
+  std::cout << std::endl;
+  std::cout << "The number of events per iteration is #gpuBlocksPerGrid * #gpuThreadsPerBlock" << std::endl;
+  std::cout << "(also in CPU/C++ code, where only the product of these two parameters counts)" << std::endl;
+  std::cout << std::endl;
+  std::cout << "Summary stats are always computed: '-p' and '-j' only control their printout" << std::endl;
+  std::cout << "The '-d' flag only enables NaN/abnormal warnings and OMP debugging" << std::endl;
+#ifndef __CUDACC__
+#ifdef _OPENMP
+  std::cout << std::endl;
+  std::cout << "Use the OMP_NUM_THREADS environment variable to control OMP multi-threading" << std::endl;
+  std::cout << "(OMP multithreading will be disabled if OMP_NUM_THREADS is not set)" << std::endl;
+#endif
+#endif
+  return ret;
+}
+
+int
+main( int argc, char** argv )
+{
+  // Namespaces for CUDA and C++ (FIXME - eventually use the same namespace everywhere...)
+#ifdef __CUDACC__
+  using namespace mg5amcGpu;
+#else
+  using namespace mg5amcCpu;
+#endif
+
+  // DEFAULTS FOR COMMAND LINE ARGUMENTS
+  bool verbose = false;
+  bool debug = false;
+  bool perf = false;
+  bool json = false;
+  unsigned int niter = 0;
+  unsigned int gpublocks = 1;
+  unsigned int gputhreads = 32;
+  unsigned int jsondate = 0;
+  unsigned int jsonrun = 0;
+  unsigned int numvec[5] = { 0, 0, 0, 0, 0 };
+  int nnum = 0;
+  // Random number mode
+  enum class RandomNumberMode
+  {
+    CommonRandom = 0,
+    CurandHost = 1,
+    CurandDevice = 2
+  };
+#ifdef __CUDACC__
+  RandomNumberMode rndgen = RandomNumberMode::CurandDevice; // default on GPU
+#elif not defined MGONGPU_HAS_NO_CURAND
+  RandomNumberMode rndgen = RandomNumberMode::CurandHost;  // default on CPU if build has curand
+#else
+  RandomNumberMode rndgen = RandomNumberMode::CommonRandom; // default on CPU if build has no curand
+#endif
+  // Rambo sampling mode (NB RamboHost implies CommonRandom or CurandHost!)
+  enum class RamboSamplingMode
+  {
+    RamboHost = 1,
+    RamboDevice = 2
+  };
+#ifdef __CUDACC__
+  RamboSamplingMode rmbsmp = RamboSamplingMode::RamboDevice; // default on GPU
+#else
+  RamboSamplingMode rmbsmp = RamboSamplingMode::RamboHost; // default on CPU
+#endif
+  // Bridge emulation mode (NB Bridge implies RamboHost!)
+  bool bridge = false;
+
+  // READ COMMAND LINE ARGUMENTS
+  for( int argn = 1; argn < argc; ++argn )
+  {
+    std::string arg = argv[argn];
+    if( ( arg == "--verbose" ) || ( arg == "-v" ) )
+    {
+      verbose = true;
+    }
+    else if( ( arg == "--debug" ) || ( arg == "-d" ) )
+    {
+      debug = true;
+    }
+    else if( ( arg == "--performance" ) || ( arg == "-p" ) )
+    {
+      perf = true;
+    }
+    else if( ( arg == "--json" ) || ( arg == "-j" ) )
+    {
+      json = true;
+    }
+    else if( arg == "--curdev" )
+    {
+#ifdef __CUDACC__
+      rndgen = RandomNumberMode::CurandDevice;
+#else
+      throw std::runtime_error( "CurandDevice is not supported on CPUs" );
+#endif
+    }
+    else if( arg == "--curhst" )
+    {
+#ifndef MGONGPU_HAS_NO_CURAND
+      rndgen = RandomNumberMode::CurandHost;
+#else
+      throw std::runtime_error( "CurandHost is not supported because this application was built without Curand support" );
+#endif
+    }
+    else if( arg == "--common" )
+    {
+      rndgen = RandomNumberMode::CommonRandom;
+    }
+    else if( arg == "--rmbdev" )
+    {
+#ifdef __CUDACC__
+      rmbsmp = RamboSamplingMode::RamboDevice;
+#else
+      throw std::runtime_error( "RamboDevice is not supported on CPUs" );
+#endif
+    }
+    else if( arg == "--rmbhst" )
+    {
+      rmbsmp = RamboSamplingMode::RamboHost;
+    }
+    else if( arg == "--bridge" )
+    {
+      bridge = true;
+    }
+    else if( is_number( argv[argn] ) && nnum < 5 )
+    {
+      numvec[nnum++] = strtoul( argv[argn], NULL, 0 );
+    }
+    else
+    {
+      return usage( argv[0] );
+    }
+  }
+
+  if( nnum == 3 || nnum == 5 )
+  {
+    gpublocks = numvec[0];
+    gputhreads = numvec[1];
+    niter = numvec[2];
+    if( nnum == 5 )
+    {
+      jsondate = numvec[3];
+      jsonrun = numvec[4];
+    }
+  }
+  else if( nnum == 1 )
+  {
+    niter = numvec[0];
+  }
+  else
+  {
+    return usage( argv[0] );
+  }
+
+  if( niter == 0 )
+    return usage( argv[0] );
+
+  if( bridge && rmbsmp == RamboSamplingMode::RamboDevice )
+  {
+    std::cout << "WARNING! Bridge selected: cannot use RamboDevice, will use RamboHost" << std::endl;
+    rmbsmp = RamboSamplingMode::RamboHost;
+  }
+
+  if( rmbsmp == RamboSamplingMode::RamboHost && rndgen == RandomNumberMode::CurandDevice )
+  {
+#if not defined MGONGPU_HAS_NO_CURAND
+    std::cout << "WARNING! RamboHost selected: cannot use CurandDevice, will use CurandHost" << std::endl;
+    rndgen = RandomNumberMode::CurandHost;
+#else
+    std::cout << "WARNING! RamboHost selected: cannot use CurandDevice, will use CommonRandom" << std::endl;
+    rndgen = RandomNumberMode::CommonRandom;
+#endif
+  }
+
+  constexpr int neppM = MemoryAccessMomenta::neppM;       // AOSOA layout
+  constexpr int neppR = MemoryAccessRandomNumbers::neppR; // AOSOA layout
+
+  using mgOnGpu::ntpbMAX;
+  if( gputhreads > ntpbMAX )
+  {
+    std::cout << "ERROR! #threads/block should be <= " << ntpbMAX << std::endl;
+    return usage( argv[0] );
+  }
+
+#ifndef __CUDACC__
+#ifdef _OPENMP
+  // Set OMP_NUM_THREADS equal to 1 if it is not yet set
+  char* ompnthr = getenv( "OMP_NUM_THREADS" );
+  if( debug )
+  {
+    std::cout << "DEBUG: omp_get_num_threads() = " << omp_get_num_threads() << std::endl; // always == 1 here!
+    std::cout << "DEBUG: omp_get_max_threads() = " << omp_get_max_threads() << std::endl;
+    std::cout << "DEBUG: ${OMP_NUM_THREADS}    = '" << ( ompnthr == 0 ? "[not set]" : ompnthr ) << "'" << std::endl;
+  }
+  if( ompnthr == NULL || std::string( ompnthr ).find_first_not_of( "0123456789" ) != std::string::npos || atol( ompnthr ) == 0 )
+  {
+    if( ompnthr != NULL )
+      std::cout << "WARNING! OMP_NUM_THREADS is invalid: will use only 1 thread" << std::endl;
+    else if( debug )
+      std::cout << "DEBUG: OMP_NUM_THREADS is not set: will use only 1 thread" << std::endl;
+    omp_set_num_threads( 1 );                                                                         // https://stackoverflow.com/a/22816325
+    if( debug ) std::cout << "DEBUG: omp_get_num_threads() = " << omp_get_num_threads() << std::endl; // always == 1 here!
+    if( debug ) std::cout << "DEBUG: omp_get_max_threads() = " << omp_get_max_threads() << std::endl;
+  }
+#endif
+#endif
+
+#ifndef __CUDACC__
+  // Fail gently and avoid "Illegal instruction (core dumped)" if the host does not support the SIMD used in the ME calculation
+  // Note: this prevents a crash on pmpe04 but not on some github CI nodes?
+  // [NB: SIMD vectorization in mg5amc C++ code is only used in the ME calculation below MatrixElementKernelHost!]
+  if( !MatrixElementKernelHost::hostSupportsSIMD() ) return 1;
+#endif
+
+  const unsigned int ndim = gpublocks * gputhreads; // number of threads in one GPU grid
+  const unsigned int nevt = ndim;                   // number of events in one iteration == number of GPU threads
+
+  if( verbose )
+    std::cout << "# iterations: " << niter << std::endl;
+
+  // *** START THE NEW TIMERS ***
+  mgOnGpu::TimerMap timermap;
+
+  // === STEP 0 - INITIALISE
+
+#ifdef __CUDACC__
+
+  // --- 00. Initialise cuda
+  // Instantiate a CudaRuntime at the beginnining of the application's main to
+  // invoke cudaSetDevice(0) in the constructor and book a cudaDeviceReset() call in the destructor
+  const std::string cdinKey = "00 CudaInit";
+  timermap.start( cdinKey );
+  CudaRuntime cudaRuntime( debug );
+#endif
+
+  // --- 0a. Initialise physics process
+  const std::string procKey = "0a ProcInit";
+  timermap.start( procKey );
+
+  // Create a process object
+  CPPProcess process( verbose );
+
+  // Read param_card and set parameters
+  process.initProc( "../../Cards/param_card.dat" );
+  const fptype energy = 1500; // historical default, Ecms = 1500 GeV = 1.5 TeV (above the Z peak)
+  //const fptype energy = 91.2; // Ecms = 91.2 GeV (Z peak)
+  //const fptype energy = 0.100; // Ecms = 100 MeV (well below the Z peak, pure em scattering)
+  const int meGeVexponent = -( 2 * mgOnGpu::npar - 8 );
+
+  // --- 0b. Allocate memory structures
+  const std::string alloKey = "0b MemAlloc";
+  timermap.start( alloKey );
+
+  // Memory buffers for random numbers
+#ifndef __CUDACC__
+  HostBufferRandomNumbers hstRnarray( nevt );
+#else
+  PinnedHostBufferRandomNumbers hstRnarray( nevt );
+  DeviceBufferRandomNumbers devRnarray( nevt );
+#endif
+
+#ifndef __CUDACC__
+  HostBufferGs hstGs( nevt );
+#else
+  PinnedHostBufferGs hstGs( nevt );
+  DeviceBufferGs devGs( nevt );
+#endif
+
+  //HostBufferGs extrGs( nevt );
+
+
+  std::vector<double> eventVector = PEP::eventExtraction("gg2ttgg_1024.lhe");
+  /* // Hardcode Gs for now (eventually they should come from Fortran MadEvent)
+  for( unsigned int i = 0; i < nevt; ++i )
+  {
+    constexpr fptype fixedG = 1.2177157847767195; // fixed G for aS=0.118 (hardcoded for now in check_sa.cc, fcheck_sa.f, runTest.cc)
+    hstGs[i] = fixedG;
+    //if ( i > 0 ) hstGs[i] = 0; // try hardcoding G only for event 0
+    //hstGs[i] = i;
+  } */
+
+  // ZW: Take Gs from LHE
+  for( unsigned int i = 0; i < nevt; ++i )
+  {
+    hstGs[i] = eventVector[4 * 6 * nevt + i];
+    //if ( i > 0 ) hstGs[i] = 0; // try hardcoding G only for event 0
+    //hstGs[i] = i;
+  }
+
+  // ZW: change eventVector ordering so that the momentum order for
+  // each particle is (E, px, py, pz) instead of the LHEF convention
+  // which is (px, py, pz, E)
+  for( unsigned int ievt = 0; ievt < nevt; ++ievt )
+  {
+    for( unsigned int iprt = 0; iprt < 6; ++iprt)
+    {
+      auto energ = eventVector[4*6*ievt + 4*iprt + 3];
+      for( unsigned int imom = 0; imom < 3; ++imom)
+      {
+        eventVector[4*6*ievt + 4*iprt + 3 - imom] = eventVector[4*6*ievt + 4*iprt + 2 - imom];
+      }
+      eventVector[4*6*ievt + 4*iprt] = energ;
+    }
+  }
+
+  // Memory buffers for momenta
+#ifndef __CUDACC__
+  HostBufferMomenta hstMomenta( nevt );
+#else
+  // ZW: change devMomenta from being output by
+  // prsk to being the one output by PEP
+  PinnedHostBufferMomenta hstMomenta( nevt );
+  DeviceBufferMomenta devMomenta( nevt );
+  PinnedHostBufferMomenta extrMomenta( nevt );
+  PinnedHostBufferMomenta checkMomenta( nevt );
+#endif
+
+  // Memory buffers for sampling weights
+#ifndef __CUDACC__
+  HostBufferWeights hstWeights( nevt );
+#else
+  PinnedHostBufferWeights hstWeights( nevt );
+  DeviceBufferWeights devWeights( nevt );
+#endif
+
+  // Memory buffers for matrix elements
+#ifndef __CUDACC__
+  HostBufferMatrixElements hstMatrixElements( nevt );
+#else
+  PinnedHostBufferMatrixElements hstMatrixElements( nevt );
+  DeviceBufferMatrixElements devMatrixElements( nevt );
+#endif
+
+  std::unique_ptr<double[]> genrtimes( new double[niter] );
+  std::unique_ptr<double[]> rambtimes( new double[niter] );
+  std::unique_ptr<double[]> wavetimes( new double[niter] );
+  std::unique_ptr<double[]> wv3atimes( new double[niter] );
+  
+  std::cout << "\n\n" << hstMomenta[333] << "\n\n";
+
+
+  #ifdef __CUDACC__
+    for( unsigned int i = 0; i < 4 * 6 * nevt; ++i)
+    {
+      extrMomenta.data()[i] = eventVector[i];
+      hstMomenta.data()[i] = extrMomenta.data()[i];
+      //std::cout << "\n\n    " << eventVector[i] << "   and   " << extrMomenta.data()[i] << "\n\n";
+    }
+  #endif
+
+  std::cout << "\n\n" << hstMomenta[333] << "\n\n";
+
+  // ZW: transpose extrMomenta explicitly
+  #ifdef __CUDACC__
+    auto npagM = nevt / neppM;
+    for( unsigned int ipagM = 0; ipagM < npagM; ipagM++ )
+      for( unsigned int ip4 = 0; ip4 < 4 ; ip4++ )
+        for( unsigned int ipar = 0; ipar < 6 ; ipar++ )
+          for( unsigned int ieppM = 0; ieppM < neppM; ieppM++ )
+            {
+              unsigned int ievt = ipagM * neppM + ieppM;
+              unsigned int cpos = ipagM * 6 * 4 * neppM + ipar * 4 * neppM + ip4 * neppM + ieppM;
+              unsigned int fpos = ievt * 6 * 4 + ipar * 4 + ip4;
+              extrMomenta.data()[cpos] = eventVector[fpos]; // F2C (Fortran to C)
+            }
+  #endif
+
+#ifdef __CUDACC__
+    for( unsigned int i = 0; i < 4 * 6 * nevt; ++i)
+    {
+      hstMomenta.data()[i] = extrMomenta.data()[i];
+      //std::cout << "\n\n    " << eventVector[i] << "   and   " << extrMomenta.data()[i] << "\n\n";
+    }
+#endif
+
+  std::cout << "\n\n" << hstMomenta[333] << "\n\n";
+
+
+
+  // ZW: remove random numper generation prnk and any dependencies on it
+  // !! note: prnk is not necessary to remove for reweighing, but need to
+  // remove prsk, which samples from prnk
+  // --- 0c. Create curand or common generator
+  const std::string cgenKey = "0c GenCreat";
+  timermap.start( cgenKey );
+  // Allocate the appropriate RandomNumberKernel
+  std::unique_ptr<RandomNumberKernelBase> prnk;
+  if( rndgen == RandomNumberMode::CommonRandom )
+  {
+    prnk.reset( new CommonRandomNumberKernel( hstRnarray ) );
+  }
+#ifndef MGONGPU_HAS_NO_CURAND
+  else if( rndgen == RandomNumberMode::CurandHost )
+  {
+    const bool onDevice = false;
+    prnk.reset( new CurandRandomNumberKernel( hstRnarray, onDevice ) );
+  }
+#ifdef __CUDACC__
+  else
+  {
+    const bool onDevice = true;
+    prnk.reset( new CurandRandomNumberKernel( devRnarray, onDevice ) );
+  }
+#else
+  else
+  {
+    throw std::logic_error( "CurandDevice is not supported on CPUs" ); // INTERNAL ERROR (no path to this statement)
+  }
+#endif
+#else
+  else
+  {
+    throw std::logic_error( "This application was built without Curand support" ); // INTERNAL ERROR (no path to this statement)
+  }
+#endif
+
+
+  // ZW: remove prsk and dependence on it (make the relevant momenta into those extracted from LHEF)
+  // !! note: prsk is the momentum sampling and it should be removed
+  // so that we instead use our own momenta from LHEF
+  // --- 0c. Create rambo sampling kernel [keep this in 0c for the moment]
+  std::unique_ptr<SamplingKernelBase> prsk;
+  if( rmbsmp == RamboSamplingMode::RamboHost )
+  {
+    prsk.reset( new RamboSamplingKernelHost( energy, hstRnarray, hstMomenta, hstWeights, nevt ) );
+  }
+  else
+  {
+#ifdef __CUDACC__
+    prsk.reset( new RamboSamplingKernelDevice( energy, devRnarray, devMomenta, devWeights, gpublocks, gputhreads ) );
+#else
+    throw std::logic_error( "RamboDevice is not supported on CPUs" ); // INTERNAL ERROR (no path to this statement)
+#endif
+  }
+
+
+  // ZW: attempt to copy momenta directly,
+  // does not work(?)
+#ifdef __CUDACC__
+  //std::cout << "\n\ndo we actually try to copy from host to device?\n\n";
+  //checkCuda( cudaMemcpy( devMomenta, extrMomenta, memSize, cudaMemcpyHostToDevice ) );
+  //copyHostFromDevice( checkMomenta, devMomenta );
+  copyDeviceFromHost( devMomenta, extrMomenta );
+#endif
+  //unsigned int memSize = sizeof(std::vector<double>) + ( sizeof( double ) * momVector.size() );
+  //checkCuda( cudaMemcpy( devMomenta, momVector, memSize, cudaMemcpyHostToDevice ) );
+
+/* #ifdef __CUDACC__
+    std::cout << "\nwe are about to try to check if we've copied stuff\n";
+    for( unsigned int i = 0; i < 4 * 6 * nevt; ++i)
+    {
+      std::cout << extrMomenta.data()[i] << "   and   " << checkMomenta.data()[i] << "\n";
+    }
+#endif */
+
+ // ZW: change pmek to use momenta extracted from LHEF
+ // basically just want to change devMomenta to PEPMomenta
+ // but PEPMomenta needs to be passed to the GPU
+  // --- 0c. Create matrix element kernel [keep this in 0c for the moment]
+  //std::cout << "\n" << hstMomenta.data()[333] << "\n";
+  std::unique_ptr<MatrixElementKernelBase> pmek;
+  if( !bridge )
+  {
+    std::cout << "\nwe are NOT in bridge territory\n";
+#ifdef __CUDACC__
+    // ZW: this is the one we use in a regular ./gcheck 32 32 32
+    pmek.reset( new MatrixElementKernelDevice( devMomenta, devGs, devMatrixElements, gpublocks, gputhreads ) );
+#else
+    pmek.reset( new MatrixElementKernelHost( hstMomenta, hstGs, hstMatrixElements, nevt ) );
+#endif
+  }
+  else
+  {
+    std::cout << "\nwe ARE in bridge territory\n";
+#ifdef __CUDACC__
+    pmek.reset( new BridgeKernelDevice( hstMomenta, hstGs, hstMatrixElements, gpublocks, gputhreads ) );
+#else
+    pmek.reset( new BridgeKernelHost( hstMomenta, hstGs, hstMatrixElements, nevt ) );
+#endif
+  }
+  //std::cout << "\n" << hstMomenta.data()[333] << "\n";
+
+
+  // --- 0c. Create cross section kernel [keep this in 0c for the moment]
+  EventStatistics hstStats;
+  CrossSectionKernelHost xsk( hstWeights, hstMatrixElements, hstStats, nevt );
+
+  // **************************************
+  // *** START MAIN LOOP ON #ITERATIONS ***
+  // **************************************
+
+  for( unsigned long int iiter = 0; iiter < niter; ++iiter )
+  {
+    //std::cout << "Iteration #" << iiter+1 << " of " << niter << std::endl;
+
+    // === STEP 1 OF 3
+
+    // *** START THE OLD-STYLE TIMER FOR RANDOM GEN ***
+    double genrtime = 0;
+
+/*     // --- 1a. Seed rnd generator (to get same results on host and device in curand)
+    // [NB This should not be necessary using the host API: "Generation functions
+    // can be called multiple times on the same generator to generate successive
+    // blocks of results. For pseudorandom generators, multiple calls to generation
+    // functions will yield the same result as a single call with a large size."]
+    const unsigned long long seed = 20200805;
+    const std::string sgenKey = "1a GenSeed ";
+    timermap.start( sgenKey );
+    prnk->seedGenerator( seed + iiter );
+    genrtime += timermap.stop();
+
+    // --- 1b. Generate all relevant numbers to build nevt events (i.e. nevt phase space points) on the host
+    const std::string rngnKey = "1b GenRnGen";
+    timermap.start( rngnKey );
+    prnk->generateRnarray();
+    //std::cout << "Got random numbers" << std::endl; */
+/* 
+#ifdef __CUDACC__
+    if( rndgen != RandomNumberMode::CurandDevice && rmbsmp == RamboSamplingMode::RamboDevice )
+    {
+      // --- 1c. Copy rnarray from host to device
+      const std::string htodKey = "1c CpHTDrnd";
+      genrtime += timermap.start( htodKey );
+      copyDeviceFromHost( devRnarray, hstRnarray );
+    }
+#endif */
+
+/*     // *** STOP THE OLD-STYLE TIMER FOR RANDOM GEN ***
+    genrtime += timermap.stop();
+
+    // === STEP 2 OF 3
+    // Fill in particle momenta for each of nevt events on the device
+
+    // *** START THE OLD-STYLE TIMER FOR RAMBO ***
+    double rambtime = 0;
+
+    // --- 2a. Fill in momenta of initial state particles on the device
+    const std::string riniKey = "2a RamboIni";
+    timermap.start( riniKey );
+    //prsk->getMomentaInitial();
+    // ZW: see how prsk is used to format momenta? and then input new momenta in the correct way
+    //std::cout << "Got initial momenta" << std::endl;
+
+    // --- 2b. Fill in momenta of final state particles using the RAMBO algorithm on the device
+    // (i.e. map random numbers to final-state particle momenta for each of nevt events)
+    const std::string rfinKey = "2b RamboFin";
+    rambtime += timermap.start( rfinKey );
+    //prsk->getMomentaFinal();
+    //std::cout << "Got final momenta" << std::endl;
+ */
+/* #ifdef __CUDACC__
+  // ZW: maybe overwrite which momenta are used here?
+    if( rmbsmp == RamboSamplingMode::RamboDevice )
+    {
+      // --- 2c. CopyDToH Weights
+      const std::string cwgtKey = "2c CpDTHwgt";
+      rambtime += timermap.start( cwgtKey );
+      copyHostFromDevice( hstWeights, devWeights );
+
+      // --- 2d. CopyDToH Momenta
+      const std::string cmomKey = "2d CpDTHmom";
+      rambtime += timermap.start( cmomKey );
+      copyHostFromDevice( hstMomenta, devMomenta );
+    }
+    else // only if ( ! bridge ) ???
+    {
+      // --- 2c. CopyHToD Weights
+      const std::string cwgtKey = "2c CpHTDwgt";
+      rambtime += timermap.start( cwgtKey );
+      copyDeviceFromHost( devWeights, hstWeights );
+
+      // --- 2d. CopyHToD Momenta
+      const std::string cmomKey = "2d CpHTDmom";
+      rambtime += timermap.start( cmomKey );
+      copyDeviceFromHost( devMomenta, hstMomenta );
+    }
+#endif */
+
+    // *** STOP THE OLD-STYLE TIMER FOR RAMBO ***
+    //rambtime += timermap.stop();
+
+    // === STEP 3 OF 3
+    // Evaluate matrix elements for all nevt events
+    // 0d. For Bridge only, transpose C2F [renamed as 0d: this is not initialisation, but I want it out of the ME timers (#371)]
+    // 0e. (Only on the first iteration) Get good helicities [renamed as 0e: this IS initialisation!]
+    // 3a. Evaluate MEs on the device (include transpose F2C for Bridge)
+    // 3b. Copy MEs back from device to host
+
+    // --- 0d. TransC2F
+    // ZW: i think we should have bridge=true here
+    //std::cout << "\n\ndo we get to step 3?\n\n";
+    //bool bridgetrue = true;
+    if( bridge )
+    {
+      std::cout << "\n\ndo we get inside the transposition step\n\n";
+      const std::string tc2fKey = "0d TransC2F";
+      timermap.start( tc2fKey );
+      std::cout << "\n\nare we going to the timermap.start?\n\n";
+      dynamic_cast<BridgeKernelBase*>( pmek.get() )->transposeInputMomentaC2F();
+      std::cout << "\n\ndo we get past the transposition call\n\n";
+      // ZW: we seg fault in line 585 when transposing momenta (why?)
+    }
+
+  // ZW: explicitly implementing transposition in this file,
+  // as a 1st check to see that we can reconstruct
+  // a scattering amplitude on the device
+
+
+
+#ifdef __CUDACC__
+  // ZW: here use LHEF Gs instead of static one
+    // --- 2d. CopyHToD Momenta
+    const std::string gKey = "0.. CpHTDg";
+    //rambtime += timermap.start( gKey ); // FIXME! NOT A RAMBO TIMER!
+    copyDeviceFromHost( devGs, hstGs );
+#endif
+
+
+  // ZW: here i think all should be the same, as long as we've made sure
+  // that the sets of momenta and Gs are properly copied
+    // --- 0e. SGoodHel
+    if( iiter == 0 )
+    {
+      const std::string ghelKey = "0e SGoodHel";
+      timermap.start( ghelKey );
+      pmek->computeGoodHelicities();
+    }
+
+    // *** START THE OLD-STYLE TIMERS FOR MATRIX ELEMENTS (WAVEFUNCTIONS) ***
+    double wavetime = 0; // calc plus copy
+    double wv3atime = 0; // calc only
+
+    // --- 3a. SigmaKin
+    const std::string skinKey = "3a SigmaKin";
+    timermap.start( skinKey );
+    constexpr unsigned int channelId = 0; // TEMPORARY? disable multi-channel in check.exe and gcheck.exe #466
+    pmek->computeMatrixElements( channelId );
+
+    // *** STOP THE NEW OLD-STYLE TIMER FOR MATRIX ELEMENTS (WAVEFUNCTIONS) ***
+    wv3atime += timermap.stop(); // calc only
+    wavetime += wv3atime;        // calc plus copy
+
+#ifdef __CUDACC__
+    if( !bridge )
+    {
+      // --- 3b. CopyDToH MEs
+      const std::string cmesKey = "3b CpDTHmes";
+      timermap.start( cmesKey );
+      copyHostFromDevice( hstMatrixElements, devMatrixElements );
+      // *** STOP THE OLD OLD-STYLE TIMER FOR MATRIX ELEMENTS (WAVEFUNCTIONS) ***
+      wavetime += timermap.stop(); // calc plus copy
+    }
+#endif
+
+    // === STEP 4 FINALISE LOOP
+    // --- 4@ Update event statistics
+    const std::string updtKey = "4@ UpdtStat";
+    timermap.start( updtKey );
+    xsk.updateEventStatistics();
+
+    // --- 4a Dump within the loop
+    const std::string loopKey = "4a DumpLoop";
+    timermap.start( loopKey );
+    genrtimes[iiter] = genrtime;
+    //rambtimes[iiter] = rambtime;
+    wavetimes[iiter] = wavetime;
+    wv3atimes[iiter] = wv3atime;
+
+    if( verbose )
+    {
+      std::cout << std::string( SEP79, '*' ) << std::endl
+                << "Iteration #" << iiter + 1 << " of " << niter << std::endl;
+      if( perf ) std::cout << "Wave function time: " << wavetime << std::endl;
+    }
+
+    for( unsigned int ievt = 0; ievt < nevt; ++ievt ) // Loop over all events in this iteration
+    {
+      if( verbose )
+      {
+        // Display momenta
+        std::cout << "Momenta:" << std::endl;
+        for( int ipar = 0; ipar < mgOnGpu::npar; ipar++ )
+        {
+          // NB: 'setw' affects only the next field (of any type)
+          std::cout << std::scientific // fixed format: affects all floats (default precision: 6)
+                    << std::setw( 4 ) << ipar + 1
+                    << std::setw( 14 ) << MemoryAccessMomenta::ieventAccessIp4IparConst( hstMomenta.data(), ievt, 0, ipar )
+                    << std::setw( 14 ) << MemoryAccessMomenta::ieventAccessIp4IparConst( hstMomenta.data(), ievt, 1, ipar )
+                    << std::setw( 14 ) << MemoryAccessMomenta::ieventAccessIp4IparConst( hstMomenta.data(), ievt, 2, ipar )
+                    << std::setw( 14 ) << MemoryAccessMomenta::ieventAccessIp4IparConst( hstMomenta.data(), ievt, 3, ipar )
+                    << std::endl
+                    << std::defaultfloat; // default format: affects all floats
+        }
+        std::cout << std::string( SEP79, '-' ) << std::endl;
+        // Display matrix elements
+        std::cout << " Matrix element = " << MemoryAccessMatrixElements::ieventAccessConst( hstMatrixElements.data(), ievt )
+                  << " GeV^" << meGeVexponent << std::endl; // FIXME: assume process.nprocesses == 1
+        std::cout << std::string( SEP79, '-' ) << std::endl;
+      }
+    }
+
+    if( !( verbose || debug || perf ) )
+    {
+      std::cout << ".";
+    }
+  }
+
+  // **************************************
+  // *** END MAIN LOOP ON #ITERATIONS ***
+  // **************************************
+
+ 
+  // === STEP 9 FINALISE
+
+  std::string rndgentxt;
+  if( rndgen == RandomNumberMode::CommonRandom )
+    rndgentxt = "COMMON RANDOM HOST";
+  else if( rndgen == RandomNumberMode::CurandHost )
+    rndgentxt = "CURAND HOST";
+  else if( rndgen == RandomNumberMode::CurandDevice )
+    rndgentxt = "CURAND DEVICE";
+#ifdef __CUDACC__
+  rndgentxt += " (CUDA code)";
+#else
+  rndgentxt += " (C++ code)";
+#endif
+
+  // Workflow description summary
+  std::string wrkflwtxt;
+  // -- CUDA or C++?
+#ifdef __CUDACC__
+  wrkflwtxt += "CUD:";
+#else
+  wrkflwtxt += "CPP:";
+#endif
+  // -- DOUBLE or FLOAT?
+#if defined MGONGPU_FPTYPE_DOUBLE
+  wrkflwtxt += "DBL+";
+#elif defined MGONGPU_FPTYPE_FLOAT
+  wrkflwtxt += "FLT+";
+#else
+  wrkflwtxt += "???+";                                      // no path to this statement
+#endif
+  // -- CUCOMPLEX or THRUST or STD complex numbers?
+#ifdef __CUDACC__
+#if defined MGONGPU_CUCXTYPE_CUCOMPLEX
+  wrkflwtxt += "CUX:";
+#elif defined MGONGPU_CUCXTYPE_THRUST
+  wrkflwtxt += "THX:";
+#elif defined MGONGPU_CUCXTYPE_CXSMPL
+  wrkflwtxt += "CXS:";
+#else
+  wrkflwtxt += "???:"; // no path to this statement
+#endif
+#else
+#if defined MGONGPU_CPPCXTYPE_STDCOMPLEX
+  wrkflwtxt += "STX:";
+#elif defined MGONGPU_CPPCXTYPE_CXSMPL
+  wrkflwtxt += "CXS:";
+#else
+  wrkflwtxt += "???:"; // no path to this statement
+#endif
+#endif
+  // -- COMMON or CURAND HOST or CURAND DEVICE random numbers?
+  if( rndgen == RandomNumberMode::CommonRandom )
+    wrkflwtxt += "COMMON+";
+  else if( rndgen == RandomNumberMode::CurandHost )
+    wrkflwtxt += "CURHST+";
+  else if( rndgen == RandomNumberMode::CurandDevice )
+    wrkflwtxt += "CURDEV+";
+  else
+    wrkflwtxt += "??????+"; // no path to this statement
+  // -- HOST or DEVICE rambo sampling?
+  if( rmbsmp == RamboSamplingMode::RamboHost )
+    wrkflwtxt += "RMBHST+";
+  else if( rmbsmp == RamboSamplingMode::RamboDevice )
+    wrkflwtxt += "RMBDEV+";
+  else
+    wrkflwtxt += "??????+"; // no path to this statement
+#ifdef __CUDACC__
+  // -- HOST or DEVICE matrix elements? Standalone MEs or BRIDGE?
+  if( !bridge )
+    wrkflwtxt += "MESDEV";
+  else
+    wrkflwtxt += "BRDDEV";
+#else
+  if( !bridge )
+    wrkflwtxt += "MESHST"; // FIXME! allow this also in CUDA (eventually with various simd levels)
+  else
+    wrkflwtxt += "BRDHST";
+#endif
+    // -- SIMD matrix elements?
+#if !defined MGONGPU_CPPSIMD
+  wrkflwtxt += "/none";
+#elif defined __AVX512VL__
+#ifdef MGONGPU_PVW512
+  wrkflwtxt += "/512z";
+#else
+  wrkflwtxt += "/512y";
+#endif
+#elif defined __AVX2__
+  wrkflwtxt += "/avx2";
+#elif defined __SSE4_2__
+#ifdef __PPC__
+  wrkflwtxt += "/ppcv";
+#elif defined __ARM_NEON__
+  wrkflwtxt += "/neon";
+#else
+  wrkflwtxt += "/sse4";
+#endif
+#else
+  wrkflwtxt += "/????"; // no path to this statement
+#endif
+  // -- Has cxtype_v::operator[] bracket with non-const reference?
+#if defined MGONGPU_CPPSIMD
+#ifdef MGONGPU_HAS_CPPCXTYPEV_BRK
+  wrkflwtxt += "+CXVBRK";
+#else
+  wrkflwtxt += "+NOVBRK";
+#endif
+#else
+  wrkflwtxt += "+NAVBRK"; // N/A
+#endif
+
+  // --- 9a Dump to screen
+  const std::string dumpKey = "9a DumpScrn";
+  timermap.start( dumpKey );
+
+  if( !( verbose || debug || perf ) )
+  {
+    std::cout << std::endl;
+  }
+
+  if( perf )
+  {
+#ifndef __CUDACC__
+#ifdef _OPENMP
+    // Get the output of "nproc --all" (https://stackoverflow.com/a/478960)
+    std::string nprocall;
+    std::unique_ptr<FILE, decltype( &pclose )> nprocpipe( popen( "nproc --all", "r" ), pclose );
+    if( !nprocpipe ) throw std::runtime_error( "`nproc --all` failed?" );
+    std::array<char, 128> nprocbuf;
+    while( fgets( nprocbuf.data(), nprocbuf.size(), nprocpipe.get() ) != nullptr ) nprocall += nprocbuf.data();
+#endif
+#endif
+#ifdef MGONGPU_CPPSIMD
+#ifdef MGONGPU_HAS_CPPCXTYPEV_BRK
+    const std::string cxtref = " [cxtype_ref=YES]";
+#else
+    const std::string cxtref = " [cxtype_ref=NO]";
+#endif
+#endif
+    // Dump all configuration parameters and all results
+    std::cout << std::string( SEP79, '*' ) << std::endl
+#ifdef __CUDACC__
+              << "Process                     = " << XSTRINGIFY( MG_EPOCH_PROCESS_ID ) << "_CUDA"
+#else
+              << "Process                     = " << XSTRINGIFY( MG_EPOCH_PROCESS_ID ) << "_CPP"
+#endif
+              << " [" << process.getCompiler() << "]"
+#ifdef MGONGPU_INLINE_HELAMPS
+              << " [inlineHel=1]"
+#else
+              << " [inlineHel=0]"
+#endif
+#ifdef MGONGPU_HARDCODE_PARAM
+              << " [hardcodePARAM=1]" << std::endl
+#else
+              << " [hardcodePARAM=0]" << std::endl
+#endif
+              << "NumBlocksPerGrid            = " << gpublocks << std::endl
+              << "NumThreadsPerBlock          = " << gputhreads << std::endl
+              << "NumIterations               = " << niter << std::endl
+              << std::string( SEP79, '-' ) << std::endl;
+    std::cout << "Workflow summary            = " << wrkflwtxt << std::endl;
+
+  }
+
+  // *** STOP THE NEW TIMERS ***
+  timermap.stop();
+  if( perf )
+  {
+    std::cout << std::string( SEP79, '*' ) << std::endl;
+    timermap.dump();
+    std::cout << std::string( SEP79, '*' ) << std::endl;
+  }
+
+  // [NB some resources like curand generators will be deleted here when stack-allocated classes go out of scope]
+  //std::cout << "ALL OK" << std::endl;
+  return 0;
+}
