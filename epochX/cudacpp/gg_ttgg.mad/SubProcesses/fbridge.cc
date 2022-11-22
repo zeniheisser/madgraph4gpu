@@ -87,7 +87,7 @@ extern "C"
                          FORTRANFPTYPE* mes,
                          const unsigned int* pchannelId )
   {
-    std::cout << "\n\n\n\nWE JUST CALLED THE BRIDGE SEQUENCE IN C++\n\n\n\n";
+    std::cout << "\nWE JUST CALLED THE BRIDGE SEQUENCE IN C++\n";
     Bridge<FORTRANFPTYPE>* pbridge = dynamic_cast<Bridge<FORTRANFPTYPE>*>( *ppbridge );
     if( pbridge == 0 ) throw std::runtime_error( "fbridgesequence_: invalid Bridge address" );
 #ifdef __CUDACC__
