@@ -38,9 +38,9 @@ int main()
 
   std::vector<double> eventVector = PEP::eventExtraction("gg2ttgg_1024.lhe");
 
-  const int nevt = eventVector[eventVector.size() - 1];
-  const int nPrt = eventVector[eventVector.size() - 2];
-  const int nMom = 4;
+  const unsigned int nevt = eventVector[eventVector.size() - 1];
+  const unsigned int nPrt = eventVector[eventVector.size() - 2];
+  const unsigned int nMom = 4;
 
 
   std::vector<double> momVector( 4 * nevt * nPrt );
@@ -66,7 +66,7 @@ int main()
   std::vector<double> mesVector( nevt );
   const unsigned int chanId = 0;
   fbridgecreate_( &fortrPoint, &nevt, &nPrt, &nMom );
-  fbridgesequence_( &fortrPoint, &momVector, &gsVector, &mesVector, &chanId );
+  fbridgesequence_( &fortrPoint, &momVector[0], &gsVector[0], &mesVector[0], &chanId );
   fbridgedelete_( &fortrPoint );
 
 
