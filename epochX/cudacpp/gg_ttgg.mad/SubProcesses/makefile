@@ -25,7 +25,7 @@ endif
 
 LIBDIR = ../../lib/
 BINDIR = ../../bin/
-PROG   = madevent
+PROG   = pepTester
 
 ifneq ("$(wildcard ../MadLoop_makefile_definitions)","")
     include ../MadLoop_makefile_definitions
