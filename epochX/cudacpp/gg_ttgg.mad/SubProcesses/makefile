@@ -25,7 +25,8 @@ endif
 
 LIBDIR = ../../lib/
 BINDIR = ../../bin/
-PROG   = pepTester
+PROG   = madevent
+PROGG  = pepTester
 
 ifneq ("$(wildcard ../MadLoop_makefile_definitions)","")
     include ../MadLoop_makefile_definitions
@@ -81,6 +82,7 @@ PROCESS= myamp.o genps.o unwgt.o setcuts.o get_color.o \
 
 DSIG=driver.o $(patsubst %.f, %.o, $(filter-out auto_dsig.f, $(wildcard auto_dsig*.f)))
 DSIG_cudacpp=driver_cudacpp.o $(patsubst %.f, %_cudacpp.o, $(filter-out auto_dsig.f, $(wildcard auto_dsig*.f)))
+# ZW: might need something like this for pepT but well see
 
 SYMMETRY = symmetry.o idenparts.o 
 
@@ -121,9 +123,18 @@ else
 endif
 
 # Also builds g$(PROG)_cudacpp if $(CUDACPP_CULIB) exists (improved patch for cpp-only builds #503)
+# ZW: this is the compilation of gmadevent
+# rewrite this to instead compile pepTester.cc, assuming that the linking
+# should then be properly handled already
+# ... FC is standard fortran compiler, CXX is standard C++ compiler
 $(CUDACPP_BUILDDIR)/c$(PROG)_cudacpp: $(PROCESS) $(DSIG_cudacpp) auto_dsig.o $(LIBS) $(MATRIX) counters.o $(CUDACPP_BUILDDIR)/.cudacpplibs
 	$(FC) -o $(CUDACPP_BUILDDIR)/c$(PROG)_cudacpp $(PROCESS) $(DSIG_cudacpp) auto_dsig.o $(MATRIX) $(LINKLIBS) $(BIASDEPENDENCIES) -fopenmp counters.o -L$(LIBDIR)/$(CUDACPP_BUILDDIR) -l$(CUDACPP_COMMONLIB) -l$(CUDACPP_CXXLIB) $(LIBFLAGSRPATH) $(LDFLAGS)
 	if [ -f $(LIBDIR)/$(CUDACPP_BUILDDIR)/lib$(CUDACPP_CULIB).* ]; then $(FC) -o $(CUDACPP_BUILDDIR)/g$(PROG)_cudacpp $(PROCESS) $(DSIG_cudacpp) auto_dsig.o $(MATRIX) $(LINKLIBS) $(BIASDEPENDENCIES) -fopenmp counters.o -L$(LIBDIR)/$(CUDACPP_BUILDDIR) -l$(CUDACPP_COMMONLIB) -l$(CUDACPP_CULIB) $(LIBFLAGSRPATH) $(LDFLAGS); fi
+
+$(CUDACPP_BUILDDIR)/c$(PROGG)_cudacpp: $(PROCESS)  pepTester.o $(LIBS) $(MATRIX) counters.o $(CUDACPP_BUILDDIR)/.cudacpplibs
+	$(CXX) -o $(CUDACPP_BUILDDIR)/c$(PROGG)_cudacpp $(PROCESS) $ pepTester.o $(MATRIX) $(LINKLIBS) $(BIASDEPENDENCIES) -fopenmp counters.o -L$(LIBDIR)/$(CUDACPP_BUILDDIR) -l$(CUDACPP_COMMONLIB) -l$(CUDACPP_CXXLIB) $(LIBFLAGSRPATH) $(LDFLAGS)
+	if [ -f $(LIBDIR)/$(CUDACPP_BUILDDIR)/lib$(CUDACPP_CULIB).* ]; then $(CXX) -o $(CUDACPP_BUILDDIR)/g$(PROGG)_cudacpp $(PROCESS)  pepTester.o $(MATRIX) $(LINKLIBS) $(BIASDEPENDENCIES) -fopenmp counters.o -L$(LIBDIR)/$(CUDACPP_BUILDDIR) -l$(CUDACPP_COMMONLIB) -l$(CUDACPP_CULIB) $(LIBFLAGSRPATH) $(LDFLAGS); fi
+
 
 counters.o: counters.cpp timer.h
 	$(CXX) -std=c++11 -Wall -Wshadow -Wextra -c $< -o $@
