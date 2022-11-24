@@ -67,7 +67,7 @@ std::vector<double>& eventExtraction ( std::string fileName ) {
     // so we can also return noPrts and noElems
     static std::vector<double> momentumVec(noElems + 2);
     momentumVec[noElems] = noPrts;
-    momentumVec[noElems + 1] = noElems;
+    momentumVec[noElems + 1] = noEvents;
 
     // ZW: looping over children nodes of LHE file, but need to
     // keep track of event ordering, so we create a dummy loop
