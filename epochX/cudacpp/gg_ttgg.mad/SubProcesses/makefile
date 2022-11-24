@@ -26,7 +26,7 @@ endif
 LIBDIR = ../../lib/
 BINDIR = ../../bin/
 PROG   = madevent
-PROGG  = pepTester
+#PROGG  = pepTester
 
 ifneq ("$(wildcard ../MadLoop_makefile_definitions)","")
     include ../MadLoop_makefile_definitions
@@ -94,14 +94,14 @@ ifeq (,$(wildcard fbridge.inc))
 all: $(PROG)
 else
 all: $(PROG) $(CUDACPP_BUILDDIR)/c$(PROG)_cudacpp # also builds g$(PROG)_cudacpp if $(CUDACPP_CULIB) exists (#503)
-all: $(PROGG) $(CUDACPP_BUILDDIR)/c$(PROGG)_cudacpp # 
+#all: $(PROGG) $(CUDACPP_BUILDDIR)/c$(PROGG)_cudacpp # 
 endif
 
 $(PROG): $(PROCESS) $(DSIG) auto_dsig.o $(LIBS) $(MATRIX) counters.o
 	$(FC) -o $(PROG) $(PROCESS) $(DSIG) auto_dsig.o $(MATRIX) $(LINKLIBS) $(BIASDEPENDENCIES) -fopenmp counters.o $(LDFLAGS)
 
-$(PROGG): $(PROCESS) pepTester.o $(LIBS) $(MATRIX) counters.o
-	$(CXX) -o $(PROGG) $(PROCESS) pepTester.o $(MATRIX) $(LINKLIBS) $(BIASDEPENDENCIES) -fopenmp counters.o $(LDFLAGS)
+#$(PROGG): $(PROCESS) pepTester.o $(LIBS) $(MATRIX) counters.o
+#	$(CXX) -o $(PROGG) $(PROCESS) pepTester.o $(MATRIX) $(LINKLIBS) $(BIASDEPENDENCIES) -fopenmp counters.o $(LDFLAGS)
 
 $(LIBS): .libs
 
@@ -132,9 +132,9 @@ endif
 # should then be properly handled already
 # ... FC is standard fortran compiler, CXX is standard C++ compiler
 
-$(CUDACPP_BUILDDIR)/c$(PROGG)_cudacpp: $(PROCESS)  pepTester.o $(LIBS) $(MATRIX) counters.o $(CUDACPP_BUILDDIR)/.cudacpplibs
-	$(CXX) -o $(CUDACPP_BUILDDIR)/c$(PROGG)_cudacpp $(PROCESS) $ pepTester.o $(MATRIX) $(LINKLIBS) $(BIASDEPENDENCIES) -fopenmp counters.o -L$(LIBDIR)/$(CUDACPP_BUILDDIR) -l$(CUDACPP_COMMONLIB) -l$(CUDACPP_CXXLIB) $(LIBFLAGSRPATH) $(LDFLAGS)
-	if [ -f $(LIBDIR)/$(CUDACPP_BUILDDIR)/lib$(CUDACPP_CULIB).* ]; then $(CXX) -o $(CUDACPP_BUILDDIR)/g$(PROGG)_cudacpp $(PROCESS)  pepTester.o $(MATRIX) $(LINKLIBS) $(BIASDEPENDENCIES) -fopenmp counters.o -L$(LIBDIR)/$(CUDACPP_BUILDDIR) -l$(CUDACPP_COMMONLIB) -l$(CUDACPP_CULIB) $(LIBFLAGSRPATH) $(LDFLAGS); fi
+#$(CUDACPP_BUILDDIR)/c$(PROGG)_cudacpp: $(PROCESS)  pepTester.o $(LIBS) $(MATRIX) counters.o $(CUDACPP_BUILDDIR)/.cudacpplibs
+#	$(CXX) -o $(CUDACPP_BUILDDIR)/c$(PROGG)_cudacpp $(PROCESS) $ pepTester.o $(MATRIX) $(LINKLIBS) $(BIASDEPENDENCIES) -fopenmp counters.o -L$(LIBDIR)/$(CUDACPP_BUILDDIR) -l$(CUDACPP_COMMONLIB) -l$(CUDACPP_CXXLIB) $(LIBFLAGSRPATH) $(LDFLAGS)
+#	if [ -f $(LIBDIR)/$(CUDACPP_BUILDDIR)/lib$(CUDACPP_CULIB).* ]; then $(CXX) -o $(CUDACPP_BUILDDIR)/g$(PROGG)_cudacpp $(PROCESS)  pepTester.o $(MATRIX) $(LINKLIBS) $(BIASDEPENDENCIES) -fopenmp counters.o -L$(LIBDIR)/$(CUDACPP_BUILDDIR) -l$(CUDACPP_COMMONLIB) -l$(CUDACPP_CULIB) $(LIBFLAGSRPATH) $(LDFLAGS); fi
 
 $(CUDACPP_BUILDDIR)/c$(PROG)_cudacpp: $(PROCESS) $(DSIG_cudacpp) auto_dsig.o $(LIBS) $(MATRIX) counters.o $(CUDACPP_BUILDDIR)/.cudacpplibs
 	$(FC) -o $(CUDACPP_BUILDDIR)/c$(PROG)_cudacpp $(PROCESS) $(DSIG_cudacpp) auto_dsig.o $(MATRIX) $(LINKLIBS) $(BIASDEPENDENCIES) -fopenmp counters.o -L$(LIBDIR)/$(CUDACPP_BUILDDIR) -l$(CUDACPP_COMMONLIB) -l$(CUDACPP_CXXLIB) $(LIBFLAGSRPATH) $(LDFLAGS)
