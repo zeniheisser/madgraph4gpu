@@ -279,7 +279,7 @@ else
   endif
 endif
 # For the moment, use AVXFLAGS everywhere: eventually, use them only in encapsulated implementations?
-CXXFLAGS+= $(AVXFLAGS)
+#CXXFLAGS+= $(AVXFLAGS)
 
 # Set the build flags appropriate to each FPTYPE choice (example: "make FPTYPE=f")
 $(info FPTYPE=$(FPTYPE))
