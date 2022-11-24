@@ -38,9 +38,9 @@ int main()
 
   std::vector<double> eventVector = PEP::eventExtraction("gg2ttgg_1024.lhe");
 
-  const unsigned int nevt = eventVector[eventVector.size() - 1];
-  const unsigned int nPrt = eventVector[eventVector.size() - 2];
-  const unsigned int nMom = 4;
+  const int nevt = eventVector[eventVector.size() - 1];
+  const int nPrt = eventVector[eventVector.size() - 2];
+  const int nMom = 4;
 
 
   std::vector<double> momVector( 4 * nevt * nPrt );
