@@ -374,7 +374,7 @@ cxx_main=$(BUILDDIR)/check.exe
 fcxx_main=$(BUILDDIR)/fcheck.exe
 
 ifneq ($(NVCC),)
-cu_main=$(BUILDDIR)/gcheck.exe
+cu_main=$(BUILDDIR)/pepTester.exe
 fcu_main=$(BUILDDIR)/fgcheck.exe
 else
 cu_main=
