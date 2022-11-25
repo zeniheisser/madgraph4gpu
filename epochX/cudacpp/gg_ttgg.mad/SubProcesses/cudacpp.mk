@@ -501,6 +501,9 @@ $(cu_main): $(BUILDDIR)/gcheck_sa.o $(LIBDIR)/lib$(MG5AMC_CULIB).so $(cu_objects
 	$(NVCC) -o $@ $(BUILDDIR)/gcheck_sa.o $(CUARCHFLAGS) $(LIBFLAGS) -L$(LIBDIR) -l$(MG5AMC_CULIB) $(cu_objects_exe) $(CULIBFLAGS)
 #$(cu_main): $(BUILDDIR)/pepTester.o $(LIBDIR)/lib$(MG5AMC_CULIB).so $(cu_objects_exe)
 #	$(NVCC) -o $@ $(BUILDDIR)/pepTester.o $(CUARCHFLAGS) $(LIBFLAGS) -L$(LIBDIR) -l$(MG5AMC_CULIB) $(cu_objects_exe) $(CULIBFLAGS)
+$(pep_main): LIBFLAGS += $(CULIBFLAGSRPATH) # avoid the need for LD_LIBRARY_PATH
+$(pep_main): $(BUILDDIR)/pepTester.o $(LIBDIR)/lib$(MG5AMC_CULIB).so $(cu_objects_exe)
+	$(NVCC) -o $@ $(BUILDDIR)/pepTester.o $(LIBFLAGS) $(CUARCHFLAGS) -L$(LIBDIR) -l$(MG5AMC_CULIB) $(cu_objects_exe) $(CULIBFLAGS)
 endif
 
 #-------------------------------------------------------------------------------
