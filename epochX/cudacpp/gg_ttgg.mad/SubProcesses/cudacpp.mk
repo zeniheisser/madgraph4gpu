@@ -376,9 +376,11 @@ fcxx_main=$(BUILDDIR)/fcheck.exe
 ifneq ($(NVCC),)
 cu_main=$(BUILDDIR)/gcheck.exe
 fcu_main=$(BUILDDIR)/fgcheck.exe
+pep_main=$(BUILDDIR)/pepTester.exe
 else
 cu_main=
 fcu_main=
+pep_main=
 endif
 
 all.$(TAG): $(BUILDDIR)/.build.$(TAG) $(LIBDIR)/lib$(MG5AMC_COMMONLIB).so $(cu_main) $(cxx_main) $(fcu_main) $(fcxx_main)
@@ -528,14 +530,20 @@ ifneq ($(NVCC),)
 ifneq ($(shell $(CXX) --version | grep ^Intel),)
 $(fcu_main): LIBFLAGS += -lintlc # compile with icpx and link with nvcc (undefined reference to `_intel_fast_memcpy')
 $(fcu_main): LIBFLAGS += -lsvml # compile with icpx and link with nvcc (undefined reference to `__svml_cos4_l9')
+$(pep_main): LIBFLAGS += -lintlc # compile with icpx and link with nvcc (undefined reference to `_intel_fast_memcpy')
+$(pep_main): LIBFLAGS += -lsvml # compile with icpx and link with nvcc (undefined reference to `__svml_cos4_l9')
 endif
 ifeq ($(UNAME_S),Darwin)
 $(fcu_main): LIBFLAGS += -L$(shell dirname $(shell $(FC) --print-file-name libgfortran.dylib)) # add path to libgfortran on Mac #375
+$(pep_main): LIBFLAGS += -L$(shell dirname $(shell $(FC) --print-file-name libgfortran.dylib)) # add path to libgfortran on Mac #375
 endif
 # ZW: new idea: compile pepTester using these settings, switching everything with fcheck (fortranbased) to cpp instead
 $(fcu_main): LIBFLAGS += $(CULIBFLAGSRPATH) # avoid the need for LD_LIBRARY_PATH
 $(fcu_main): $(BUILDDIR)/fcheck_sa.o $(BUILDDIR)/fsampler_cu.o $(LIBDIR)/lib$(MG5AMC_CULIB).so $(cu_objects_exe)
 	$(NVCC) -o $@ $(BUILDDIR)/fcheck_sa.o $(BUILDDIR)/fsampler_cu.o $(LIBFLAGS) -lgfortran -L$(LIBDIR) -l$(MG5AMC_CULIB) $(cu_objects_exe) $(CULIBFLAGS)
+$(pep_main): LIBFLAGS += $(CULIBFLAGSRPATH) # avoid the need for LD_LIBRARY_PATH
+$(pep_main): $(BUILDDIR)/pepTester.o $(LIBDIR)/lib$(MG5AMC_CULIB).so $(cu_objects_exe)
+	$(NVCC) -o $@ $(BUILDDIR)/pepTester.o $(LIBFLAGS) $(CUARCHFLAGS) -L$(LIBDIR) -l$(MG5AMC_CULIB) $(cu_objects_exe) $(CULIBFLAGS)
 endif
 
 #-------------------------------------------------------------------------------
