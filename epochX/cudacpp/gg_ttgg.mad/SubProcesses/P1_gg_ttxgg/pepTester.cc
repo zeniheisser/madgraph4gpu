@@ -33,7 +33,11 @@
 #include "PEP.hpp"
 //#include "fbridge.cc"
 
- 
+#ifdef __CUDACC__
+  using namespace mg5amcGpu
+#else
+  using namespace mg5amcCpu
+#endif
 
 int main()
 {
