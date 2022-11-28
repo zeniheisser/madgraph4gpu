@@ -34,9 +34,9 @@
 //#include "fbridge.cc"
 
 #ifdef __CUDACC__
-  using namespace mg5amcGpu
+  using namespace mg5amcGpu;
 #else
-  using namespace mg5amcCpu
+  using namespace mg5amcCpu;
 #endif
 
 int main()
