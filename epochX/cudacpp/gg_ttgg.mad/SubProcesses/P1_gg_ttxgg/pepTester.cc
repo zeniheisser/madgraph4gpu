@@ -158,7 +158,12 @@ int main()
     gsVector[ ievt ] = eventVector[ 4 * nPrt * nevt + ievt ];
   }
 
-  CppObjectInFortran *fortrPoint;
+#ifdef __CUDACC__
+  mg5amcGpu::CppObjectInFortran *fortrPoint;
+#else
+  mg5amcCpu::CppObjectInFortran *fortrPoint;
+#endif
+
   std::vector<double> mesVector( nevt );
   const unsigned int chanId = 0;
   fbridgecreate_( &fortrPoint, &nevt, &nPrt, &nMom );
