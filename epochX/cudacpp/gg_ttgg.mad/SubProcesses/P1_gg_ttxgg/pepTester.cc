@@ -31,7 +31,7 @@
 #include "epoch_process_id.h"
 #include "timermap.h"
 #include "PEP.hpp"
-#include "fbridge.cc"
+//#include "fbridge.cc"
 
  
 
@@ -64,7 +64,7 @@ int main()
     gsVector[ ievt ] = eventVector[ 4 * nPrt * nevt + ievt ];
   }
 
-  //CppObjectInFortran *fortrPoint;
+  CppObjectInFortran *fortrPoint;
   //std::vector<double> mesVector( nevt );
   //const unsigned int chanId = 0;
   //fbridgecreate_( &fortrPoint, &nevt, &nPrt, &nMom );
