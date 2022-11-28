@@ -31,7 +31,7 @@
 #include "epoch_process_id.h"
 #include "timermap.h"
 #include "PEP.hpp"
-//#include "fbridge.cc"
+#include "fbridge.cc"
 
 #ifdef __CUDACC__
   using namespace mg5amcGpu;
