@@ -73,7 +73,7 @@ int main()
   std::vector<double> mesVector( nevt );
   const unsigned int chanId = 0;
   fbridgecreate_( &fortrPoint, &nevt, &nPrt, &nMom );
-  //fbridgesequence_( &fortrPoint, &momVector[0], &gsVector[0], &mesVector[0], &chanId );
+  fbridgesequence_( &fortrPoint, &momVector[0], &gsVector[0], &mesVector[0], &chanId );
   fbridgedelete_( &fortrPoint );
 
 
