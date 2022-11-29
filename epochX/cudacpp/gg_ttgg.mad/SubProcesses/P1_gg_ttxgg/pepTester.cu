@@ -76,6 +76,11 @@ int main()
   fbridgesequence_( &fortrPoint, &momVector[0], &gsVector[0], &mesVector[0], &chanId );
   fbridgedelete_( &fortrPoint );
 
+  for( auto matrElem : mesVector )
+  {
+    std::cout << matrElem << "\n";
+  }
+
 
 
   return 0;
