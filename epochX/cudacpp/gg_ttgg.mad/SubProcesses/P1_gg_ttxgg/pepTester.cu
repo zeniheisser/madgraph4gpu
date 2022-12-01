@@ -118,7 +118,7 @@ int main()
 
   for( auto pairSet : PEP::procExtractor(lheFile) )
   {
-    std::cout << "Process: " << std::get<std::string>(pairSet) << " with " << std::get<int> << " external particles\n";
+    std::cout << "Process: " << std::get<0>(pairSet) << " with " << std::get<1> << " external particles\n";
   }
 
 
