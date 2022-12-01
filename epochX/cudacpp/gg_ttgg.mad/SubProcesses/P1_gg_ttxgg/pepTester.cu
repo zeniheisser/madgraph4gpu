@@ -107,6 +107,20 @@ int main()
     std::cout << "OG wgt is " << wgtsVector[k] << " and RWd is " << (mesVector2[k] / mesVector[k]) * wgtsVector[k] << "\n";
   }
 
+  pt::ptree lheFile;
+
+  try {
+      pt::read_xml("gg2ttgg_1024.lhe", lheFile);
+  } catch (pt::xml_parser_error &e) {
+      std :: cout << "Failed to parse LHE file" << e.what();
+  } catch (...) {        std :: cout << "Undefined error while parsing LHE file";
+  }
+
+  for( auto pairSet : PEP::procExtractor(lheFile) )
+  {
+    std::cout << "Process: " << std::get<std::string>(pairSet) << " with " << std::get<int> << " external particles\n";
+  }
+
 
 
   return 0;
