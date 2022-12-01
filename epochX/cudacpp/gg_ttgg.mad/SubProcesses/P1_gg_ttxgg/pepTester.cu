@@ -117,6 +117,7 @@ int main()
   }
 
   std::set<std::pair<std::string, int>> processSet = PEP::procExtractor(lheFile);
+  std::cout << "\n" << processSet.size() << "\n";
 
   for( std::pair<std::string, int> pairSet : processSet )
   {
