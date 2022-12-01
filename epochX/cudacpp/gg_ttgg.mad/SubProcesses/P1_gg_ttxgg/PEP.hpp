@@ -200,7 +200,7 @@ std::set<std::pair<std::string, int>>& procExtractor ( pt::ptree eventFile ) {
                 }
             }
         }
-        if (procSet.find( std::make_pair( thisLine, noPrts ) ) = procSet.end()){
+        if (procSet.find( std::make_pair( thisLine, noPrts ) ) == procSet.end()){
             procSet.insert(std::make_pair( thisLine, noPrts ));
         }
     }
