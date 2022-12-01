@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <cmath>
+#include <utility>
 
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
@@ -100,5 +101,108 @@ std::vector<double>& eventExtraction ( std::string fileName ) {
     return momentumVec;
 }
 
+std::vector<std::string>& procList ( pt::ptree eventFile ) {
+
+    // ZW: get the generator
+    // development used MG5aMC so could make simplifications for that,
+    // but the extraction works for general LHE files 
+    auto genName = eventFile.get<std::string>("LesHouchesEvents.init.generator.<xmlattr>.name");
+
+    // ZW: extract number of events, either using the generation info (if MG5aMC)
+    // or by just counting the number of event tags (other generators)
+    int noEvents = 0;
+    if (genName == "MadGraph5_aMC@NLO") {
+        auto& mgInfo = eventFile.get_child("LesHouchesEvents.header.MGGenerationInfo");
+        auto lineEnd = mgInfo.data().substr(2,60).find("\n");
+        noEvents = std::stoi(mgInfo.data().substr(32, lineEnd + 2));
+    } else {
+        for (auto& event : eventFile.get_child("LesHouchesEvents")) {
+            if (event.first != "event"){
+                continue;
+            }
+            noEvents += 1;
+        }
+    }
+
+    static std::vector<std::string> procsList(noEvents);
+
+    // ZW: looping over children nodes of LHE file, but need to
+    // keep track of event ordering, so we create a dummy loop
+    // variable to remember current event number
+    int currEv = 0;
+    for (auto& event : eventFile.get_child("LesHouchesEvents")) {
+        if (event.first != "event"){
+            continue;
+        }
+        // ZW: for each new event, find the linebreak from the first line (event information)
+        // where it switches to the second line (first real particle line)
+        auto startPos = event.second.data().find("\n", 8); 
+        auto noPrts = std::stoi(event.data().substr(0,7));
+        std::string thisLine = "";
+        bool toPtNFnd = true;
+        auto prtState = std::stoi(event.second.data().substr(startPos + 11));
+        // ZW: loop over all particles in current event
+        for (int currPrt = 0; currPrt < noPrts; currPrt++ ) {
+            // ZW: loop over each momentum component of current particle
+            thisLine += std::to_string(std::stoi(event.second.data().substr(startPos)));
+            thisLine += " ";
+            // ZW: update startPos so that the next particle iteration will start at the break between current particle and next
+            startPos = event.second.data().find("\n", startPos + 2);
+            if( toPtNFnd ){
+                if( std::stoi(event.second.data().substr(startPos + 11)) != prtState ) {
+                    thisLine += " > ";
+                    toPtNFnd = false;
+                }
+            }
+        }
+        procsList[currEv] = thisLine;
+        currEv += 1;
+    }
+    return procsList;
+}
+
+std::set<std::pair<std::string, int>>& procExtractor ( pt::ptree eventFile ) {
+
+    // ZW: get the generator
+    // development used MG5aMC so could make simplifications for that,
+    // but the extraction works for general LHE files 
+    auto genName = eventFile.get<std::string>("LesHouchesEvents.init.generator.<xmlattr>.name");
+
+    static std::set<std::pair<std::string, int>> procSet;
+
+    // ZW: looping over children nodes of LHE file, but need to
+    // keep track of event ordering, so we create a dummy loop
+    // variable to remember current event number
+    for (auto& event : eventFile.get_child("LesHouchesEvents")) {
+        if (event.first != "event"){
+            continue;
+        }
+        // ZW: for each new event, find the linebreak from the first line (event information)
+        // where it switches to the second line (first real particle line)
+        auto startPos = event.second.data().find("\n", 8); 
+        auto noPrts = std::stoi(event.data().substr(0,7));
+        std::string thisLine = "";
+        bool toPtNFnd = true;
+        auto prtState = std::stoi(event.second.data().substr(startPos + 11));
+        // ZW: loop over all particles in current event
+        for (int currPrt = 0; currPrt < noPrts; currPrt++ ) {
+            // ZW: loop over each momentum component of current particle
+            thisLine += std::to_string(std::stoi(event.second.data().substr(startPos)));
+            thisLine += " ";
+            // ZW: update startPos so that the next particle iteration will start at the break between current particle and next
+            startPos = event.second.data().find("\n", startPos + 2);
+            if( toPtNFnd ){
+                if( std::stoi(event.second.data().substr(startPos + 11)) != prtState ) {
+                    thisLine += " > ";
+                    toPtNFnd = false;
+                }
+            }
+        }
+        if (procSet.count( std::make_pair( thisLine, noPrts ) )){
+            procSet.insert(std::make_pair( thisLine, noPrts ));
+        }
+    }
+    return procSet;
+}
 
 }
