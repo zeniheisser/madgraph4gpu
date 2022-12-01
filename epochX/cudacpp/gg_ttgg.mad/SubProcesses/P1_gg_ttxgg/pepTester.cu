@@ -116,7 +116,9 @@ int main()
   } catch (...) {        std :: cout << "Undefined error while parsing LHE file";
   }
 
-  for( auto pairSet : PEP::procExtractor(lheFile) )
+  std::set<std::pair<std::string, int>> processSet = PEP::procExtractor(lheFile);
+
+  for( std::pair<std::string, int> pairSet : processSet )
   {
     std::cout << "Process: " << std::get<0>(pairSet) << " with " << std::get<1> << " external particles\n";
   }
