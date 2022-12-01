@@ -120,7 +120,7 @@ int main()
 
   for( std::pair<std::string, int> pairSet : processSet )
   {
-    std::cout << "Process: " << std::get<0>(pairSet) << " with " << std::get<1> << " external particles\n";
+    std::cout << "Process: " << std::get<std::string>(pairSet) << " with " << std::get<int> << " external particles\n";
   }
 
 
