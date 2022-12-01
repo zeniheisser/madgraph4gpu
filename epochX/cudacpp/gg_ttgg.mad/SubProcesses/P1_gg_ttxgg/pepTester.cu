@@ -94,7 +94,7 @@ int main()
  for( unsigned int i = 0; i < nevt; ++i )
  {
     constexpr double fixedG = 1.2177157847767195; // fixed G for aS=0.118 (hardcoded for now in check_sa.cc, fcheck_sa.f, runTest.cc)
-    gsVector[i] = fixedG;
+    gsVector2[i] = fixedG;
     //if ( i > 0 ) hstGs[i] = 0; // try hardcoding G only for event 0
     //hstGs[i] = i;
  }
@@ -104,7 +104,7 @@ int main()
 
   for( unsigned int k = 0; k < nevt; ++k)
   {
-    std::cout << "OG ME is " << mesVector[k] << " and RWd ME is " << mesVector2[k] << "\n";
+    std::cout << "OG wgt is " << wgtsVector[k] << " and RWd is " << (mesVector2[k] / mesVector[k]) * wgtsVector[k] << "\n";
   }
 
 
