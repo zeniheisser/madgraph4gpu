@@ -4,6 +4,7 @@
 // it is sufficiently similar for this purpose
 #include <iostream>
 #include <string>
+#include <set>
 #include <cmath>
 #include <utility>
 
@@ -137,7 +138,7 @@ std::vector<std::string>& procList ( pt::ptree eventFile ) {
         // ZW: for each new event, find the linebreak from the first line (event information)
         // where it switches to the second line (first real particle line)
         auto startPos = event.second.data().find("\n", 8); 
-        auto noPrts = std::stoi(event.data().substr(0,7));
+        auto noPrts = std::stoi(event.second.data().substr(0,7));
         std::string thisLine = "";
         bool toPtNFnd = true;
         auto prtState = std::stoi(event.second.data().substr(startPos + 11));
@@ -180,7 +181,7 @@ std::set<std::pair<std::string, int>>& procExtractor ( pt::ptree eventFile ) {
         // ZW: for each new event, find the linebreak from the first line (event information)
         // where it switches to the second line (first real particle line)
         auto startPos = event.second.data().find("\n", 8); 
-        auto noPrts = std::stoi(event.data().substr(0,7));
+        auto noPrts = std::stoi(event.second.data().substr(0,7));
         std::string thisLine = "";
         bool toPtNFnd = true;
         auto prtState = std::stoi(event.second.data().substr(startPos + 11));
