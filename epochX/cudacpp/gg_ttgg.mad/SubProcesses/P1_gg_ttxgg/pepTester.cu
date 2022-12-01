@@ -76,9 +76,9 @@ int main()
   const unsigned int chanId = 0;
   fbridgecreate_( &fortrPoint, &nevt, &nPrt, &nMom );
   fbridgesequence_( &fortrPoint, &momVector[0], &gsVector[0], &mesVector[0], &chanId );
-  fbridgedelete_( &fortrPoint );
+//  fbridgedelete_( &fortrPoint );
 
-  for( auto matrElem : mesVector )
+ /*  for( auto matrElem : mesVector )
   {
     std::cout << matrElem << "\n";
   }
@@ -87,6 +87,27 @@ int main()
   {
     std::cout << wgts << "\n";
   }
+ */
+
+
+ std::vector<double> mesVector2( nevt );
+ for( unsigned int i = 0; i < nevt; ++i )
+ {
+    constexpr double fixedG = 1.2177157847767195; // fixed G for aS=0.118 (hardcoded for now in check_sa.cc, fcheck_sa.f, runTest.cc)
+    gsvector[i] = fixedG;
+    //if ( i > 0 ) hstGs[i] = 0; // try hardcoding G only for event 0
+    //hstGs[i] = i;
+ }
+
+  fbridgesequence_( &fortrPoint, &momVector[0], &gsVector[0], &mesVector2[0], &chanId );
+  fbridgedelete_( &fortrPoint );
+
+  for( unsigned int k = 0; k < nevt; ++k)
+  {
+    std::cout << "OG ME is " << mesVector[k] << " and RWd ME is " << mesVector2[k] << "\n";
+  }
+
+
 
   return 0;
 }
