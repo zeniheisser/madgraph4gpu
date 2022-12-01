@@ -94,7 +94,7 @@ int main()
  for( unsigned int i = 0; i < nevt; ++i )
  {
     constexpr double fixedG = 1.2177157847767195; // fixed G for aS=0.118 (hardcoded for now in check_sa.cc, fcheck_sa.f, runTest.cc)
-    gsVector2[i] = fixedG;
+    gsVector[i] = fixedG;
     //if ( i > 0 ) hstGs[i] = 0; // try hardcoding G only for event 0
     //hstGs[i] = i;
  }
