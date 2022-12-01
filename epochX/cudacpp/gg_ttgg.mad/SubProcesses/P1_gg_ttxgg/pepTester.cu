@@ -52,6 +52,7 @@ int main()
 
   std::vector<double> momVector( 4 * nevt * nPrt );
   std::vector<double> gsVector( nevt );
+  std::vector<double> wgtsVector( nevt );
 
   // ZW: change eventVector ordering so that the momentum order for
   // each particle is (E, px, py, pz) instead of the LHEF convention
@@ -67,6 +68,7 @@ int main()
       }
     }
     gsVector[ ievt ] = eventVector[ 4 * nPrt * nevt + ievt ];
+    wgtsVector[ ievt ] = eventVector[ (4 * nPrt + 1) * nevt + ievt];
   }
 
   CppObjectInFortran *fortrPoint;
@@ -81,7 +83,10 @@ int main()
     std::cout << matrElem << "\n";
   }
 
-
+  for( auto wgts : wgtsVector )
+  {
+    std::cout << wgts << "\n";
+  }
 
   return 0;
 }
