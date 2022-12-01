@@ -83,7 +83,7 @@ std::vector<double>& eventExtraction ( std::string fileName ) {
         // ZW: append alphaS of current event
         // ZW: update -- for now append g_S instead of alphaS
         momentumVec[noEvents*noPrts*4 + currEv] = std::sqrt( 4.0 * M_PI * std::stod(event.second.data().substr(startPos - 15, 16)));
-        momentumVec[noEvents*(noPrts*4 + 1) + currEv] = std::stod(event.second.data().substr(startPos - 61, 16));
+        momentumVec[noEvents*(noPrts*4 + 1) + currEv] = std::stod(event.second.data().substr(startPos - 60, 16));
         // ZW: loop over all particles in current event
         for (int currPrt = 0; currPrt < noPrts; currPrt++ ) {
             // ZW: loop over each momentum component of current particle
