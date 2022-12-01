@@ -185,6 +185,7 @@ std::set<std::pair<std::string, int>>& procExtractor ( pt::ptree eventFile ) {
         std::string thisLine = "";
         bool toPtNFnd = true;
         auto prtState = std::stoi(event.second.data().substr(startPos + 11));
+        //std::cout << "in an event\n";
         // ZW: loop over all particles in current event
         for (int currPrt = 0; currPrt < noPrts; currPrt++ ) {
             // ZW: loop over each momentum component of current particle
@@ -199,7 +200,7 @@ std::set<std::pair<std::string, int>>& procExtractor ( pt::ptree eventFile ) {
                 }
             }
         }
-        if (procSet.count( std::make_pair( thisLine, noPrts ) )){
+        if (procSet.find( std::make_pair( thisLine, noPrts ) ) = procSet.end()){
             procSet.insert(std::make_pair( thisLine, noPrts ));
         }
     }
