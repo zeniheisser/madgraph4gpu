@@ -126,7 +126,7 @@ int main()
 
   std::vector<std::string> eventElems = PEP::pepSplitter(lheFile);
   for( auto entry : eventElems ){
-    std::cout << "Entry:" << entry << "and it ends here\n";
+    std::cout << "Entry:" << entry << "\n";
   }
 
 

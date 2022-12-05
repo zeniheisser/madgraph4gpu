@@ -11,6 +11,7 @@
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/replace.hpp>
 
 // ZW: only use the property_tree (and associated rapidXML implementation)
 // portions of boost, so shorten namespace for simplicity
@@ -228,7 +229,8 @@ std::vector<std::string>& pepSplitter ( pt::ptree eventFile ) {
         // where it switches to the second line (first real particle line)
         auto startPos = event.second.data().find("\n", 8); 
         auto noPrts = std::stoi(event.second.data().substr(0,7));
-        boost::split(procElems, event.second.data(), boost::is_any_of(" "));
+        std::string currEvt = boost::replace_all_copy(event.second.data(), '\n', ' ');
+        boost::split(procElems, currEvt, boost::is_any_of(" "));
         //std::cout << "in an event\n";
         
     }
