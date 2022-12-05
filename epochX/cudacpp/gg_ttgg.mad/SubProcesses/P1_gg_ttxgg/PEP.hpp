@@ -231,13 +231,21 @@ std::vector<std::string>& pepSplitter ( pt::ptree eventFile ) {
         auto startPos = event.second.data().find("\n", 8); 
         auto noPrts = std::stoi(event.second.data().substr(0,7));
         std::replace( event.second.data().begin(), event.second.data().end(), '\n', ' ');
+        std::cout << "first we replace some stuff\n";
         boost::split(procElems, event.second.data(), boost::is_any_of(" "));
+        std::cout << "then we split some stuff\n";
         int falseSize = std::count(procElems.begin(), procElems.end(), "");
+        std::cout << "next, we count some stuff\n";
         trueElems.reserve(procElems.size() - falseSize);
+        std::cout << "and after that we allocate some stuff\n";
         int trueSize = 0;
+        std::cout << "and finally, we memorise some stuff\n";
         for( int k = 0; k < procElems.size(); ++k){
             if( procElems[k] != ""){
+                std::cout << "but we might not actually make it into the loop\n";
                 trueElems[trueSize] = procElems[k];
+                std::cout << "and if we do, it's not clear that we can do anything within it\n";
+                trueSize += 1;
             }
         }
 
