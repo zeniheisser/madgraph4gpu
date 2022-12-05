@@ -10,6 +10,7 @@
 
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
+#include <boost/algorithm/string.hpp>
 
 // ZW: only use the property_tree (and associated rapidXML implementation)
 // portions of boost, so shorten namespace for simplicity
@@ -205,6 +206,33 @@ std::set<std::pair<std::string, int>>& procExtractor ( pt::ptree eventFile ) {
         }
     }
     return procSet;
+}
+
+std::vector<std::string>& pepSplitter ( pt::ptree eventFile ) {
+
+    // ZW: get the generator
+    // development used MG5aMC so could make simplifications for that,
+    // but the extraction works for general LHE files 
+    auto genName = eventFile.get<std::string>("LesHouchesEvents.init.generator.<xmlattr>.name");
+
+    static std::vector<std::string> procElems;
+
+    // ZW: looping over children nodes of LHE file, but need to
+    // keep track of event ordering, so we create a dummy loop
+    // variable to remember current event number
+    for (auto& event : eventFile.get_child("LesHouchesEvents")) {
+        if (event.first != "event"){
+            continue;
+        }
+        // ZW: for each new event, find the linebreak from the first line (event information)
+        // where it switches to the second line (first real particle line)
+        auto startPos = event.second.data().find("\n", 8); 
+        auto noPrts = std::stoi(event.second.data().substr(0,7));
+        boost::split(procElems, event.second.data(), boost::is_any_of(" "));
+        //std::cout << "in an event\n";
+        
+    }
+    return procElems;
 }
 
 }
