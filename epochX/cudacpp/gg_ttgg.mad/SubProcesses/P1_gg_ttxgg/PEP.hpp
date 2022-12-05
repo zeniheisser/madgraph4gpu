@@ -217,6 +217,7 @@ std::vector<std::string>& pepSplitter ( pt::ptree eventFile ) {
     auto genName = eventFile.get<std::string>("LesHouchesEvents.init.generator.<xmlattr>.name");
 
     static std::vector<std::string> procElems;
+    static std::vector<std::string> trueElems;
 
     // ZW: looping over children nodes of LHE file, but need to
     // keep track of event ordering, so we create a dummy loop
@@ -230,12 +231,20 @@ std::vector<std::string>& pepSplitter ( pt::ptree eventFile ) {
         auto startPos = event.second.data().find("\n", 8); 
         auto noPrts = std::stoi(event.second.data().substr(0,7));
         std::replace( event.second.data().begin(), event.second.data().end(), '\n', ' ');
-        std::cout << event.second.data();
         boost::split(procElems, event.second.data(), boost::is_any_of(" "));
+        int falseSize = std::count(procElems.begin(), procElems.end(), "");
+        trueElems.reserve(procElems.size() - falseSize);
+        int trueSize = 0;
+        for( int k = 0; k < procElems.size(); ++k){
+            if( procElems[k] != ""){
+                trueElems[trueSize] = procElems[k];
+            }
+        }
+
         //std::cout << "in an event\n";
         
     }
-    return procElems;
+    return trueElems;
 }
 
 }
