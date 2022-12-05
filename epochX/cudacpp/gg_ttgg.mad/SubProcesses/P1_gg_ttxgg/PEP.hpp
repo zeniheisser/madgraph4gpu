@@ -231,6 +231,7 @@ std::vector<std::string>& pepSplitter ( pt::ptree eventFile ) {
         auto noPrts = std::stoi(event.second.data().substr(0,7));
         std::replace( event.second.data().begin(), event.second.data().end(), '\n', ' ');
         std::replace( event.second.data().begin(), event.second.data().end(), '\t', ' ');
+        std::cout << event.second.data();
         boost::split(procElems, event.second.data(), boost::is_any_of(" "));
         //std::cout << "in an event\n";
         
