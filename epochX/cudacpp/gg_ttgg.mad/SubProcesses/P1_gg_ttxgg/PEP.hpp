@@ -236,7 +236,7 @@ std::vector<std::string>& pepSplitter ( pt::ptree eventFile ) {
         std::cout << "then we split some stuff\n";
         int falseSize = std::count(procElems.begin(), procElems.end(), "");
         std::cout << "next, we count some stuff\n";
-        trueElems.reserve(procElems.size() - falseSize);
+        trueElems.resize(procElems.size() - falseSize);
         std::cout << "and after that we allocate some stuff\n";
         int trueSize = 0;
         std::cout << "and finally, we memorise some stuff\n";
