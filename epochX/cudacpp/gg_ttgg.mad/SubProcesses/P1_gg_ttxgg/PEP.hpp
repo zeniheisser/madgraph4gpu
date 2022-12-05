@@ -221,7 +221,7 @@ std::vector<std::string>& pepSplitter ( pt::ptree eventFile ) {
     // ZW: looping over children nodes of LHE file, but need to
     // keep track of event ordering, so we create a dummy loop
     // variable to remember current event number
-    for (auto event : eventFile.get_child("LesHouchesEvents")) {
+    for (auto& event : eventFile.get_child("LesHouchesEvents")) {
         if (event.first != "event"){
             continue;
         }
@@ -229,9 +229,16 @@ std::vector<std::string>& pepSplitter ( pt::ptree eventFile ) {
         // where it switches to the second line (first real particle line)
         auto startPos = event.second.data().find("\n", 8); 
         auto noPrts = std::stoi(event.second.data().substr(0,7));
-        std::replace( event.second.data().begin(), event.second.data().end(), '\n', ' ');
-        std::replace( event.second.data().begin(), event.second.data().end(), '\t', ' ');
-        std::cout << event.second.data();
+        std::string currEvt;
+        size_t currLen = 0;
+        size_t len = event.second.data().length();
+        while (currLen < len){
+            size_t end = event.second.data().find_first_of(' ', currLen) + 1;
+            currEvt += event.second.data().substr(currLen, end - currLen);
+            currLen = event.second.data().find_first_not_of(' ', end );
+        }
+        std::replace( currEvt.begin(), currEvt.end(), '\n', ' ');
+        //std::cout << event.second.data();
         boost::split(procElems, event.second.data(), boost::is_any_of(" "));
         //std::cout << "in an event\n";
         
