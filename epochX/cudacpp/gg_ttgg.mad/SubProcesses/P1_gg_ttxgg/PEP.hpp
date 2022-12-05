@@ -233,10 +233,12 @@ std::vector<std::string>& pepSplitter ( pt::ptree eventFile ) {
         std::replace( event.second.data().begin(), event.second.data().end(), '\n', ' ');
         boost::split(procElems, event.second.data(), boost::is_any_of(" "));
         int falseSize = std::count(procElems.begin(), procElems.end(), "");
-        trueElems.reserve(procElems.size() - falseSize);
+        trueElems.resize(procElems.size() - falseSize);
+        int trueSize = 0;
         for( int k = 0; k < procElems.size(); ++k){
             if( procElems[k] != ""){
-                trueElems.push_back(procElems[k]);
+                trueElems[trueSize] = procElems[k];
+                trueSize += 1;
             }
         }
 
