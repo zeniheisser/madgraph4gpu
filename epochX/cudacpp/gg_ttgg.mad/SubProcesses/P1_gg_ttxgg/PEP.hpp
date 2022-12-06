@@ -104,7 +104,7 @@ std::vector<double>& eventExtraction ( std::string fileName ) {
     return momentumVec;
 }
 
-std::vector<std::string>& procList ( pt::ptree eventFile ) {
+std::vector<std::string>& procList ( pt::ptree &eventFile ) {
 
     // ZW: get the generator
     // development used MG5aMC so could make simplifications for that,
@@ -164,7 +164,7 @@ std::vector<std::string>& procList ( pt::ptree eventFile ) {
     return procsList;
 }
 
-std::set<std::pair<std::string, int>>& procExtractor ( pt::ptree eventFile ) {
+std::set<std::pair<std::string, int>>& procExtractor ( pt::ptree &eventFile ) {
 
     // ZW: get the generator
     // development used MG5aMC so could make simplifications for that,
@@ -209,12 +209,7 @@ std::set<std::pair<std::string, int>>& procExtractor ( pt::ptree eventFile ) {
     return procSet;
 }
 
-std::vector<std::string>& pepSplitter ( pt::ptree eventFile ) {
-
-    // ZW: get the generator
-    // development used MG5aMC so could make simplifications for that,
-    // but the extraction works for general LHE files 
-    auto genName = eventFile.get<std::string>("LesHouchesEvents.init.generator.<xmlattr>.name");
+std::vector<std::string>& pepSplitter ( pt::ptree &eventFile ) {
 
     static std::vector<std::string> procElems;
     static std::vector<std::string> trueElems;
@@ -239,6 +234,58 @@ std::vector<std::string>& pepSplitter ( pt::ptree eventFile ) {
                 trueSize += 1;
             }
         }
+
+        //std::cout << "in an event\n";
+        
+    }
+    return trueElems;
+}
+
+std::vector<std::string>& eventExtractor( pt::ptree &eventFile ) {
+
+    static std::vector<std::string> procElems;
+    static std::vector<std::string> trueElems;
+
+    // ZW: looping over children nodes of LHE file, but need to
+    // keep track of event ordering, so we create a dummy loop
+    // variable to remember current event number
+    for (auto event : eventFile.get_child("LesHouchesEvents")) {
+        if (event.first != "event"){
+            continue;
+        }
+        // ZW: for each new event, find the linebreak from the first line (event information)
+        // where it switches to the second line (first real particle line)
+        std::replace( event.second.data().begin(), event.second.data().end(), '\n', ' ');
+        boost::split(procElems, event.second.data(), boost::is_any_of(" "));
+        int noPrt = 0;
+        bool noPrtLost = true;
+        while( noPrtLost ){
+            if(procElems[noPrt] == ""){
+                noPrt += 1;
+                continue;
+            } else {
+                noPrt = std::stoi(procElems[noPrt]);
+                noPrtLost = false;
+            }
+        }
+        //int falseSize = std::count(procElems.begin(), procElems.end(), "");
+        trueElems.resize(procElems.size() - std::count(procElems.begin(), procElems.end(), ""));
+        int trueSize = 0;
+        int totNumElems = 6 + 13 * noPrt;
+        int prcElem = 0;
+        while ( trueSize < totNumElems ){
+            if( procElems[prcElem] != ""){
+                trueElems[trueSize] = procElems[prcElem];
+                trueSize += 1;
+            }
+            trueSize += 1;
+        }
+ /*        for( int k = 0; k < procElems.size(); ++k){
+            if( procElems[k] != ""){
+                trueElems[trueSize] = procElems[k];
+                trueSize += 1;
+            }
+        } */
 
         //std::cout << "in an event\n";
         

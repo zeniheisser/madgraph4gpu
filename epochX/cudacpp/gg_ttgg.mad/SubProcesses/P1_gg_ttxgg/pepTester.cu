@@ -124,12 +124,12 @@ int main()
     std::cout << "Process: " << pairSet.first << " with " << pairSet.second << " external particles\n";
   }
 
-/*   std::vector<std::string> eventElems = PEP::pepSplitter(lheFile);
+  std::vector<std::string> eventElems = PEP::eventExtractor(lheFile);
   for( auto entry : eventElems ){
     if( entry != ""){
       std::cout << "Entry: " << entry << "\n";
     }
-  } */
+  }
 
 
 
