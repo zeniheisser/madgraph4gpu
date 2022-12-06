@@ -280,15 +280,6 @@ std::vector<std::string>& eventExtractor( pt::ptree &eventFile ) {
             }
             prcElem += 1;
         }
- /*        for( int k = 0; k < procElems.size(); ++k){
-            if( procElems[k] != ""){
-                trueElems[trueSize] = procElems[k];
-                trueSize += 1;
-            }
-        } */
-
-        //std::cout << "in an event\n";
-        
     }
     return trueElems;
 }
