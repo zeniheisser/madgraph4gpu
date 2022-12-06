@@ -116,8 +116,8 @@ int main()
   } catch (...) {        std :: cout << "Undefined error while parsing LHE file";
   }
 
-/*   std::set<std::pair<std::string, int>> processSet = PEP::procExtractor(lheFile);
-  std::cout << "\n" << processSet.size() << "\n"; */
+  std::set<std::pair<std::string, int>> processSet = PEP::procExtractor(lheFile);
+  //std::cout << "\n" << processSet.size() << "\n";
 
   for( std::pair<std::string, int> pairSet : processSet )
   {
