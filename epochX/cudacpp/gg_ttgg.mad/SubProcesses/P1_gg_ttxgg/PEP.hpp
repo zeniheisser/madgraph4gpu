@@ -278,7 +278,7 @@ std::vector<std::string>& eventExtractor( pt::ptree &eventFile ) {
                 trueElems[trueSize] = procElems[prcElem];
                 trueSize += 1;
             }
-            trueSize += 1;
+            prcElem += 1;
         }
  /*        for( int k = 0; k < procElems.size(); ++k){
             if( procElems[k] != ""){

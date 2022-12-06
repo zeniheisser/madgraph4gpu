@@ -126,9 +126,7 @@ int main()
 
   std::vector<std::string> eventElems = PEP::eventExtractor(lheFile);
   for( auto entry : eventElems ){
-    if( entry != ""){
       std::cout << "Entry: " << entry << "\n";
-    }
   }
 
 
