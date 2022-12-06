@@ -228,8 +228,6 @@ std::vector<std::string>& pepSplitter ( pt::ptree eventFile ) {
         }
         // ZW: for each new event, find the linebreak from the first line (event information)
         // where it switches to the second line (first real particle line)
-        auto startPos = event.second.data().find("\n", 8); 
-        auto noPrts = std::stoi(event.second.data().substr(0,7));
         std::replace( event.second.data().begin(), event.second.data().end(), '\n', ' ');
         boost::split(procElems, event.second.data(), boost::is_any_of(" "));
         int falseSize = std::count(procElems.begin(), procElems.end(), "");

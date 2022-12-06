@@ -102,10 +102,10 @@ int main()
   fbridgesequence_( &fortrPoint, &momVector[0], &gsVector[0], &mesVector2[0], &chanId );
   fbridgedelete_( &fortrPoint );
 
-/*   for( unsigned int k = 0; k < nevt; ++k)
+  for( unsigned int k = 0; k < nevt; ++k)
   {
     std::cout << "OG wgt is " << wgtsVector[k] << " and RWd is " << (mesVector2[k] / mesVector[k]) * wgtsVector[k] << "\n";
-  } */
+  }
 
   pt::ptree lheFile;
 
@@ -116,20 +116,20 @@ int main()
   } catch (...) {        std :: cout << "Undefined error while parsing LHE file";
   }
 
-  std::set<std::pair<std::string, int>> processSet = PEP::procExtractor(lheFile);
-  std::cout << "\n" << processSet.size() << "\n";
+/*   std::set<std::pair<std::string, int>> processSet = PEP::procExtractor(lheFile);
+  std::cout << "\n" << processSet.size() << "\n"; */
 
   for( std::pair<std::string, int> pairSet : processSet )
   {
     std::cout << "Process: " << pairSet.first << " with " << pairSet.second << " external particles\n";
   }
 
-  std::vector<std::string> eventElems = PEP::pepSplitter(lheFile);
+/*   std::vector<std::string> eventElems = PEP::pepSplitter(lheFile);
   for( auto entry : eventElems ){
     if( entry != ""){
       std::cout << "Entry: " << entry << "\n";
     }
-  }
+  } */
 
 
 
