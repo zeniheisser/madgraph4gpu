@@ -105,7 +105,7 @@ int main()
  */
 
 
- std::vector<double> mesVector2( nevt );
+ std::vector<double> mesVector2( nEvtExt );
  for( unsigned int i = 0; i < nevt; ++i )
  {
     constexpr double fixedG = 1.2177157847767195; // fixed G for aS=0.118 (hardcoded for now in check_sa.cc, fcheck_sa.f, runTest.cc)
