@@ -43,7 +43,7 @@
 int main()
 {
 
-  std::vector<double> eventVector = PEP::eventExtraction("gg2ttgg_65k.lhe");
+  std::vector<double> eventVector = PEP::eventExtraction("gg2ttgg_10k.lhe");
 
   const int nevt = eventVector[eventVector.size() - 1];
   const int nPrt = eventVector[eventVector.size() - 2];
@@ -125,7 +125,7 @@ int main()
   pt::ptree lheFile;
 
   try {
-      pt::read_xml("gg2ttgg_65k.lhe", lheFile);
+      pt::read_xml("gg2ttgg_10k.lhe", lheFile);
   } catch (pt::xml_parser_error &e) {
       std :: cout << "Failed to parse LHE file" << e.what();
   } catch (...) {        std :: cout << "Undefined error while parsing LHE file";
