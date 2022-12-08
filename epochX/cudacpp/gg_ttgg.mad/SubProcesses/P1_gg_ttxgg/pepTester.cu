@@ -48,7 +48,7 @@ int main()
   const int nevt = eventVector[eventVector.size() - 1];
   const int nPrt = eventVector[eventVector.size() - 2];
   const int nMom = 4;
-  const int nWarpRemain = 32 - ( nevt % 32 );
+  const int nWarpRemain = (32 - ( nevt % 32 )) % 32;
   const int nEvtExt = nevt + nWarpRemain; 
 
 
