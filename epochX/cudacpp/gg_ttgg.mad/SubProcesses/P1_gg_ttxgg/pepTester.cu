@@ -48,11 +48,13 @@ int main()
   const int nevt = eventVector[eventVector.size() - 1];
   const int nPrt = eventVector[eventVector.size() - 2];
   const int nMom = 4;
+  const int nWarpRemain = 32 - ( nevt % 32 );
+  const int nEvtExt = nevt + nWarpRemain; 
 
 
-  std::vector<double> momVector( 4 * nevt * nPrt );
-  std::vector<double> gsVector( nevt );
-  std::vector<double> wgtsVector( nevt );
+  std::vector<double> momVector( 4 * nEvtExt * nPrt );
+  std::vector<double> gsVector( nEvtExt );
+  std::vector<double> wgtsVector( nEvtExt );
 
   // ZW: change eventVector ordering so that the momentum order for
   // each particle is (E, px, py, pz) instead of the LHEF convention
@@ -61,20 +63,33 @@ int main()
   {
     for( unsigned int iprt = 0; iprt < nPrt; ++iprt)
     {
-      momVector[4*6*ievt + 4*iprt] = eventVector[4*6*ievt + 4*iprt + 3];
+      momVector[4*nPrt*ievt + 4*iprt] = eventVector[4*nPrt*ievt + 4*iprt + 3];
       for( unsigned int imom = 0; imom < 3; ++imom)
       {
-        momVector[4*6*ievt + 4*iprt + 3 - imom] = eventVector[4*6*ievt + 4*iprt + 2 - imom];
+        momVector[4*nPrt*ievt + 4*iprt + 3 - imom] = eventVector[4*nPrt*ievt + 4*iprt + 2 - imom];
       }
     }
     gsVector[ ievt ] = eventVector[ 4 * nPrt * nevt + ievt ];
     wgtsVector[ ievt ] = eventVector[ (4 * nPrt + 1) * nevt + ievt];
   }
 
+  for( unsigned int ievt = 0; ievt < nWarpRemain; ++ievt)
+  {
+    for( unsigned int iprt = 0; iprt < nPrt; ++iprt)
+    {
+      for( unsigned int imom = 0; imom < 4; ++imom)
+      {
+        momVector[4*nPrt*nevt +4*nPrt*ievt + 4*iprt + imom] = 0.;
+      }
+    }
+    gsVector[nevt + ievt] = 0.;
+    wgtsVector[nevt + ievt] = 0.;
+  }
+
   CppObjectInFortran *fortrPoint;
-  std::vector<double> mesVector( nevt );
+  std::vector<double> mesVector( nEvtExt );
   const unsigned int chanId = 0;
-  fbridgecreate_( &fortrPoint, &nevt, &nPrt, &nMom );
+  fbridgecreate_( &fortrPoint, &nEvtExt, &nPrt, &nMom );
   fbridgesequence_( &fortrPoint, &momVector[0], &gsVector[0], &mesVector[0], &chanId );
 //  fbridgedelete_( &fortrPoint );
 
