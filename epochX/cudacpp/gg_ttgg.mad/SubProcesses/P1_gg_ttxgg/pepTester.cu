@@ -117,10 +117,10 @@ int main()
   fbridgesequence_( &fortrPoint, &momVector[0], &gsVector[0], &mesVector2[0], &chanId );
   fbridgedelete_( &fortrPoint );
 
-/*   for( unsigned int k = 0; k < nevt; ++k)
+  for( unsigned int k = 0; k < nevt; ++k)
   {
     std::cout << "OG wgt is " << wgtsVector[k] << " and RWd is " << (mesVector2[k] / mesVector[k]) * wgtsVector[k] << "\n";
-  } */
+  } 
 
   pt::ptree lheFile;
 
