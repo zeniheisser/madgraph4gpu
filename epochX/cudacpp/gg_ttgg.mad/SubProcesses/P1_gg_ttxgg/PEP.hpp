@@ -257,30 +257,11 @@ std::vector<std::string>& eventExtractor( pt::ptree &eventFile ) {
         // where it switches to the second line (first real particle line)
         std::replace( event.second.data().begin(), event.second.data().end(), '\n', ' ');
         boost::split(procElems, event.second.data(), boost::is_any_of(" "));
-        int noPrt = 0;
-        bool noPrtLost = true;
-        while( noPrtLost ){
-            if(procElems[noPrt] == ""){
-                noPrt += 1;
-                continue;
-            } else {
-                noPrt = std::stoi(procElems[noPrt]);
-                noPrtLost = false;
-            }
-        }
-        //int falseSize = std::count(procElems.begin(), procElems.end(), "");
-        trueElems.resize(procElems.size() - std::count(procElems.begin(), procElems.end(), ""));
-        int trueSize = 0;
-        int totNumElems = 6 + 13 * noPrt;
-        int prcElem = 0;
         procElems.erase(std::remove(procElems.begin(), procElems.end(), ""));
-/*         while ( trueSize < totNumElems ){
-            if( procElems[prcElem] != ""){
-                trueElems[trueSize] = procElems[prcElem];
-                trueSize += 1;
-            }
-            prcElem += 1;
-        } */
+        const int noPrt = std::stoi(procElems[0]);
+        int totNumElems = 6 + 13 * noPrt;
+        trueElems.resize(totNumElems);
+        int trueSize = 0;
         for (auto currElem = 0; currElem < totNumElems; ++currElem)
         {
             trueElems[currElem] = procElems[currElem];
