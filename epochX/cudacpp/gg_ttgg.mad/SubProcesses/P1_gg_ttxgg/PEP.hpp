@@ -273,12 +273,17 @@ std::vector<std::string>& eventExtractor( pt::ptree &eventFile ) {
         int trueSize = 0;
         int totNumElems = 6 + 13 * noPrt;
         int prcElem = 0;
-        while ( trueSize < totNumElems ){
+        procElems.erase(std::remove(procElems.begin(), procElems.end(), ""));
+/*         while ( trueSize < totNumElems ){
             if( procElems[prcElem] != ""){
                 trueElems[trueSize] = procElems[prcElem];
                 trueSize += 1;
             }
             prcElem += 1;
+        } */
+        for (auto currElem = 0; currElem < totNumElems; ++currElem)
+        {
+            trueElems[currElem] = procElems[currElem];
         }
     }
     return trueElems;
