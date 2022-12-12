@@ -115,7 +115,6 @@ int main()
  }
 
   fbridgesequence_( &fortrPoint, &momVector[0], &gsVector[0], &mesVector2[0], &chanId );
-  fbridgedelete_( &fortrPoint );
 
  /*  for( unsigned int k = 0; k < nevt; ++k)
   {
@@ -145,8 +144,11 @@ int main()
   } */
 
   auto vecPtr = PEP::eventParser("gg2ttgg_10k.lhe");
-  std::cout << vecPtr[2]->at(0) << "\n";
+  std::vector<double> mesVector3( nEvtExt );
 
+  fbridgesequence_( &fortrPoint, &vecPtr[1]->at(0), &vecPtr[2]->at(0), &mesVector3[0], &chanId );
+
+  fbridgedelete_( &fortrPoint );
 
   return 0;
 }
