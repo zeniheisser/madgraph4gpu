@@ -317,8 +317,12 @@ std::vector<std::vector<double>*>& eventParser( std::string lheFile ) {
     int noPrts = noPrt( parseFile );
     int noEvts = noEvt( parseFile );
     static std::vector<double> eventVector( 6*noEvts + 13*noPrts );
+    static std::vector<double> momVector( 4*noPrts );
+    static std::vector<double> alphaVector( noEvts );
     std::vector<std::string> procElems;
     int indexElement = 0;
+    int momIndex = 0;
+    int alphaIndex = 0;
 
     for (auto event : parseFile.get_child("LesHouchesEvents")) {
         if (event.first != "event"){
@@ -336,8 +340,20 @@ std::vector<std::vector<double>*>& eventParser( std::string lheFile ) {
             eventVector[indexElement] = std::stod(procElems[currElem]);
             indexElement += 1;
         }
+        for ( auto prts = 0; prts < noPrt; ++prts )
+        {
+            momVector[momIndex] = std::stod(procElems[6 + 13*prts + 9]);
+            momIndex += 1;
+            for ( auto momComp = 0; momComp < 3; ++momComp )
+            {
+                momVector[momIndex] = std::stod(procElems[6 + 13*prts + 6 + momComp]);
+                momIndex += 1;
+            }
+        }
+        alphaVector[alphaIndex] = std::stod(procElems[5]);
+        alphaIndex += 1;
     }
-    static std::vector<std::vector<double>*> ptrVec{ &eventVector };
+    static std::vector<std::vector<double>*> ptrVec{ &eventVector, &momVector };
     return ptrVec;
 }
 
