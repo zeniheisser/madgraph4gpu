@@ -353,7 +353,7 @@ std::vector<std::vector<double>*>& eventParser( std::string lheFile ) {
         alphaVector[alphaIndex] = std::stod(procElems[5]);
         alphaIndex += 1;
     }
-    static std::vector<std::vector<double>*> ptrVec{ &eventVector, &momVector };
+    static std::vector<std::vector<double>*> ptrVec{ &eventVector, &momVector, &alphasVector };
     return ptrVec;
 }
 
