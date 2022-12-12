@@ -317,9 +317,16 @@ std::vector<std::vector<double>*>& eventParser( std::string lheFile ) {
     pt::ptree parseFile = fileLoader( lheFile );
     int noPrts = noPrt( parseFile );
     int noEvts = noEvt( parseFile );
+    int noPrtsRemain;
+    int nWarpRemain = (32 - ( noEvts % 32 )) % 32;
+    if ( noPrts % noEvts == 0){
+        noPrtsRemain = 4 * nWarpRemain * int( noPrts / noEvt );
+    }   else {
+        noPrtsRemain = 4 * 32 * 10;
+    }
     static std::vector<double> eventVector( 6*noEvts + 13*noPrts );
-    static std::vector<double> momVector( 4*noPrts );
-    static std::vector<double> alphaVector( noEvts );
+    static std::vector<double> momVector( 4*noPrts + noPrtsRemain );
+    static std::vector<double> alphaVector( noEvts + nWarpRemain );
     std::vector<std::string> procElems;
     int indexElement = 0;
     int momIndex = 0;
