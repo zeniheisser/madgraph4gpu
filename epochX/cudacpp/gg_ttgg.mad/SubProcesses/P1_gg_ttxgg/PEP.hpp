@@ -320,7 +320,7 @@ std::vector<std::vector<double>*>& eventParser( std::string lheFile ) {
     int noPrtsRemain;
     int nWarpRemain = (32 - ( noEvts % 32 )) % 32;
     if ( noPrts % noEvts == 0){
-        noPrtsRemain = 4 * nWarpRemain * int( noPrts / noEvt );
+        noPrtsRemain = 4 * nWarpRemain * int( noPrts / noEvts );
     }   else {
         noPrtsRemain = 4 * 32 * 10;
     }
