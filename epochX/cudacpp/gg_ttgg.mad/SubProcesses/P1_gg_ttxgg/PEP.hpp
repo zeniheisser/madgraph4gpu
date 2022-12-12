@@ -243,7 +243,7 @@ std::vector<std::string>& pepSplitter ( pt::ptree &eventFile ) {
 
 std::vector<std::string>& eventExtractor( pt::ptree &eventFile ) {
 
-    static std::vector<std::string> procElems;
+    std::vector<std::string> procElems;
     static std::vector<std::string> trueElems;
 
     // ZW: looping over children nodes of LHE file, but need to
@@ -261,13 +261,84 @@ std::vector<std::string>& eventExtractor( pt::ptree &eventFile ) {
         const int noPrt = std::stoi(procElems[0]);
         int totNumElems = 6 + 13 * noPrt;
         trueElems.resize(totNumElems);
-        int trueSize = 0;
         for (auto currElem = 0; currElem < totNumElems; ++currElem)
         {
             trueElems[currElem] = procElems[currElem];
         }
     }
     return trueElems;
+}
+
+std::vector<std::vector<double>*>& eventParser( std::string lheFile ) {
+    pt::ptree parseFile = fileLoader( lheFile );
+    int noPrts = noPrt( parseFile );
+    int noEvts = noEvt( parseFile );
+    static std::vector<double> eventVector( 6*noEvts + 13*noPrts );
+    std::vector<std::string> procElems;
+    int indexElement = 0;
+
+    for (auto event : parseFile.get_child("LesHouchesEvents")) {
+        if (event.first != "event"){
+            continue;
+        }
+        // ZW: for each new event, find the linebreak from the first line (event information)
+        // where it switches to the second line (first real particle line)
+        std::replace( event.second.data().begin(), event.second.data().end(), '\n', ' ');
+        boost::split(procElems, event.second.data(), boost::is_any_of(" "));
+        procElems.erase(std::remove(procElems.begin(), procElems.end(), ""));
+        const int noPrt = std::stoi(procElems[0]);
+        int totNumElems = 6 + 13 * noPrt;
+        for (auto currElem = 0; currElem < totNumElems; ++currElem)
+        {
+            eventVector[indexElement] = std::stod(procElems[currElem]);
+            indexElement += 1;
+        }
+    }
+    static std::vector<std::vector<double>*> ptrVec{ &eventVector };
+    return ptrVec;
+}
+
+pt::ptree& fileLoader ( std::string fileName ) {
+    static pt::ptree eventFile;
+
+    try {
+        pt::read_xml(fileName, eventFile);
+    } catch (pt::xml_parser_error &e) {
+        std :: cout << "Failed to parse LHE file" << e.what();
+    } catch (...) {        std :: cout << "Undefined error while parsing LHE file";
+    }
+
+    return eventFile;
+}
+
+int& noPrt( pt::ptree& eventFile ) {
+    // ZW: extract number of particles per event
+    // by just counting the number prts per event tag
+    //int noEvents = 0;
+    static int noPrts = 0;
+    for (auto& event : eventFile.get_child("LesHouchesEvents")) {
+        if (event.first != "event"){
+            continue;
+        }
+        //noEvents += 1;
+        noPrts += std::stoi(eventFile.get_child("LesHouchesEvents.event").data().substr(0,7));
+    }
+    return noPrts;
+}
+
+int& noEvt( pt::ptree& eventFile ) {
+    // ZW: extract number of particles per event
+    // by just counting the number prts per event tag
+    static int noEvents = 0;
+    //static int noPrts = 0;
+    for (auto& event : eventFile.get_child("LesHouchesEvents")) {
+        if (event.first != "event"){
+            continue;
+        }
+        noEvents += 1;
+        //noPrts += std::stoi(eventFile.get_child("LesHouchesEvents.event").data().substr(0,7));
+    }
+    return noEvents;
 }
 
 }

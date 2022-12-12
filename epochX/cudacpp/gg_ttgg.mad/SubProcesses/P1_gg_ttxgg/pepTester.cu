@@ -117,10 +117,10 @@ int main()
   fbridgesequence_( &fortrPoint, &momVector[0], &gsVector[0], &mesVector2[0], &chanId );
   fbridgedelete_( &fortrPoint );
 
-  for( unsigned int k = 0; k < nevt; ++k)
+ /*  for( unsigned int k = 0; k < nevt; ++k)
   {
     std::cout << "OG wgt is " << wgtsVector[k] << " and RWd is " << (mesVector2[k] / mesVector[k]) * wgtsVector[k] << "\n";
-  } 
+  }  */
 
   pt::ptree lheFile;
 
@@ -139,11 +139,13 @@ int main()
     std::cout << "Process: " << pairSet.first << " with " << pairSet.second << " external particles\n";
   }
 
-  std::vector<std::string> eventElems = PEP::eventExtractor(lheFile);
+ /*  std::vector<std::string> eventElems = PEP::eventExtractor(lheFile);
   for( auto entry : eventElems ){
       std::cout << "Entry: " << entry << "\n";
-  }
+  } */
 
+  auto vecPtr = PEP::eventParser("gg2ttgg_10k.lhe");
+  std::cout << vecPtr[0];
 
 
   return 0;
