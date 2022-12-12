@@ -313,6 +313,7 @@ int& noEvt( pt::ptree& eventFile ) {
 }
 
 std::vector<std::vector<double>*>& eventParser( std::string lheFile ) {
+    bool getGs = true;
     pt::ptree parseFile = fileLoader( lheFile );
     int noPrts = noPrt( parseFile );
     int noEvts = noEvt( parseFile );
@@ -350,7 +351,11 @@ std::vector<std::vector<double>*>& eventParser( std::string lheFile ) {
                 momIndex += 1;
             }
         }
-        alphaVector[alphaIndex] = std::stod(procElems[5]);
+        if( getGs ){
+            alphaVector[alphaIndex] = std::sqrt( 4.0 * M_PI * std::stod(procElems[5]));
+        } else {
+            alphaVector[alphaIndex] = std::stod(procElems[5]);
+        }
         alphaIndex += 1;
     }
     static std::vector<std::vector<double>*> ptrVec{ &eventVector, &momVector, &alphaVector };
