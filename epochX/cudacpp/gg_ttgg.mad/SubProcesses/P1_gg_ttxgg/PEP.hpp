@@ -269,35 +269,6 @@ std::vector<std::string>& eventExtractor( pt::ptree &eventFile ) {
     return trueElems;
 }
 
-std::vector<std::vector<double>*>& eventParser( std::string lheFile ) {
-    pt::ptree parseFile = fileLoader( lheFile );
-    int noPrts = noPrt( parseFile );
-    int noEvts = noEvt( parseFile );
-    static std::vector<double> eventVector( 6*noEvts + 13*noPrts );
-    std::vector<std::string> procElems;
-    int indexElement = 0;
-
-    for (auto event : parseFile.get_child("LesHouchesEvents")) {
-        if (event.first != "event"){
-            continue;
-        }
-        // ZW: for each new event, find the linebreak from the first line (event information)
-        // where it switches to the second line (first real particle line)
-        std::replace( event.second.data().begin(), event.second.data().end(), '\n', ' ');
-        boost::split(procElems, event.second.data(), boost::is_any_of(" "));
-        procElems.erase(std::remove(procElems.begin(), procElems.end(), ""));
-        const int noPrt = std::stoi(procElems[0]);
-        int totNumElems = 6 + 13 * noPrt;
-        for (auto currElem = 0; currElem < totNumElems; ++currElem)
-        {
-            eventVector[indexElement] = std::stod(procElems[currElem]);
-            indexElement += 1;
-        }
-    }
-    static std::vector<std::vector<double>*> ptrVec{ &eventVector };
-    return ptrVec;
-}
-
 pt::ptree& fileLoader ( std::string fileName ) {
     static pt::ptree eventFile;
 
@@ -339,6 +310,35 @@ int& noEvt( pt::ptree& eventFile ) {
         //noPrts += std::stoi(eventFile.get_child("LesHouchesEvents.event").data().substr(0,7));
     }
     return noEvents;
+}
+
+std::vector<std::vector<double>*>& eventParser( std::string lheFile ) {
+    pt::ptree parseFile = fileLoader( lheFile );
+    int noPrts = noPrt( parseFile );
+    int noEvts = noEvt( parseFile );
+    static std::vector<double> eventVector( 6*noEvts + 13*noPrts );
+    std::vector<std::string> procElems;
+    int indexElement = 0;
+
+    for (auto event : parseFile.get_child("LesHouchesEvents")) {
+        if (event.first != "event"){
+            continue;
+        }
+        // ZW: for each new event, find the linebreak from the first line (event information)
+        // where it switches to the second line (first real particle line)
+        std::replace( event.second.data().begin(), event.second.data().end(), '\n', ' ');
+        boost::split(procElems, event.second.data(), boost::is_any_of(" "));
+        procElems.erase(std::remove(procElems.begin(), procElems.end(), ""));
+        const int noPrt = std::stoi(procElems[0]);
+        int totNumElems = 6 + 13 * noPrt;
+        for (auto currElem = 0; currElem < totNumElems; ++currElem)
+        {
+            eventVector[indexElement] = std::stod(procElems[currElem]);
+            indexElement += 1;
+        }
+    }
+    static std::vector<std::vector<double>*> ptrVec{ &eventVector };
+    return ptrVec;
 }
 
 }
