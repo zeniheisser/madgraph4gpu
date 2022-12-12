@@ -145,7 +145,7 @@ int main()
   } */
 
   auto vecPtr = PEP::eventParser("gg2ttgg_10k.lhe");
-  std::cout << vecPtr[0];
+  std::cout << vecPtr[0]->at(0);
 
 
   return 0;
