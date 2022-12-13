@@ -411,7 +411,7 @@ std::vector<std::string>& stringSplitter( std::string currEvent ){
     return procElems;
 }
 
-std::string& procReader( std::string& currEvent ){
+std::string& procReader( std::string currEvent ){
     std::vector<std::string> eventElems = stringSplitter( currEvent );
     static std::string process = eventElems[0];
     process += ": ";
