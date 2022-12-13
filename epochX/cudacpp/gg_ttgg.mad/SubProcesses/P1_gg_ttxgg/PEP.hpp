@@ -482,6 +482,7 @@ std::vector<std::vector<double>*>& multiEventParser( pt::ptree& eventFile ){
     std::vector<std::vector<bool>*> procOrdering = procOrder( eventFile, procList, nEvt );
     for (unsigned int k = 0; k < procList.size(); ++k )
     {
+        std::cout << "\n\n" << numPrts[k] << "\n\n" << nEvt << "\n\n";
         auto processVecs = singleEventParser( eventFile, *procOrdering[k], nEvt, numPrts[k] );
         vecPtrs.insert(std::end(vecPtrs), std::begin(processVecs), std::end(processVecs) );
     }
