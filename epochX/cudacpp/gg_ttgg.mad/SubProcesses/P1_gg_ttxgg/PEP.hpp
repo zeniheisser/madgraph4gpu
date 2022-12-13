@@ -477,7 +477,7 @@ std::vector<std::vector<double>*>& multiEventParser( pt::ptree& eventFile ){
     {
         numPrts[k] = std::stoi(procList[k].substr(procList[k].find(":")));
     }
-    std::vector<std::vector<double>*> vecPtrs;
+    static std::vector<std::vector<double>*> vecPtrs;
     unsigned int nEvt = noEvt( eventFile );
     std::vector<std::vector<bool>*> procOrdering = procOrder( eventFile, procList, nEvt );
     for (unsigned int k = 0; k < procList.size(); ++k )
