@@ -411,19 +411,22 @@ std::vector<std::string>& stringSplitter( std::string currEvent ){
     return procElems;
 }
 
-std::string& procReader( std::string currEvent ){
+std::string procReader( std::string currEvent ){
     std::vector<std::string> eventElems = stringSplitter( currEvent );
     for ( auto strang : eventElems ){
-        std::cout << strang << "  ";
+        //std::cout << strang << "  ";
+        // ZW: this looks correct, so the error lies somewhere netweem here and the return(?)
     }
-    static std::string process = eventElems[0];
+    std::string process = eventElems[0];
+    std::cout << process << "\n";
     process += ": ";
+    std::cout << process << "\n";
     unsigned int nPrt = std::stoi(eventElems[0]);
     std::cout << "\n" << nPrt << "\n";
     bool prtStatus = true;
     for( unsigned int prtcl = 0; prtcl < nPrt; ++prtcl)
     {
-        std::cout << prtcl << " ";
+        //std::cout << prtcl << " ";
         process += eventElems[6 + 13*prtcl] + " ";
         if ( prtStatus ){
             if ( eventElems[7 + 13*prtcl] != eventElems[7 + 13*(prtcl+1)]){
@@ -431,6 +434,7 @@ std::string& procReader( std::string currEvent ){
                 prtStatus = false;
             }
         }
+        std::cout << process << "\n";
     } 
     return process;
 }
