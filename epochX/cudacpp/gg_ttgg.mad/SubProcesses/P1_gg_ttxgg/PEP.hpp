@@ -285,29 +285,23 @@ pt::ptree& fileLoader ( std::string fileName ) {
 int& noPrt( pt::ptree& eventFile ) {
     // ZW: extract number of particles per event
     // by just counting the number prts per event tag
-    //int noEvents = 0;
     static int noPrts = 0;
     for (auto& event : eventFile.get_child("LesHouchesEvents")) {
         if (event.first != "event"){
             continue;
         }
-        //noEvents += 1;
         noPrts += std::stoi(eventFile.get_child("LesHouchesEvents.event").data().substr(0,7));
     }
     return noPrts;
 }
 
 int& noEvt( pt::ptree& eventFile ) {
-    // ZW: extract number of particles per event
-    // by just counting the number prts per event tag
     static int noEvents = 0;
-    //static int noPrts = 0;
     for (auto& event : eventFile.get_child("LesHouchesEvents")) {
         if (event.first != "event"){
             continue;
         }
         noEvents += 1;
-        //noPrts += std::stoi(eventFile.get_child("LesHouchesEvents.event").data().substr(0,7));
     }
     return noEvents;
 }
@@ -322,6 +316,7 @@ std::vector<std::vector<double>*>& eventParser( std::string lheFile ) {
     if ( noPrts % noEvts == 0){
         noPrtsRemain = 4 * nWarpRemain * int( noPrts / noEvts );
     }   else {
+        std::cout << "\nNo. of particles is not a multiple of the no of events -- this function only takes singular processes.\n";
         noPrtsRemain = 4 * 32 * 10;
     }
     static std::vector<double> eventVector( 6*noEvts + 13*noPrts );
@@ -336,8 +331,6 @@ std::vector<std::vector<double>*>& eventParser( std::string lheFile ) {
         if (event.first != "event"){
             continue;
         }
-        // ZW: for each new event, find the linebreak from the first line (event information)
-        // where it switches to the second line (first real particle line)
         std::replace( event.second.data().begin(), event.second.data().end(), '\n', ' ');
         boost::split(procElems, event.second.data(), boost::is_any_of(" "));
         procElems.erase(std::remove(procElems.begin(), procElems.end(), ""));
@@ -367,6 +360,137 @@ std::vector<std::vector<double>*>& eventParser( std::string lheFile ) {
     }
     static std::vector<std::vector<double>*> ptrVec{ &eventVector, &momVector, &alphaVector };
     return ptrVec;
+}
+
+std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, std::vector<bool>& relEv, unsigned int nEvt, unsigned int nPrt ) {
+    bool getGs = true;
+    unsigned int nuEvt = nEvt + ((32 - ( nEvt % 32 )) % 32);
+    static std::vector<double> momVector( 4 * nuEvt * nPrt);
+    static std::vector<double> alphaVector( nuEvt );
+    std::vector<std::string> procElems;
+    unsigned int momIndex = 0;
+    unsigned int alphaIndex = 0;
+    unsigned int currEvt = 0;
+
+    for (auto event : eventFile.get_child("LesHouchesEvents")) {
+        if (event.first != "event"){
+            continue;
+        }
+        if (relEv[currEvt] ) {
+        std::replace( event.second.data().begin(), event.second.data().end(), '\n', ' ');
+        boost::split(procElems, event.second.data(), boost::is_any_of(" "));
+        procElems.erase(std::remove(procElems.begin(), procElems.end(), ""));
+        for ( auto prts = 0; prts < nPrt; ++prts )
+        {
+            momVector[momIndex] = std::stod(procElems[6 + 13*prts + 9]);
+            momIndex += 1;
+            for ( auto momComp = 0; momComp < 3; ++momComp )
+            {
+                momVector[momIndex] = std::stod(procElems[6 + 13*prts + 6 + momComp]);
+                momIndex += 1;
+            }
+        }
+        if( getGs ){
+            alphaVector[alphaIndex] = std::sqrt( 4.0 * M_PI * std::stod(procElems[5]));
+        } else {
+            alphaVector[alphaIndex] = std::stod(procElems[5]);
+        }
+        alphaIndex += 1;
+        }
+        currEvt += 1;
+    }
+    static std::vector<std::vector<double>*> ptrVec{ &momVector, &alphaVector };
+    return ptrVec;
+}
+
+std::vector<std::string>& stringSplitter( std::string& currEvent ){
+    static std::vector<std::string> procElems;
+    std::replace( currEvent.begin(), currEvent.end(), '\n', ' ');
+    boost::split(procElems, currEvent, boost::is_any_of(" "));
+    procElems.erase(std::remove(procElems.begin(), procElems.end(), ""));
+    return procElems;
+}
+
+std::string& procReader( std::string& currEvent ){
+    std::vector<std::string> eventElems = stringSplitter( currEvent );
+    static std::string process = eventElems[0] + ":";
+    unsigned int nPrt = std::stoi(eventElems[0]);
+    bool prtStatus = true;
+    for( unsigned int prtcl = 0; prtcl < nPrt; ++prtcl)
+    {
+        process += eventElems[6 + 13*prtcl] + " ";
+        if ( prtStatus ){
+            if ( eventElems[7 + 13*prtcl] != eventElems[7 + 13*(prtcl+1)]){
+                process += "> ";
+                prtStatus = false;
+            }
+        }
+    } 
+    return process;
+}
+
+std::vector<std::vector<bool>*>& procOrder( pt::ptree& eventFile, std::vector<std::string> evtSet, unsigned int nEvt ) {
+    static std::vector<std::vector<bool>*> eventBools( evtSet.size() );
+    for ( auto vecPtr : eventBools )
+    {
+        vecPtr->resize( nEvt );
+    }
+    unsigned int currEv = 0;
+
+    for (auto event : eventFile.get_child("LesHouchesEvents")) {
+        if (event.first != "event"){
+            continue;
+        }
+        std::string currProc = procReader( event.second.data() );
+        for ( unsigned int k = 0; k < evtSet.size(); ++k) {
+            if ( currProc == evtSet[k] )
+            {
+                (*eventBools[k])[currEv] = true;
+            } else {
+                (*eventBools[k])[currEv] = false;
+            }
+        }
+        currEv += 1;
+    }
+    return eventBools;
+}
+
+std::vector<std::string>& processExtractor( pt::ptree& eventFile ) {
+    static std::vector<std::string> processes;
+    for (auto event : eventFile.get_child("LesHouchesEvents")) {
+        if (event.first != "event"){
+            continue;
+        }
+        std::string currProc = procReader( event.second.data() );
+        if ( std::find(processes.begin(), processes.end(), currProc) == processes.end()) {
+            processes.push_back(currProc);
+            continue;
+        }
+    }
+    return processes;
+}
+
+std::vector<std::vector<double>*>& multiEventParser( pt::ptree& eventFile ){
+    std::vector<std::string> procList = processExtractor( eventFile );
+    std::vector<unsigned int> numPrts(procList.size());
+    for ( unsigned int k = 0; k < procList.size(); ++k )
+    {
+        numPrts[k] = std::stoi(procList[k].substr(procList[k].find(":")));
+    }
+    std::vector<std::vector<double>*> vecPtrs;
+    unsigned int nEvt = noEvt( eventFile );
+    std::vector<std::vector<bool>*> procOrdering = procOrder( eventFile, procList, nEvt );
+    for (unsigned int k = 0; k < procList.size(); ++k )
+    {
+        auto processVecs = singleEventParser( eventFile, *procOrdering[k], nEvt, numPrts[k] );
+        vecPtrs.insert(std::end(vecPtrs), std::begin(processVecs), std::end(processVecs) );
+    }
+    return vecPtrs;
+}
+
+std::vector<std::vector<double>*>& lheParser( std::string fileName ){
+    pt::ptree lheFile = fileLoader( fileName );
+    return multiEventParser(lheFile);
 }
 
 }

@@ -143,7 +143,7 @@ int main()
       std::cout << "Entry: " << entry << "\n";
   } */
 
-  auto vecPtr = PEP::eventParser("gg2ttgg_10k.lhe");
+  auto vecPtr = PEP::lheParser("gg2ttgg_10k.lhe");
   std::vector<double> mesVector3( nEvtExt );
 
   fbridgesequence_( &fortrPoint, &vecPtr[1]->at(0), &vecPtr[2]->at(0), &mesVector3[0], &chanId );
