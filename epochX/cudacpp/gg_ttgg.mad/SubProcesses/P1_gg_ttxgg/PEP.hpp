@@ -429,6 +429,7 @@ std::string& procReader( std::string currEvent ){
             }
         }
     } 
+    std::cout << process << "\n";
     return process;
 }
 
