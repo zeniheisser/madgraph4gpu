@@ -436,7 +436,7 @@ std::vector<std::vector<bool>*>& procOrder( pt::ptree& eventFile, std::vector<st
     std::cout << "\nset up return vector\n";
     for ( auto vecPtr : eventBools )
     {
-        (*vecPtr).resize( nEvt );
+        vecPtr->resize( nEvt );
         std::cout << "\nresized vecs\n";
     }
     unsigned int currEv = 0;
