@@ -403,7 +403,7 @@ std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, std:
     return ptrVec;
 }
 
-std::vector<std::string>& stringSplitter( std::string& currEvent ){
+std::vector<std::string>& stringSplitter( std::string currEvent ){
     static std::vector<std::string> procElems;
     std::replace( currEvent.begin(), currEvent.end(), '\n', ' ');
     boost::split(procElems, currEvent, boost::is_any_of(" "));
