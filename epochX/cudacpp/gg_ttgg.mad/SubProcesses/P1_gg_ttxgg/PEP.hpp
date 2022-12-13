@@ -469,7 +469,8 @@ std::vector<std::string>& processExtractor( pt::ptree& eventFile ) {
             continue;
         }
         std::string currProc = procReader( event.second.data() );
-        if ( std::find(processes.begin(), processes.end(), currProc) == processes.end()) {
+        if ( std::none_of(processes.cbegin(), processes.cend(), [&currProc](std::string proc){ return proc == currProc;}))
+        {
             processes.push_back(currProc);
         }
     }
