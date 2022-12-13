@@ -432,13 +432,22 @@ std::string& procReader( std::string& currEvent ){
 
 std::vector<std::vector<bool>*>& procOrder( pt::ptree& eventFile, std::vector<std::string> evtSet, unsigned int nEvt ) {
     std::cout << "\nin procOrder\n";
-    static std::vector<std::vector<bool>*> eventBools( evtSet.size() );
+    static std::vector<std::vector<bool>*> eventBools;
     std::cout << "\nset up return vector\n";
-    for ( auto vecPtr : eventBools )
+ /*    for ( auto vecPtr : eventBools )
     {
         vecPtr->resize( nEvt );
         std::cout << "\nresized vecs\n";
+    } */
+
+    for (unsigned int k = 0; k < evtSet.size(); ++k )
+    {
+        static std::vector<bool> procBools( nEvt );
+        std::cout <<"\nset up bool vec\n";
+        eventBools.push_back(&procBools);
+        std::cout << "\nresized vecs\n";
     }
+
     unsigned int currEv = 0;
 
     for (auto event : eventFile.get_child("LesHouchesEvents")) {
