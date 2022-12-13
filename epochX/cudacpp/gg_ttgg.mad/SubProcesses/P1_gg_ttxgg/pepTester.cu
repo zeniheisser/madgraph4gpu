@@ -144,6 +144,7 @@ int main()
   } */
 
   auto vecPtr = PEP::lheParser("gg2ttgg_10k.lhe");
+  std::cout << "\n\nTHE PARSING WORKED!\n\n";
   std::vector<double> mesVector3( nEvtExt );
 
   fbridgesequence_( &fortrPoint, &vecPtr[1]->at(0), &vecPtr[2]->at(0), &mesVector3[0], &chanId );
