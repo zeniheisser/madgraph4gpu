@@ -431,10 +431,13 @@ std::string& procReader( std::string& currEvent ){
 }
 
 std::vector<std::vector<bool>*>& procOrder( pt::ptree& eventFile, std::vector<std::string> evtSet, unsigned int nEvt ) {
+    std::cout << "\nin procOrder\n";
     static std::vector<std::vector<bool>*> eventBools( evtSet.size() );
+    std::cout << "\nset up return vector\n";
     for ( auto vecPtr : eventBools )
     {
         vecPtr->resize( nEvt );
+        std::cout << "\nresized vecs\n";
     }
     unsigned int currEv = 0;
 
@@ -442,13 +445,19 @@ std::vector<std::vector<bool>*>& procOrder( pt::ptree& eventFile, std::vector<st
         if (event.first != "event"){
             continue;
         }
+        std::cout << "\nin event loop\n";
         std::string currProc = procReader( event.second.data() );
+        std::cout << "\nread proc\n";
         for ( unsigned int k = 0; k < evtSet.size(); ++k) {
             if ( currProc == evtSet[k] )
             {
+                std::cout << "\ncorrect process\n";
                 (*eventBools[k])[currEv] = true;
+                std::cout << "\nset to true\n";
             } else {
+                std::cout <<"\nincorrect proess\n";
                 (*eventBools[k])[currEv] = false;
+                std::cout << "\nset to false\n";
             }
         }
         currEv += 1;
