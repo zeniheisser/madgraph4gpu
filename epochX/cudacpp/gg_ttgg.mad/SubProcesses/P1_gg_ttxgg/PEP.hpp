@@ -413,7 +413,8 @@ std::vector<std::string>& stringSplitter( std::string& currEvent ){
 
 std::string& procReader( std::string& currEvent ){
     std::vector<std::string> eventElems = stringSplitter( currEvent );
-    static std::string process = eventElems[0] + ": ";
+    static std::string process = eventElems[0];
+    process += ": ";
     unsigned int nPrt = std::stoi(eventElems[0]);
     bool prtStatus = true;
     for( unsigned int prtcl = 0; prtcl < nPrt; ++prtcl)
@@ -464,7 +465,6 @@ std::vector<std::string>& processExtractor( pt::ptree& eventFile ) {
         std::string currProc = procReader( event.second.data() );
         if ( std::find(processes.begin(), processes.end(), currProc) == processes.end()) {
             processes.push_back(currProc);
-            continue;
         }
     }
     return processes;
@@ -475,9 +475,10 @@ std::vector<std::vector<double>*>& multiEventParser( pt::ptree& eventFile ){
     std::vector<std::string> procList = processExtractor( eventFile );
     std::cout << "\n\nextracted processes\n\n";
     std::vector<unsigned int> numPrts(procList.size());
+    std::cout <<
     for ( unsigned int k = 0; k < procList.size(); ++k )
     {
-        std::cout << "\n\n" << procList[k] << "\n\n";
+        //std::cout << "\n\n" << procList[k] << "\n\n";
         numPrts[k] = std::stoi(procList[k].substr(0,1));
     }
     std::cout << "\n\ngot prtnos\n\n";
