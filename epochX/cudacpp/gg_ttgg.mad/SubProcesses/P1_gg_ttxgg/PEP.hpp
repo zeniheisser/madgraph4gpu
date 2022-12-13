@@ -418,11 +418,11 @@ std::string procReader( std::string currEvent ){
         // ZW: this looks correct, so the error lies somewhere netweem here and the return(?)
     }
     std::string process = eventElems[0];
-    std::cout << process << "\n";
+    //std::cout << process << "\n";
     process += ": ";
-    std::cout << process << "\n";
+    //std::cout << process << "\n";
     unsigned int nPrt = std::stoi(eventElems[0]);
-    std::cout << "\n" << nPrt << "\n";
+    //std::cout << "\n" << nPrt << "\n";
     bool prtStatus = true;
     for( unsigned int prtcl = 0; prtcl < nPrt; ++prtcl)
     {
@@ -434,7 +434,7 @@ std::string procReader( std::string currEvent ){
                 prtStatus = false;
             }
         }
-        std::cout << process << "\n";
+        //std::cout << process << "\n";
     } 
     return process;
 }
@@ -461,9 +461,9 @@ std::vector<std::vector<bool>*>& procOrder( pt::ptree& eventFile, std::vector<st
                 (*eventBools[k])[currEv] = true;
                 std::cout << "\nset to true\n";
             } else {
-                //std::cout <<"\nincorrect proess\n";
+                std::cout <<"\nincorrect proess\n";
                 (*eventBools[k])[currEv] = false;
-                //std::cout << "\nset to false\n";
+                std::cout << "\nset to false\n";
             }
         }
         currEv += 1;
