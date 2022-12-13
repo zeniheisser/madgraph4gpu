@@ -475,7 +475,7 @@ std::vector<std::vector<double>*>& multiEventParser( pt::ptree& eventFile ){
     std::vector<std::string> procList = processExtractor( eventFile );
     std::cout << "\n\nextracted processes\n\n";
     std::vector<unsigned int> numPrts(procList.size());
-    std::cout <<
+    std::cout << "\n\n" << procList[0] << "\n\n";
     for ( unsigned int k = 0; k < procList.size(); ++k )
     {
         //std::cout << "\n\n" << procList[k] << "\n\n";
