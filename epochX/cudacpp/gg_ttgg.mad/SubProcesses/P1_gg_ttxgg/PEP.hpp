@@ -471,6 +471,7 @@ std::vector<std::string>& processExtractor( pt::ptree& eventFile ) {
         std::string currProc = procReader( event.second.data() );
         if ( std::none_of(processes.cbegin(), processes.cend(), [&currProc](std::string proc){ return proc == currProc;}))
         {
+            std::cout << "\n" << currProc << "\n";
             processes.push_back(currProc);
         }
     }
@@ -480,7 +481,7 @@ std::vector<std::string>& processExtractor( pt::ptree& eventFile ) {
 std::vector<std::vector<double>*>& multiEventParser( pt::ptree& eventFile ){
     std::vector<std::string> procList = processExtractor( eventFile );
     std::vector<unsigned int> numPrts(procList.size());
-    std::cout << "\n" << procList[0] << "\n" << procList.size() << "\n";
+    //std::cout << "\n" << procList[0] << "\n" << procList.size() << "\n";
     for ( unsigned int k = 0; k < procList.size(); ++k )
     {
         std::cout << "\n" << procList[k];
