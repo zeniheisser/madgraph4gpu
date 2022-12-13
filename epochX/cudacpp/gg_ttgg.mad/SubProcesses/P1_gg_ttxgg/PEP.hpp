@@ -431,21 +431,11 @@ std::string& procReader( std::string& currEvent ){
 }
 
 std::vector<std::vector<bool>*>& procOrder( pt::ptree& eventFile, std::vector<std::string> evtSet, unsigned int nEvt ) {
-    std::cout << "\nin procOrder\n";
     static std::vector<std::vector<bool>*> eventBools;
-    std::cout << "\nset up return vector\n";
- /*    for ( auto vecPtr : eventBools )
-    {
-        vecPtr->resize( nEvt );
-        std::cout << "\nresized vecs\n";
-    } */
-
     for (unsigned int k = 0; k < evtSet.size(); ++k )
     {
         static std::vector<bool> procBools( nEvt );
-        std::cout <<"\nset up bool vec\n";
         eventBools.push_back(&procBools);
-        std::cout << "\nresized vecs\n";
     }
 
     unsigned int currEv = 0;
@@ -454,9 +444,7 @@ std::vector<std::vector<bool>*>& procOrder( pt::ptree& eventFile, std::vector<st
         if (event.first != "event"){
             continue;
         }
-        std::cout << "\nin event loop\n";
         std::string currProc = procReader( event.second.data() );
-        std::cout << "\nread proc\n";
         for ( unsigned int k = 0; k < evtSet.size(); ++k) {
             if ( currProc == evtSet[k] )
             {
@@ -489,20 +477,15 @@ std::vector<std::string>& processExtractor( pt::ptree& eventFile ) {
 }
 
 std::vector<std::vector<double>*>& multiEventParser( pt::ptree& eventFile ){
-    std::cout << "\n\nin multiEv\n\n";
     std::vector<std::string> procList = processExtractor( eventFile );
-    std::cout << "\n\nextracted processes\n\n";
     std::vector<unsigned int> numPrts(procList.size());
-    std::cout << "\n\n" << procList[0] << "\n\n";
+    std::cout << "\n" << procList[0] << "\n" << procList.size() << "\n";
     for ( unsigned int k = 0; k < procList.size(); ++k )
     {
-        //std::cout << "\n\n" << procList[k] << "\n\n";
         numPrts[k] = std::stoi(procList[k].substr(0,1));
     }
-    std::cout << "\n\ngot prtnos\n\n";
     static std::vector<std::vector<double>*> vecPtrs;
     unsigned int nEvt = noEvt( eventFile );
-    std::cout << "\n\nfound nEvt\n\n";
     std::vector<std::vector<bool>*> procOrdering = procOrder( eventFile, procList, nEvt );
     std::cout << "\n\nfound event ordering\n\n";
     for (unsigned int k = 0; k < procList.size(); ++k )
