@@ -476,7 +476,7 @@ std::vector<std::vector<double>*>& multiEventParser( pt::ptree& eventFile ){
     for ( unsigned int k = 0; k < procList.size(); ++k )
     {
         std::cout << "\n\n" << procList[k] << "\n\n";
-        numPrts[k] = std::stoi(procList[k].substr(procList[k].find(":")));
+        numPrts[k] = std::stoi(procList[k].substr(procList[k].find(":") + 1));
     }
     static std::vector<std::vector<double>*> vecPtrs;
     unsigned int nEvt = noEvt( eventFile );
