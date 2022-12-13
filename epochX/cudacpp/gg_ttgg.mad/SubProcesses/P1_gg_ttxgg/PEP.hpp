@@ -416,6 +416,7 @@ std::string& procReader( std::string currEvent ){
     static std::string process = eventElems[0];
     process += ": ";
     unsigned int nPrt = std::stoi(eventElems[0]);
+    std::cout << "\n" << nPrt << "\n";
     bool prtStatus = true;
     for( unsigned int prtcl = 0; prtcl < nPrt; ++prtcl)
     {
@@ -471,7 +472,7 @@ std::vector<std::string>& processExtractor( pt::ptree& eventFile ) {
         std::string currProc = procReader( event.second.data() );
         if ( std::none_of(processes.cbegin(), processes.cend(), [&currProc](std::string proc){ return proc == currProc;}))
         {
-            std::cout << "\n" << currProc << "\n";
+            //std::cout << "\n" << currProc << "\n";
             processes.push_back(currProc);
         }
     }
