@@ -471,15 +471,21 @@ std::vector<std::string>& processExtractor( pt::ptree& eventFile ) {
 }
 
 std::vector<std::vector<double>*>& multiEventParser( pt::ptree& eventFile ){
+    std::cout << "\n\nin multiEv\n\n";
     std::vector<std::string> procList = processExtractor( eventFile );
+    std::cout << "\n\nextracted processes\n\n";
     std::vector<unsigned int> numPrts(procList.size());
     for ( unsigned int k = 0; k < procList.size(); ++k )
     {
+        std::cout << "\n\n" << procList[k] << "\n\n";
         numPrts[k] = std::stoi(procList[k].substr(0,1));
     }
+    std::cout << "\n\ngot prtnos\n\n";
     static std::vector<std::vector<double>*> vecPtrs;
     unsigned int nEvt = noEvt( eventFile );
+    std::cout << "\n\nfound nEvt\n\n";
     std::vector<std::vector<bool>*> procOrdering = procOrder( eventFile, procList, nEvt );
+    std::cout << "\n\nfound event ordering\n\n";
     for (unsigned int k = 0; k < procList.size(); ++k )
     {
         std::cout << "\n\n" << numPrts[k] << "\n\n" << nEvt << "\n\n";
