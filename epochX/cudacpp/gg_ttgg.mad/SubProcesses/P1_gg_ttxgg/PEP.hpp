@@ -413,7 +413,7 @@ std::vector<std::string>& stringSplitter( std::string& currEvent ){
 
 std::string& procReader( std::string& currEvent ){
     std::vector<std::string> eventElems = stringSplitter( currEvent );
-    static std::string process = eventElems[0] + ":";
+    static std::string process = eventElems[0] + ": ";
     unsigned int nPrt = std::stoi(eventElems[0]);
     bool prtStatus = true;
     for( unsigned int prtcl = 0; prtcl < nPrt; ++prtcl)
