@@ -420,6 +420,7 @@ std::string& procReader( std::string currEvent ){
     bool prtStatus = true;
     for( unsigned int prtcl = 0; prtcl < nPrt; ++prtcl)
     {
+        std::cout << prtcl << " ";
         process += eventElems[6 + 13*prtcl] + " ";
         if ( prtStatus ){
             if ( eventElems[7 + 13*prtcl] != eventElems[7 + 13*(prtcl+1)]){
@@ -485,7 +486,6 @@ std::vector<std::vector<double>*>& multiEventParser( pt::ptree& eventFile ){
     //std::cout << "\n" << procList[0] << "\n" << procList.size() << "\n";
     for ( unsigned int k = 0; k < procList.size(); ++k )
     {
-        std::cout << "\n" << procList[k];
         numPrts[k] = std::stoi(procList[k].substr(0,1));
     }
     static std::vector<std::vector<double>*> vecPtrs;
