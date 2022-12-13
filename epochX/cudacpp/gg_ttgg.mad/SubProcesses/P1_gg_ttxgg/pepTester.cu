@@ -147,7 +147,7 @@ int main()
   std::cout << "\n\nTHE PARSING WORKED!\n\n";
   std::vector<double> mesVector3( nEvtExt );
 
-  fbridgesequence_( &fortrPoint, &vecPtr[1]->at(0), &vecPtr[2]->at(0), &mesVector3[0], &chanId );
+  fbridgesequence_( &fortrPoint, &vecPtr[0]->at(0), &vecPtr[1]->at(0), &mesVector3[0], &chanId );
 
   fbridgedelete_( &fortrPoint );
 
