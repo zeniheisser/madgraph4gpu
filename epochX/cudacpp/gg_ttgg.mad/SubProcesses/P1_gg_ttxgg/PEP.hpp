@@ -457,13 +457,9 @@ std::vector<std::vector<bool>*>& procOrder( pt::ptree& eventFile, std::vector<st
         for ( unsigned int k = 0; k < evtSet.size(); ++k) {
             if ( currProc == evtSet[k] )
             {
-                std::cout << "\ncorrect process\n";
                 (*eventBools[k])[currEv] = true;
-                std::cout << "\nset to true\n";
             } else {
-                std::cout <<"\nincorrect proess\n";
                 (*eventBools[k])[currEv] = false;
-                std::cout << "\nset to false\n";
             }
         }
         currEv += 1;
@@ -480,7 +476,6 @@ std::vector<std::string>& processExtractor( pt::ptree& eventFile ) {
         std::string currProc = procReader( event.second.data() );
         if ( std::none_of(processes.cbegin(), processes.cend(), [&currProc](std::string proc){ return proc == currProc;}))
         {
-            //std::cout << "\n" << currProc << "\n";
             processes.push_back(currProc);
         }
     }
@@ -490,7 +485,6 @@ std::vector<std::string>& processExtractor( pt::ptree& eventFile ) {
 std::vector<std::vector<double>*>& multiEventParser( pt::ptree& eventFile ){
     std::vector<std::string> procList = processExtractor( eventFile );
     std::vector<unsigned int> numPrts(procList.size());
-    //std::cout << "\n" << procList[0] << "\n" << procList.size() << "\n";
     for ( unsigned int k = 0; k < procList.size(); ++k )
     {
         numPrts[k] = std::stoi(procList[k].substr(0,1));
@@ -498,12 +492,14 @@ std::vector<std::vector<double>*>& multiEventParser( pt::ptree& eventFile ){
     static std::vector<std::vector<double>*> vecPtrs;
     unsigned int nEvt = noEvt( eventFile );
     std::vector<std::vector<bool>*> procOrdering = procOrder( eventFile, procList, nEvt );
-    std::cout << "\n\nfound event ordering\n\n";
+    std::cout << "\n" << procList.size() << "\n";
     for (unsigned int k = 0; k < procList.size(); ++k )
     {
-        std::cout << "\n\n" << numPrts[k] << "\n\n" << nEvt << "\n\n";
+        std::cout << "trying to parse w singleeventparser\n";
         auto processVecs = singleEventParser( eventFile, *procOrdering[k], nEvt, numPrts[k] );
+        std::cout << "successfully parsed w singleeventparser\n";
         vecPtrs.insert(std::end(vecPtrs), std::begin(processVecs), std::end(processVecs) );
+        std::cout << "appended new pointers to return vector\n";
     }
     return vecPtrs;
 }
