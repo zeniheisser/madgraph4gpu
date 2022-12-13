@@ -452,9 +452,9 @@ std::vector<std::vector<bool>*>& procOrder( pt::ptree& eventFile, std::vector<st
                 (*eventBools[k])[currEv] = true;
                 std::cout << "\nset to true\n";
             } else {
-                std::cout <<"\nincorrect proess\n";
+                //std::cout <<"\nincorrect proess\n";
                 (*eventBools[k])[currEv] = false;
-                std::cout << "\nset to false\n";
+                //std::cout << "\nset to false\n";
             }
         }
         currEv += 1;
