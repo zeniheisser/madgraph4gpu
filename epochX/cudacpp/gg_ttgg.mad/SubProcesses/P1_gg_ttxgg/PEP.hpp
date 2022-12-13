@@ -413,6 +413,9 @@ std::vector<std::string>& stringSplitter( std::string currEvent ){
 
 std::string& procReader( std::string currEvent ){
     std::vector<std::string> eventElems = stringSplitter( currEvent );
+    for ( auto strang : eventElems ){
+        std::cout << strang << "  ";
+    }
     static std::string process = eventElems[0];
     process += ": ";
     unsigned int nPrt = std::stoi(eventElems[0]);
@@ -429,7 +432,6 @@ std::string& procReader( std::string currEvent ){
             }
         }
     } 
-    std::cout << currEvent << "\n";
     return process;
 }
 
