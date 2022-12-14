@@ -134,7 +134,7 @@ int main()
   } catch (...) {        std :: cout << "Undefined error while parsing LHE file";
   }
 
-  std::set<std::pair<std::string, int>> processSet = PEP::procExtractor(lheFile);
+  std::set<std::pair<std::string, int>> processSet = PEP::STRINGREAD::procExtractor(lheFile);
   //std::cout << "\n" << processSet.size() << "\n";
 
   for( std::pair<std::string, int> pairSet : processSet )
@@ -156,7 +156,7 @@ int main()
   auto vecPtr2 = PEP::lheParser("gg2ttgg_10k.lhe");
   auto stop3 = std::chrono::high_resolution_clock::now();
 
-  fbridgesequence_( &fortrPoint, &vecPtr1[1]->at(0), &vecPtr[2]->at(0), &mesVector2[0], &chanId );
+  fbridgesequence_( &fortrPoint, &vecPtr1[1]->at(0), &vecPtr1[2]->at(0), &mesVector2[0], &chanId );
 
   std::vector<double> mesVector3( nEvtExt );
 
@@ -168,7 +168,7 @@ int main()
 
   auto duration2 = std::chrono::duration_cast<std::chrono::microseconds>(stop2 - start2);
 
-  auto duration2 = std::chrono::duration_cast<std::chrono::microseconds>(stop3 - start3);
+  auto duration3 = std::chrono::duration_cast<std::chrono::microseconds>(stop3 - start3);
 
   std::cout << "\n\n First version took " << duration1.count() << "\n Second version took " << duration2.count() << "\n" << "\n Third version took " << duration2.count() << "\n";
 
