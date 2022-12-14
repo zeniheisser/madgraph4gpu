@@ -157,9 +157,9 @@ int main()
 
   fbridgedelete_( &fortrPoint );
 
-  auto duration1 = std::chrono::duration_cast<microseconds>(stop1 - start1);
+  auto duration1 = std::chrono::duration_cast<std::chrono::microseconds>(stop1 - start1);
 
-  auto duration2 = std::chrono::duration_cast<microseconds>(stop2 - start2);
+  auto duration2 = std::chrono::duration_cast<std::chrono::microseconds>(stop2 - start2);
 
   std::cout << "\n\n First version took " << duration1.count() << "\n Second version took " << duration2.count() << "\n";
 
