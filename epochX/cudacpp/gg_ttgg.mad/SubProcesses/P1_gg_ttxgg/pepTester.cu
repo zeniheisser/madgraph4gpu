@@ -170,7 +170,7 @@ int main()
 
   auto duration3 = std::chrono::duration_cast<std::chrono::microseconds>(stop3 - start3);
 
-  std::cout << "\n\n First version took " << duration1.count() << "\n Second version took " << duration2.count() << "\n" << "\n Third version took " << duration2.count() << "\n";
+  std::cout << "\n\n First version took " << duration1.count() << "\n Second version took " << duration2.count() << "\n" << "\n Third version took " << duration3.count() << "\n";
 
   return 0;
 }
