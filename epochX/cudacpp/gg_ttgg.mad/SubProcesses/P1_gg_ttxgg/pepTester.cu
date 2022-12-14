@@ -45,7 +45,7 @@ int main()
 {
   auto start1 = std::chrono::high_resolution_clock::now();
 
-  std::vector<double> eventVector = PEP::eventExtraction("gg2ttgg_10k.lhe");
+  std::vector<double> eventVector = PEP::STRINGREAD::eventExtraction("gg2ttgg_10k.lhe");
 
   const int nevt = eventVector[eventVector.size() - 1];
   const int nPrt = eventVector[eventVector.size() - 2];
@@ -148,12 +148,19 @@ int main()
   } */
 
   auto start2 = std::chrono::high_resolution_clock::now();
-  auto vecPtr = PEP::lheParser("gg2ttgg_10k.lhe");
+  auto vecPtr1 = PEP::eventParser("gg2ttgg_10k.lhe");
   auto stop2 = std::chrono::high_resolution_clock::now();
+
+
+  auto start3 = std::chrono::high_resolution_clock::now();
+  auto vecPtr2 = PEP::lheParser("gg2ttgg_10k.lhe");
+  auto stop3 = std::chrono::high_resolution_clock::now();
+
+  fbridgesequence_( &fortrPoint, &vecPtr1[1]->at(0), &vecPtr[2]->at(0), &mesVector2[0], &chanId );
 
   std::vector<double> mesVector3( nEvtExt );
 
-  fbridgesequence_( &fortrPoint, &vecPtr[0]->at(0), &vecPtr[1]->at(0), &mesVector3[0], &chanId );
+  fbridgesequence_( &fortrPoint, &vecPtr2[0]->at(0), &vecPtr2[1]->at(0), &mesVector3[0], &chanId );
 
   fbridgedelete_( &fortrPoint );
 
@@ -161,7 +168,9 @@ int main()
 
   auto duration2 = std::chrono::duration_cast<std::chrono::microseconds>(stop2 - start2);
 
-  std::cout << "\n\n First version took " << duration1.count() << "\n Second version took " << duration2.count() << "\n";
+  auto duration2 = std::chrono::duration_cast<std::chrono::microseconds>(stop3 - start3);
+
+  std::cout << "\n\n First version took " << duration1.count() << "\n Second version took " << duration2.count() << "\n" << "\n Third version took " << duration2.count() << "\n";
 
   return 0;
 }

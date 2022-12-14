@@ -20,6 +20,13 @@ namespace pt = boost::property_tree;
 // namespace PEP
 namespace PEP
 {
+    // ZW: namespace for previous iteration of PEP
+    // which relied on an assumed structure of the LHE
+    // based on spacing
+    // New iteration only assumes the explicit LHE standard
+    // and using these functions, although faster,
+    // may parse files incorrectly
+    namespace STRINGREAD{
 
 // ZW: function for extracting the necessary information
 // to regenerate the matrix elements of an LHE file
@@ -208,25 +215,28 @@ std::set<std::pair<std::string, int>>& procExtractor ( pt::ptree &eventFile ) {
     }
     return procSet;
 }
+    }
 
+// ZW: deprecated function, returns every parameter in the final event node
+// as a vector of strings
 std::vector<std::string>& pepSplitter ( pt::ptree &eventFile ) {
 
     static std::vector<std::string> procElems;
     static std::vector<std::string> trueElems;
 
-    // ZW: looping over children nodes of LHE file, but need to
-    // keep track of event ordering, so we create a dummy loop
-    // variable to remember current event number
+    // ZW: looping over children nodes of LHE file
     for (auto event : eventFile.get_child("LesHouchesEvents")) {
         if (event.first != "event"){
             continue;
         }
-        // ZW: for each new event, find the linebreak from the first line (event information)
-        // where it switches to the second line (first real particle line)
+        // ZW: for each new event, replace all linebreaks with blankspace
+        // and then split the string into a vector
         std::replace( event.second.data().begin(), event.second.data().end(), '\n', ' ');
         boost::split(procElems, event.second.data(), boost::is_any_of(" "));
         int falseSize = std::count(procElems.begin(), procElems.end(), "");
         trueElems.resize(procElems.size() - falseSize);
+        // ZW: explicitly get rid of all the elements containing only the null characters
+        // which come from repeated blankspaces in the string
         int trueSize = 0;
         for( int k = 0; k < procElems.size(); ++k){
             if( procElems[k] != ""){
@@ -234,27 +244,23 @@ std::vector<std::string>& pepSplitter ( pt::ptree &eventFile ) {
                 trueSize += 1;
             }
         }
-
-        //std::cout << "in an event\n";
-        
     }
     return trueElems;
 }
 
+// ZW: deprecated function, returns each mandatory parameter of
+// the final event node of the LHE file
+// Works more or less like pepSplitter but only returns the event and
+// particle information from the event
+// (ie no extra information that could be added and still maintain
+// the LHE standard)
 std::vector<std::string>& eventExtractor( pt::ptree &eventFile ) {
-
     std::vector<std::string> procElems;
     static std::vector<std::string> trueElems;
-
-    // ZW: looping over children nodes of LHE file, but need to
-    // keep track of event ordering, so we create a dummy loop
-    // variable to remember current event number
     for (auto event : eventFile.get_child("LesHouchesEvents")) {
         if (event.first != "event"){
             continue;
         }
-        // ZW: for each new event, find the linebreak from the first line (event information)
-        // where it switches to the second line (first real particle line)
         std::replace( event.second.data().begin(), event.second.data().end(), '\n', ' ');
         boost::split(procElems, event.second.data(), boost::is_any_of(" "));
         procElems.erase(std::remove(procElems.begin(), procElems.end(), ""));
@@ -269,9 +275,12 @@ std::vector<std::string>& eventExtractor( pt::ptree &eventFile ) {
     return trueElems;
 }
 
+// ZW: function for loading an XML (LHE) file as a propertytree
+// to clean up other functions
+// Just tries using the boost XML reader to load the LHEF
+// and catches the boost errors if it fails
 pt::ptree& fileLoader ( std::string fileName ) {
     static pt::ptree eventFile;
-
     try {
         pt::read_xml(fileName, eventFile);
     } catch (pt::xml_parser_error &e) {
@@ -282,6 +291,10 @@ pt::ptree& fileLoader ( std::string fileName ) {
     return eventFile;
 }
 
+// ZW: returns the total number of particles in the LHE
+// NOTE: NOT the number of particles per event NOR
+// a vector of particles for each event,
+// but the sum of number of particles from each event
 int& noPrt( pt::ptree& eventFile ) {
     // ZW: extract number of particles per event
     // by just counting the number prts per event tag
@@ -295,6 +308,8 @@ int& noPrt( pt::ptree& eventFile ) {
     return noPrts;
 }
 
+// ZW: returns total number of events within the LHEF by
+// looping over the number of nodes with the tag "event"
 int& noEvt( pt::ptree& eventFile ) {
     static int noEvents = 0;
     for (auto& event : eventFile.get_child("LesHouchesEvents")) {
@@ -306,6 +321,9 @@ int& noEvt( pt::ptree& eventFile ) {
     return noEvents;
 }
 
+// ZW: all-encompassing function for parsing LHEF
+// which contains only one type of process
+// Works (relatively quickly)
 std::vector<std::vector<double>*>& eventParser( std::string lheFile ) {
     bool getGs = true;
     pt::ptree parseFile = fileLoader( lheFile );
