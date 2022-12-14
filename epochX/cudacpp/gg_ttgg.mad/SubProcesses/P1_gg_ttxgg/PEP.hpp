@@ -414,19 +414,13 @@ std::vector<std::string>& stringSplitter( std::string currEvent ){
 std::string procReader( std::string currEvent ){
     std::vector<std::string> eventElems = stringSplitter( currEvent );
     for ( auto strang : eventElems ){
-        //std::cout << strang << "  ";
-        // ZW: this looks correct, so the error lies somewhere netweem here and the return(?)
     }
     std::string process = eventElems[0];
-    //std::cout << process << "\n";
     process += ": ";
-    //std::cout << process << "\n";
     unsigned int nPrt = std::stoi(eventElems[0]);
-    //std::cout << "\n" << nPrt << "\n";
     bool prtStatus = true;
     for( unsigned int prtcl = 0; prtcl < nPrt; ++prtcl)
     {
-        //std::cout << prtcl << " ";
         process += eventElems[6 + 13*prtcl] + " ";
         if ( prtStatus ){
             if ( eventElems[7 + 13*prtcl] != eventElems[7 + 13*(prtcl+1)]){
@@ -434,7 +428,6 @@ std::string procReader( std::string currEvent ){
                 prtStatus = false;
             }
         }
-        //std::cout << process << "\n";
     } 
     return process;
 }
@@ -492,14 +485,10 @@ std::vector<std::vector<double>*>& multiEventParser( pt::ptree& eventFile ){
     static std::vector<std::vector<double>*> vecPtrs;
     unsigned int nEvt = noEvt( eventFile );
     std::vector<std::vector<bool>*> procOrdering = procOrder( eventFile, procList, nEvt );
-    std::cout << "\n" << procList.size() << "\n";
     for (unsigned int k = 0; k < procList.size(); ++k )
     {
-        std::cout << "trying to parse w singleeventparser\n";
         auto processVecs = singleEventParser( eventFile, *procOrdering[k], nEvt, numPrts[k] );
-        std::cout << "successfully parsed w singleeventparser\n";
         vecPtrs.insert(std::end(vecPtrs), std::begin(processVecs), std::end(processVecs) );
-        std::cout << "appended new pointers to return vector\n";
     }
     return vecPtrs;
 }
