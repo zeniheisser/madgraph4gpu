@@ -10,6 +10,7 @@
 #include <memory>
 #include <numeric>
 #include <string>
+#include <chrono>
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -42,6 +43,7 @@
 
 int main()
 {
+  auto start1 = std::chrono::high_resolution_clock::now();
 
   std::vector<double> eventVector = PEP::eventExtraction("gg2ttgg_10k.lhe");
 
@@ -85,6 +87,8 @@ int main()
     gsVector[nevt + ievt] = 0.;
     wgtsVector[nevt + ievt] = 0.;
   }
+
+  auto stop1 = std::chrono::high_resolution_clock::now();
 
   CppObjectInFortran *fortrPoint;
   std::vector<double> mesVector( nEvtExt );
@@ -143,13 +147,21 @@ int main()
       std::cout << "Entry: " << entry << "\n";
   } */
 
+  auto start2 = std::chrono::high_resolution_clock::now();
   auto vecPtr = PEP::lheParser("gg2ttgg_10k.lhe");
-  std::cout << "\n\nTHE PARSING WORKED!\n\n";
+  auto stop2 = std::chrono::high_resolution_clock::now();
+
   std::vector<double> mesVector3( nEvtExt );
 
   fbridgesequence_( &fortrPoint, &vecPtr[0]->at(0), &vecPtr[1]->at(0), &mesVector3[0], &chanId );
 
   fbridgedelete_( &fortrPoint );
+
+  auto duration1 = std::chrono::duration_cast<microseconds>(stop1 - start1);
+
+  auto duration2 = std::chrono::duration_cast<microseconds>(stop2 - start2);
+
+  std::cout << "\n\n First version took " << duration1.count() << "\n Second version took " << duration2.count() << "\n";
 
   return 0;
 }
