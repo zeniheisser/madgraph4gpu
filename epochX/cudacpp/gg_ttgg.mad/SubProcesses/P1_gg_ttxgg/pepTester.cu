@@ -34,6 +34,7 @@
 #include "PEP.hpp"
 #include "fbridge.cc"
 
+
 #ifdef __CUDACC__
   using namespace mg5amcGpu;
 #else
@@ -109,6 +110,7 @@ int main()
  */
 
 
+ const unsigned int chanId = 0;
  std::vector<double> mesVector2( nEvtExt );
  for( unsigned int i = 0; i < nevt; ++i )
  {

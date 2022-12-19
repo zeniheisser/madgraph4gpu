@@ -1,7 +1,5 @@
 // ZW: header for LHEF parsing
-// uses boost (rapidXML) for LHE file parsing
-// although LHEF does not fulfil the XML standard totally
-// it is sufficiently similar for this purpose
+// uses boost (rapidXML) for LHEF parsing
 #include <iostream>
 #include <string>
 #include <set>
@@ -323,7 +321,8 @@ int& noEvt( pt::ptree& eventFile ) {
 
 // ZW: all-encompassing function for parsing LHEF
 // which contains only one type of process
-// Works (relatively quickly)
+// Works (relatively quickly, ~2 times slower than pure string parsing)
+// but has no safety in case of LHEFs with multiple processes
 std::vector<std::vector<double>*>& eventParser( std::string lheFile ) {
     bool getGs = true;
     pt::ptree parseFile = fileLoader( lheFile );
@@ -380,48 +379,10 @@ std::vector<std::vector<double>*>& eventParser( std::string lheFile ) {
     return ptrVec;
 }
 
-std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, std::vector<bool>& relEv, unsigned int nEvt, unsigned int nPrt ) {
-    bool getGs = true;
-    unsigned int nuEvt = nEvt + ((32 - ( nEvt % 32 )) % 32);
-    static std::vector<double> momVector( 4 * nuEvt * nPrt);
-    static std::vector<double> alphaVector( nuEvt );
-    std::vector<std::string> procElems;
-    unsigned int momIndex = 0;
-    unsigned int alphaIndex = 0;
-    unsigned int currEvt = 0;
 
-    for (auto event : eventFile.get_child("LesHouchesEvents")) {
-        if (event.first != "event"){
-            continue;
-        }
-        if (relEv[currEvt] ) {
-        std::replace( event.second.data().begin(), event.second.data().end(), '\n', ' ');
-        boost::split(procElems, event.second.data(), boost::is_any_of(" "));
-        procElems.erase(std::remove(procElems.begin(), procElems.end(), ""));
-        for ( auto prts = 0; prts < nPrt; ++prts )
-        {
-            momVector[momIndex] = std::stod(procElems[6 + 13*prts + 9]);
-            momIndex += 1;
-            for ( auto momComp = 0; momComp < 3; ++momComp )
-            {
-                momVector[momIndex] = std::stod(procElems[6 + 13*prts + 6 + momComp]);
-                momIndex += 1;
-            }
-        }
-        if( getGs ){
-            alphaVector[alphaIndex] = std::sqrt( 4.0 * M_PI * std::stod(procElems[5]));
-        } else {
-            alphaVector[alphaIndex] = std::stod(procElems[5]);
-        }
-        alphaIndex += 1;
-        }
-        currEvt += 1;
-    }
-    static std::vector<std::vector<double>*> ptrVec{ &momVector, &alphaVector };
-    return ptrVec;
-}
-
-std::vector<std::string>& stringSplitter( std::string currEvent ){
+// ZW: turning string into a vector of strings, split by blankspaces and newlines
+// and get rid of any vector entries that are just the null character
+std::vector<std::string>& stringSplitter( std::string& currEvent ){
     static std::vector<std::string> procElems;
     std::replace( currEvent.begin(), currEvent.end(), '\n', ' ');
     boost::split(procElems, currEvent, boost::is_any_of(" "));
@@ -429,20 +390,22 @@ std::vector<std::string>& stringSplitter( std::string currEvent ){
     return procElems;
 }
 
+// ZW: function for extracting the process from an LHE event block
+// in terms of the PDG codes, starting with the number of external particles
+// ie the process g g to t tbar would be "4: 21 21 > 6 -6"
 std::string procReader( std::string currEvent ){
     std::vector<std::string> eventElems = stringSplitter( currEvent );
     for ( auto strang : eventElems ){
     }
-    std::string process = eventElems[0];
-    process += ": ";
+    std::string process = eventElems[0] + ":";
     unsigned int nPrt = std::stoi(eventElems[0]);
     bool prtStatus = true;
     for( unsigned int prtcl = 0; prtcl < nPrt; ++prtcl)
     {
-        process += eventElems[6 + 13*prtcl] + " ";
+        process +=  " " + eventElems[6 + 13*prtcl];
         if ( prtStatus ){
             if ( eventElems[7 + 13*prtcl] != eventElems[7 + 13*(prtcl+1)]){
-                process += "> ";
+                process += " >";
                 prtStatus = false;
             }
         }
@@ -450,6 +413,11 @@ std::string procReader( std::string currEvent ){
     return process;
 }
 
+// ZW: extracts the process ordering within the LHEF, ordered by where the first
+// instance of an process occurs in the LHEF andd returns a vector
+// of pointers to vectors of bools, where the vectors of bools tracks
+// to which events of the LHE corresponds to which process, where
+// true means a given event is of the given process
 std::vector<std::vector<bool>*>& procOrder( pt::ptree& eventFile, std::vector<std::string> evtSet, unsigned int nEvt ) {
     static std::vector<std::vector<bool>*> eventBools;
     for (unsigned int k = 0; k < evtSet.size(); ++k )
@@ -459,7 +427,6 @@ std::vector<std::vector<bool>*>& procOrder( pt::ptree& eventFile, std::vector<st
     }
 
     unsigned int currEv = 0;
-
     for (auto event : eventFile.get_child("LesHouchesEvents")) {
         if (event.first != "event"){
             continue;
@@ -478,6 +445,9 @@ std::vector<std::vector<bool>*>& procOrder( pt::ptree& eventFile, std::vector<st
     return eventBools;
 }
 
+// ZW: extracts which processes occur in an LHEF, ordered by where the first
+// instance of an process occurs in the LHEF, ie the first event is of process 1,
+// the first event (in order) of a different process is process 2 etc
 std::vector<std::string>& processExtractor( pt::ptree& eventFile ) {
     static std::vector<std::string> processes;
     for (auto event : eventFile.get_child("LesHouchesEvents")) {
@@ -493,6 +463,65 @@ std::vector<std::string>& processExtractor( pt::ptree& eventFile ) {
     return processes;
 }
 
+// ZW: function for parsing a single type of process from an LHEF
+// eventFile is the propertytree of the LHEF
+// relEv is a vector of bools which states which of the events to parse (ie which have the considered process)
+// nEvt is an integer of the number of event corresponding to the given process
+// nPrt is the number of external particles within the given process
+std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, std::vector<bool>& relEv, unsigned int nEvt, unsigned int nPrt ) {
+    // ZW: getGs says whether to return the g_S (true) or the alpha_S(false)
+    bool getGs = true;
+    // ZW: nuEvt is the total number of relevant events rounded up
+    // to the nearest multiple of 32
+    unsigned int nuEvt = nEvt + ((32 - ( nEvt % 32 )) % 32);
+    // ZW: momVector is the returned vector of 4-momenta,
+    // (currently) ordered as (E, px, py, pz)
+    static std::vector<double> momVector( 4 * nuEvt * nPrt);
+    // ZW: alphaVector is the returned vector of alphas or gs
+    static std::vector<double> alphaVector( nuEvt );
+    // ZW: dummy indices to keep track of RELEVANT momenta, alphas, and event
+    unsigned int momIndex = 0;
+    unsigned int alphaIndex = 0;
+    unsigned int currEvt = 0;
+
+    for (auto event : eventFile.get_child("LesHouchesEvents")) {
+        if (event.first != "event"){
+            continue;
+        }
+        // ZW: check if event should be considered 
+        if (relEv[currEvt] ) {
+        // ZW: turning event block into a vector of strings
+        auto procElems = stringSplitter(event.second.data());
+        // ZW: appending the momenta, ordered as (E,px,py,pz)
+        for ( auto prts = 0; prts < nPrt; ++prts )
+        {
+            momVector[momIndex] = std::stod(procElems[6 + 13*prts + 9]);
+            momIndex += 1;
+            for ( auto momComp = 0; momComp < 3; ++momComp )
+            {
+                momVector[momIndex] = std::stod(procElems[6 + 13*prts + 6 + momComp]);
+                momIndex += 1;
+            }
+        }
+        // ZW: append the alphas or gs
+        if( getGs ){
+            alphaVector[alphaIndex] = std::sqrt( 4.0 * M_PI * std::stod(procElems[5]));
+        } else {
+            alphaVector[alphaIndex] = std::stod(procElems[5]);
+        }
+        alphaIndex += 1;
+        }
+        currEvt += 1;
+    }
+    // ZW: declare the vector of pointers to the vectors of momenta and alphas
+    static std::vector<std::vector<double>*> ptrVec{ &momVector, &alphaVector };
+    return ptrVec;
+}
+
+// ZW: wrapper for parsing LHEFs, without assumption of only containing a single type of process
+// Returns vector of pointers to vectors of doubles, where every sequential pair of doubles
+// corresponds to one type of process contained within the LHEF, order by their order of appearance
+// in the LHEF
 std::vector<std::vector<double>*>& multiEventParser( pt::ptree& eventFile ){
     std::vector<std::string> procList = processExtractor( eventFile );
     std::vector<unsigned int> numPrts(procList.size());
@@ -511,6 +540,9 @@ std::vector<std::vector<double>*>& multiEventParser( pt::ptree& eventFile ){
     return vecPtrs;
 }
 
+// ZW: wrapper for multiEventParser so user only needs to apply the filename
+// of the LHEF
+// Should eventually be extended to also work for zipped files
 std::vector<std::vector<double>*>& lheParser( std::string fileName ){
     pt::ptree lheFile = fileLoader( fileName );
     return multiEventParser(lheFile);
