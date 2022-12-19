@@ -42,11 +42,11 @@ namespace PEP::PER
     std::vector<double>& matrixCalculation( std::string lheFile )
     {
         auto vecPtr = PEP::lheParser( lheFile );
-        const unsigned int nEvt = *(vecPtr[1]).size();
-        static std::vector<double> meVector( *(vecPtr[1]).size() );
+        const int nEvt = vecPtr[1]->size();
+        static std::vector<double> meVector( nEvt );
         const unsigned int chanId = 0;
         const int nMom = 4;
-        const unsigned int nPrts = (*(vecPtr[0]).size()) / ( nMom * nEvt );
+        const int nPrts = (*(vecPtr[0]).size()) / ( nMom * nEvt );
         CppObjectInFortran *fortrPoint;
         fbridgecreate_( &fortrPoint, &nEvt, &nPrts, &nMom );
         fbridgesequence_( &fortrPoint, &vecPtr[0]->at(0), &vecPtr[1]->at(0), &meVector[0], &chanId );
