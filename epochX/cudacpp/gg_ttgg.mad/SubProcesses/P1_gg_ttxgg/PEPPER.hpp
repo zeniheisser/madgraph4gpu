@@ -14,6 +14,7 @@
 #include <numeric>
 #include <string>
 #include <chrono>
+#include <stdio.h>
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -54,4 +55,40 @@ namespace PEP::PER
 
         return meVector;
     }
+
+    std::string& filePuller( std::string fileLoc )
+    {
+        std::ifstream fileLoad( fileLoc );
+        std::stringstream buffer;
+        buffer << fileLoad.rdbuf();
+        static std::string fileContent = buffer.str();
+        return fileContent;
+    }
+
+    void paramReplacer( std::string parCardLoc, std::string paramCard )
+    {
+        auto remCheck = std::remove(parCardLoc);
+        std::ofstream outputCard( parCardLoc );
+        outputCard << paramCard;
+        outputCard.close();
+    }
+
+    std::string& singleRwgtReader( std::string rwgtCard )
+    {
+        auto setPos = rwgtCard.find("set");
+        auto firstLaunch = rwgtCard.find("launch", setPos);
+        auto nuLine = rwgtCard.find("\n", setPos);
+        static std::string rwgtParams = "";
+        while( setPos < firstLaunch )
+        {
+            if( setPos == std::string::npos ){
+                break;
+            }
+            rwgtParams += rwgtCard.substr(setPos + 4, nuLine - setPos - 4) + "\n";
+            setPos = rwgtCard.find("set", nuLine);
+            nuLine =  rwgtCard.find("\n", setPos);
+        }
+        return rwgtParams;
+    }
+
 }
