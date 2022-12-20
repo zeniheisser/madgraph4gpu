@@ -24,7 +24,7 @@ int main()
     std::cout << "\n" << rwgtparams << "\n\n";
 
     auto rwgtvector = PEP::PER::rwgtReader( rwgtCard );
-    for(string parSet : rwgtvector){
+    for(std::string parSet : rwgtvector){
         std::cout << "\n" << parSet << "\n";
     }
 
