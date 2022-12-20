@@ -56,7 +56,7 @@ namespace PEP::PER
         return meVector;
     }
 
-    std::string filePuller( std::string fileLoc )
+    std::string filePuller( std::string& fileLoc )
     {
         std::cout << "\n\nfilename is   " << fileLoc << "\n\n";
         std::ifstream fileLoad( fileLoc );
@@ -68,7 +68,7 @@ namespace PEP::PER
         return fileContent;
     }
 
-    void paramReplacer( std::string parCardLoc, std::string paramCard )
+    void paramReplacer( std::string& parCardLoc, std::string paramCard )
     {
         const char *parChardLoc = parCardLoc.c_str();
         auto remCheck = remove( parChardLoc );
@@ -77,11 +77,11 @@ namespace PEP::PER
         outputCard.close();
     }
 
-    std::string& singleRwgtReader( std::string rwgtCard )
+    std::string& singleRwgtReader( const std::string& rwgtCard )
     {
         std::cout << "\n\nin singleRwgtReader\n\n";
         auto setPos = rwgtCard.find("set");
-        auto firstLaunch = rwgtCard.find("launch", setPos);
+        auto firstLaunch = rwgtCard.find("\nlaunch", setPos);
         auto nuLine = rwgtCard.find("\n", setPos);
         static std::string rwgtParams = "";
         while( setPos < firstLaunch )
