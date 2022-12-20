@@ -93,7 +93,7 @@ namespace PEP::PER
         return rwgtParams;
     }
     
-    std::vector<std::string>>& rwgtReader( const std::string& rwgtCard )
+    std::vector<std::string>& rwgtReader( const std::string& rwgtCard )
     {
         auto setPos = rwgtCard.find("set");
         auto launchPos = rwgtCard.find("\nlaunch", setPos);
