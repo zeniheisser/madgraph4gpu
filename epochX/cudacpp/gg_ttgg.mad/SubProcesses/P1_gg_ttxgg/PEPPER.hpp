@@ -75,7 +75,7 @@ namespace PEP::PER
         outputCard.close();
     }
 
-    std::string& singleRwgtReader( const std::string& rwgtCard )
+    std::string& singleRwgtReader( std::string rwgtCard )
     {
         std::string nuRwgtCard;
         std::transform( rwgtCard.begin(), rwgtCard.end(), nuRwgtCard.begin(), ::tolower );
