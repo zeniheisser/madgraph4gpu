@@ -20,6 +20,7 @@ int main()
     }
 
     std::string rwgtCard = PEP::PER::filePuller( "reweight_card.dat" );
+    std::cout << "\n\n" << rwgtCard << "\n\n";
 
     auto rwgtparams = PEP::PER::singleRwgtReader( rwgtCard );
 
