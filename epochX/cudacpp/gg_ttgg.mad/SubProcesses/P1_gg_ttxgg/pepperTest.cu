@@ -19,7 +19,7 @@ int main()
         std::cout <<"\nTHE PARAMCARDS DIFFER\n" << parametercard << "\n\n" << nuParams << "\n\n";
     }
 
-    std::string rwgtCard = PEP::PER::filePuller( "reweight_card.dat" )
+    std::string rwgtCard = PEP::PER::filePuller( "reweight_card.dat" );
 
     auto rwgtparams = PEP::PER::singleRwgtReader( rwgtCard );
 
