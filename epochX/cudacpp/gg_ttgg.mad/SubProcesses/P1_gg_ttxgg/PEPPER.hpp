@@ -58,12 +58,10 @@ namespace PEP::PER
 
     std::string filePuller( std::string fileLoc )
     {
-        std::cout << "\n\nfilename is   " << fileLoc << "\n\n";
         std::ifstream fileLoad( fileLoc );
         std::stringstream buffer;
         buffer << fileLoad.rdbuf();
         std::string fileContent = buffer.str();
-        std::cout << "\n\n" << fileContent << "\n\n";
         buffer.str(std::string());
         return fileContent;
     }
@@ -79,24 +77,44 @@ namespace PEP::PER
 
     std::string& singleRwgtReader( const std::string& rwgtCard )
     {
-        std::cout << "\n\nin singleRwgtReader\n\n";
         auto setPos = rwgtCard.find("set");
         auto firstLaunch = rwgtCard.find("\nlaunch", setPos);
         auto nuLine = rwgtCard.find("\n", setPos);
         static std::string rwgtParams = "";
         while( setPos < firstLaunch )
         {
-            std::cout << "\n\nin the while loop\n\n";
             if( setPos == std::string::npos ){
-                std::cout << "\n\nin loopbreak\n\n";
                 break;
             }
-            std::cout << "\n\ngot past breakloop\n\n";
             rwgtParams += rwgtCard.substr(setPos + 4, nuLine - setPos - 4) + "\n";
             setPos = rwgtCard.find("set", nuLine);
             nuLine =  rwgtCard.find("\n", setPos);
         }
-        std::cout << "\n\n" << setPos << "                    " << firstLaunch << "\n\n";
+        return rwgtParams;
+    }
+    
+    std::vector<std::string>>& rwgtReader( const std::string& rwgtCard )
+    {
+        auto setPos = rwgtCard.find("set");
+        auto launchPos = rwgtCard.find("\nlaunch", setPos);
+        auto nuLine = rwgtCard.find("\n", setPos);
+        static std::vector<std::string> rwgtParams;
+        while( launchPos != std::string::npos )
+        {
+            auto firstLaunch = rwgtCard.find("\nlaunch", setPos);
+            std::string rwgtParamStr = "";
+            while ( setPos < firstLaunch)
+            {
+                if( setPos == std::string::npos ){
+                    break;
+                }
+                rwgtParamStr += rwgtCard.substr(setPos + 4, nuLine - setPos - 4) + "\n";
+                setPos = rwgtCard.find("set", nuLine);
+                nuLine = rwgtCard.find("\n", setPos);
+            }
+            rwgtParams.push_back(rwgtParamStr);
+            launchPos = rwgtCard.find("\nlaunch", setPos);
+        }
         return rwgtParams;
     }
 
