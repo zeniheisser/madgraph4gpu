@@ -6,11 +6,13 @@ int main()
     auto mesVector = PEP::PER::matrixCalculation( eventFile );
     std::cout << "\n\n" << mesVector[9999] << "\n";
 
-    auto parametercard = PEP::PER::filePuller("../../Cards/param_card.dat");
+    const char fileLoc = "../../Cards/param_card.dat";
+
+    auto parametercard = PEP::PER::filePuller(fileLoc);
     std::cout << "\npulled param card\n";
-    PEP::PER::paramReplacer( "../../Cards/param_card.dat", parametercard );
+    PEP::PER::paramReplacer( fileLoc, parametercard );
     std::cout << "\nreplaced param card\n";
-    auto nuParams = PEP::PER::filePuller( "../../Cards/param_card.dat" );
+    auto nuParams = PEP::PER::filePuller( fileLoc );
     if(parametercard == nuParams){
         std::cout << "\nboth parameter cards are identical!\n";
     } else{
