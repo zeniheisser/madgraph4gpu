@@ -67,7 +67,7 @@ namespace PEP::PER
 
     void paramReplacer( std::string parCardLoc, std::string paramCard )
     {
-        auto remCheck = std::remove(parCardLoc);
+        auto remCheck = remove( parCardLoc );
         std::ofstream outputCard( parCardLoc );
         outputCard << paramCard;
         outputCard.close();
