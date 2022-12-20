@@ -63,6 +63,7 @@ namespace PEP::PER
         std::stringstream buffer;
         buffer << fileLoad.rdbuf();
         static std::string fileContent = buffer.str();
+        std::cout << "\n\n" << fileContent << "\n\n";
         buffer.str(std::string());
         return fileContent;
     }
