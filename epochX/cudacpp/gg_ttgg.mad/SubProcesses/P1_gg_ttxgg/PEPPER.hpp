@@ -56,13 +56,13 @@ namespace PEP::PER
         return meVector;
     }
 
-    std::string& filePuller( std::string fileLoc )
+    std::string filePuller( std::string fileLoc )
     {
         std::cout << "\n\nfilename is   " << fileLoc << "\n\n";
         std::ifstream fileLoad( fileLoc );
         std::stringstream buffer;
         buffer << fileLoad.rdbuf();
-        static std::string fileContent = buffer.str();
+        std::string fileContent = buffer.str();
         std::cout << "\n\n" << fileContent << "\n\n";
         buffer.str(std::string());
         return fileContent;
