@@ -77,7 +77,7 @@ namespace PEP::PER
 
     std::string& singleRwgtReader( const std::string& rwgtCard )
     {
-        std::string nuRwgtCard( rwgtCard.size() );
+        std::string nuRwgtCard;
         std::transform( rwgtCard.begin(), rwgtCard.end(), nuRwgtCard.begin(), ::tolower );
         auto setPos = nuRwgtCard.find("set");
         auto firstLaunch = nuRwgtCard.find("\nlaunch", setPos);
@@ -97,7 +97,7 @@ namespace PEP::PER
     
     std::vector<std::string>& rwgtReader( std::string rwgtCard )
     {
-        std::string nuRwgtCard( rwgtCard.size() );
+        std::string nuRwgtCard;
         std::transform( rwgtCard.begin(), rwgtCard.end(), nuRwgtCard.begin(), ::tolower );
         auto setPos = nuRwgtCard.find("set");
         auto launchPos = nuRwgtCard.find("\nlaunch", setPos);
