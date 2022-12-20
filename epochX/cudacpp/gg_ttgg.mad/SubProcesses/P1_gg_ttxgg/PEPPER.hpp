@@ -40,7 +40,7 @@
 
 namespace PEP::PER
 {
-    std::vector<double>& matrixCalculation( std::string lheFile )
+    std::vector<double>& matrixCalculation( const std::string& lheFile )
     {
         auto vecPtr = PEP::lheParser( lheFile );
         const int nEvt = vecPtr[1]->size();
@@ -56,7 +56,7 @@ namespace PEP::PER
         return meVector;
     }
 
-    std::string filePuller( std::string fileLoc )
+    std::string filePuller( const std::string& fileLoc )
     {
         std::ifstream fileLoad( fileLoc );
         std::stringstream buffer;
@@ -66,7 +66,7 @@ namespace PEP::PER
         return fileContent;
     }
 
-    void paramReplacer( std::string& parCardLoc, std::string paramCard )
+    void paramReplacer( const std::string& parCardLoc, const std::string& paramCard )
     {
         const char *parChardLoc = parCardLoc.c_str();
         auto remCheck = remove( parChardLoc );
@@ -77,43 +77,47 @@ namespace PEP::PER
 
     std::string& singleRwgtReader( const std::string& rwgtCard )
     {
-        auto setPos = rwgtCard.find("set");
-        auto firstLaunch = rwgtCard.find("\nlaunch", setPos);
-        auto nuLine = rwgtCard.find("\n", setPos);
+        std::string nuRwgtCard( rwgtCard.size() );
+        std::transform( rwgtCard.begin(), rwgtCard.end(), nuRwgtCard.begin(), ::tolower );
+        auto setPos = nuRwgtCard.find("set");
+        auto firstLaunch = nuRwgtCard.find("\nlaunch", setPos);
+        auto nuLine = nuRwgtCard.find("\n", setPos);
         static std::string rwgtParams = "";
         while( setPos < firstLaunch )
         {
             if( setPos == std::string::npos ){
                 break;
             }
-            rwgtParams += rwgtCard.substr(setPos + 4, nuLine - setPos - 4) + "\n";
-            setPos = rwgtCard.find("set", nuLine);
-            nuLine =  rwgtCard.find("\n", setPos);
+            rwgtParams += nuRwgtCard.substr(setPos + 4, nuLine - setPos - 4) + "\n";
+            setPos = nuRwgtCard.find("set", nuLine);
+            nuLine =  nuRwgtCard.find("\n", setPos);
         }
         return rwgtParams;
     }
     
-    std::vector<std::string>& rwgtReader( const std::string& rwgtCard )
+    std::vector<std::string>& rwgtReader( std::string rwgtCard )
     {
-        auto setPos = rwgtCard.find("set");
-        auto launchPos = rwgtCard.find("\nlaunch", setPos);
-        auto nuLine = rwgtCard.find("\n", setPos);
+        std::string nuRwgtCard( rwgtCard.size() );
+        std::transform( rwgtCard.begin(), rwgtCard.end(), nuRwgtCard.begin(), ::tolower );
+        auto setPos = nuRwgtCard.find("set");
+        auto launchPos = nuRwgtCard.find("\nlaunch", setPos);
+        auto nuLine = nuRwgtCard.find("\n", setPos);
         static std::vector<std::string> rwgtParams;
         while( launchPos != std::string::npos )
         {
-            auto firstLaunch = rwgtCard.find("\nlaunch", setPos);
+            auto firstLaunch = nuRwgtCard.find("\nlaunch", setPos);
             std::string rwgtParamStr = "";
             while ( setPos < firstLaunch)
             {
                 if( setPos == std::string::npos ){
                     break;
                 }
-                rwgtParamStr += rwgtCard.substr(setPos + 4, nuLine - setPos - 4) + "\n";
-                setPos = rwgtCard.find("set", nuLine);
-                nuLine = rwgtCard.find("\n", setPos);
+                rwgtParamStr += nuRwgtCard.substr(setPos + 4, nuLine - setPos - 4) + "\n";
+                setPos = nuRwgtCard.find("set", nuLine);
+                nuLine = nuRwgtCard.find("\n", setPos);
             }
             rwgtParams.push_back(rwgtParamStr);
-            launchPos = rwgtCard.find("\nlaunch", setPos);
+            launchPos = nuRwgtCard.find("\nlaunch", setPos);
         }
         return rwgtParams;
     }
