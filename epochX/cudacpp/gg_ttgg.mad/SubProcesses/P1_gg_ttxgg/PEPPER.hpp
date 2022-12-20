@@ -58,10 +58,12 @@ namespace PEP::PER
 
     std::string& filePuller( std::string fileLoc )
     {
+        std::cout << "\n\nfilename is   " << fileLoc << "\n\n";
         std::ifstream fileLoad( fileLoc );
         std::stringstream buffer;
         buffer << fileLoad.rdbuf();
         static std::string fileContent = buffer.str();
+        buffer.str(std::string());
         return fileContent;
     }
 
