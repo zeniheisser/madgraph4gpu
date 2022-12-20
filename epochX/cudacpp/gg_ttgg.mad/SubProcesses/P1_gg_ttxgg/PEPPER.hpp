@@ -76,19 +76,24 @@ namespace PEP::PER
 
     std::string& singleRwgtReader( std::string rwgtCard )
     {
+        std::cout << "\n\nin singleRwgtReader\n\n";
         auto setPos = rwgtCard.find("set");
         auto firstLaunch = rwgtCard.find("launch", setPos);
         auto nuLine = rwgtCard.find("\n", setPos);
         static std::string rwgtParams = "";
         while( setPos < firstLaunch )
         {
+            std::cout << "\n\nin the while loop\n\n";
             if( setPos == std::string::npos ){
+                std::cout << "\n\nin loopbreak\n\n";
                 break;
             }
+            std::cout << "\n\ngot past breakloop\n\n";
             rwgtParams += rwgtCard.substr(setPos + 4, nuLine - setPos - 4) + "\n";
             setPos = rwgtCard.find("set", nuLine);
             nuLine =  rwgtCard.find("\n", setPos);
         }
+        std::cout << "\n\n" << setPos << "                    " << firstLaunch << "\n\n";
         return rwgtParams;
     }
 
