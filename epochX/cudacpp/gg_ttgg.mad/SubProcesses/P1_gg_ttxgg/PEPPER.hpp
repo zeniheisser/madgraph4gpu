@@ -56,7 +56,7 @@ namespace PEP::PER
         return meVector;
     }
 
-    std::string& filePuller( const std::string&  fileLoc )
+    std::string& filePuller( std::string fileLoc )
     {
         std::ifstream fileLoad( fileLoc );
         std::stringstream buffer;
@@ -65,7 +65,7 @@ namespace PEP::PER
         return fileContent;
     }
 
-    void paramReplacer( const std::string& parCardLoc, std::string paramCard )
+    void paramReplacer( std::string parCardLoc, std::string paramCard )
     {
         const char *parChardLoc = parCardLoc.c_str();
         auto remCheck = remove( parChardLoc );
