@@ -6,7 +6,7 @@ int main()
     auto mesVector = PEP::PER::matrixCalculation( eventFile );
     std::cout << "\n\n" << mesVector[9999] << "\n";
 
-    const char fileLoc = "../../Cards/param_card.dat";
+    static const std::string fileLoc = "../../Cards/param_card.dat";
 
     auto parametercard = PEP::PER::filePuller(fileLoc);
     std::cout << "\npulled param card\n";
