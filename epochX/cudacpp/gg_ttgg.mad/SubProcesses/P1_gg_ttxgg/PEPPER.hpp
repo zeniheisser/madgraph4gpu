@@ -154,6 +154,7 @@ namespace PEP::PER
             std::cout << "\nin else\n";
             auto nuLine = paramCard.find( "\n", blockLock );
             auto blockEnd = paramCard.find( "###", blockLock );
+            std::cout << "\nnuLine is   " << nuLine << "   and blockEnd is   " << blockEnd << "\n"; 
             while( nuLine < blockEnd )
             {
                 auto tuLine = paramCard.find( "\n", nuLine + 1 );
