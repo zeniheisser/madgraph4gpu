@@ -135,7 +135,7 @@ namespace PEP::PER
         return words;
     }
 
-    std::vector<int>& findBlockPar( const std::vector<std::string>& paramLine, const std::string& paramCard )
+    std::vector<int>& findBlockPar( std::vector<std::string> paramLine, std::string paramCard )
     {
         static std::vector<int> blockPars;
         auto blockLock = paramCard.find(paramLine[0]);
@@ -161,7 +161,7 @@ namespace PEP::PER
         return blockPars;
     }
     
-    std::vector<int>& findParamEnds( const std::vector<int> & blockParLocs, const std::string& paramCard )
+    std::vector<int>& findParamEnds( std::vector<int> blockParLocs, std::string paramCard )
     {
         static std::vector<int> lineEnds(blockParLocs.size());
         for( int k = 0; k < blockParLocs.size(); ++k)
