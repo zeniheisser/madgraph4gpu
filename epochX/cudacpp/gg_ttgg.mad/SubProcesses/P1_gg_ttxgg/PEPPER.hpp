@@ -194,7 +194,7 @@ namespace PEP::PER
         for( int k = 0; k < parLocs.size(); ++k )
         {
             modCard +=  paramCard.substr( srtPos, parLocs[k] - srtPos ) + paramLine[2];
-            srtPos = endLocs[k]
+            srtPos = endLocs[k];
         }
         modCard += paramCard.substr(srtPos);
         return modCard;
