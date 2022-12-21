@@ -137,24 +137,16 @@ namespace PEP::PER
 
     std::vector<int>& findBlockPar( std::vector<std::string> paramLine, std::string paramCard )
     {
-        for( std::string lineWords : paramLine )
-        {
-            std::cout << "\n" << lineWords << "\n";
-        }
         static std::vector<int> blockPars;
         auto blockLock = paramCard.find("block " + paramLine[0]);
-        std::cout << "\nblockLock is  " << blockLock << "\n";
         if( paramLine[1] != "all" )
         {
-            std::cout << "\nin if\n";
             auto paraLock = paramCard.find(" " + paramLine[2] + " ", blockLock );
             blockPars.push_back(paraLock + paramLine[2].length() + 2);
         } else 
         {
-            std::cout << "\nin else\n";
             auto nuLine = paramCard.find( "\n", blockLock );
             auto blockEnd = paramCard.find( "###", blockLock );
-            std::cout << "\nnuLine is   " << nuLine << "   and blockEnd is   " << blockEnd << "\n"; 
             while( nuLine < blockEnd )
             {
                 auto tuLine = paramCard.find( "\n", nuLine + 1 );
@@ -166,10 +158,6 @@ namespace PEP::PER
                 }
                 nuLine = tuLine;
             }
-        }
-        for( int vals : blockPars )
-        {
-            std::cout << "\n" << vals << "\n";
         }
         return blockPars;
     }
@@ -186,7 +174,6 @@ namespace PEP::PER
 
     std::string& replaceBlockPar( std::vector<std::string> paramLine, std::string paramCard)
     {
-        //REPLACE SINGLE SPECIFIC PARAMETER IN PARAMCARD
         auto parLocs = findBlockPar( paramLine, paramCard );
         static std::string modCard = paramCard.substr(0, parLocs[0] - 1);
         unsigned int srtPos = 0;
@@ -200,9 +187,16 @@ namespace PEP::PER
         return modCard;
     }
 
-    /* RETURNTYPE paramCardReplacer()
+    std::string& paramCardReplacer( std::string paramSet, std::string paramCard )
     {
-        REPLACE ALL GIVEN PARAMETERS IN PARAMCARD
-    } */
+        static std::string modiCard = paramCard;
+        auto paramSetVec = splitByLine(paramSet);
+        for( auto params : paramSetVec )
+        {
+            auto paramVec = splitByBlank( params );
+            modiCard = replaceBlockPar( paramVec, modiCard );
+        }
+        return modiCard;
+    }
 
 }

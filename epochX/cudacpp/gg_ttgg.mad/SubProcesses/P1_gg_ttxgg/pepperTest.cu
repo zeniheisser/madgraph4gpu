@@ -29,13 +29,10 @@ int main()
     }
 
     auto parameterCard = PEP::PER::filePuller( "param_card.dat" );
-    std::cout << "\nloaded param_card\n";
-    std::vector<std::string> paraKara{"dim6","all","0"};
-    std::cout << "\nmade a vector\n";
-    auto modiCard = PEP::PER::replaceBlockPar( paraKara, parameterCard);
-    std::cout << "\nreplaced block params\n";
 
-    std::cout << "\n\n" << parameterCard << "\n\n" << modiCard << "\n\n";
+    auto nuParamCard = PEP::PER::paramCardReplacer( rwgtvector[rwgtvector.size() - 1], parameterCard );
+
+    std::cout << "\n\n" << nuParamCard << "\n\n";
 
 
     return 0;
