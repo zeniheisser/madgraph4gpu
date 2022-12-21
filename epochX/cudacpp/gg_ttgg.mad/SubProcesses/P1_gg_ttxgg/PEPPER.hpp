@@ -137,14 +137,20 @@ namespace PEP::PER
 
     std::vector<int>& findBlockPar( std::vector<std::string> paramLine, std::string paramCard )
     {
+        for( std::string lineWords : paramLine )
+        {
+            std::cout << "\n" << lineWords << "\n";
+        }
         static std::vector<int> blockPars;
         auto blockLock = paramCard.find(paramLine[0]);
         if( paramLine[1] != "all" )
         {
+            std::cout << "\nin if\n";
             auto paraLock = paramCard.find(" " + paramLine[2] + " ", blockLock );
             blockPars.push_back(paraLock + paramLine[2].length() + 2);
         } else 
         {
+            std::cout << "\nin else\n";
             auto nuLine = paramCard.find( "\n", blockLock );
             auto blockEnd = paramCard.find( "###", blockLock );
             while( nuLine < blockEnd )
