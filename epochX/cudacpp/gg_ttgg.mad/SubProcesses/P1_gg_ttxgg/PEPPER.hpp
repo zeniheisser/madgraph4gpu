@@ -181,8 +181,10 @@ namespace PEP::PER
         std::cout << "\ninitialised modCard\n";
         auto endLocs = findParamEnds( parLocs, paramCard );
         std::cout << "\n through findParamEnds\n";
+        std::cout << "\n" << parLocs.size() << "\n";
         for( int k = 0; k < parLocs.size(); ++k )
         {
+            std::cout << "\n" << k << "\n";
             modCard += paramCard.substr(parLocs[k], endLocs[k] - parLocs[k]) + "\n";
         }
         std::cout << "\ngot through loop\n";
