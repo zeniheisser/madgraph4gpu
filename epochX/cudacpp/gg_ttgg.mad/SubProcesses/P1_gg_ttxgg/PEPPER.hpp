@@ -199,8 +199,9 @@ namespace PEP::PER
         for( int k = 0; k < parLocs.size(); ++k )
         {
             std::cout << "\n" << k << "\n";
-            modCard += paramCard.substr(parLocs[k], endLocs[k] - parLocs[k]) + "\n";
+            modCard += paramCard.substr(parLocs[k], endLocs[k] - parLocs[k]) + "\n      ";
         }
+        modCard += paramCard.substr(endLocs[endLocs.size() - 1]);
         std::cout << "\ngot through loop\n";
         return modCard;
     }
