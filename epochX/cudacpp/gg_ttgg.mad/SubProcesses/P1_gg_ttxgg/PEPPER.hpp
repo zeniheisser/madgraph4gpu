@@ -190,7 +190,7 @@ namespace PEP::PER
             srtPos = endLocs[k];
             std::cout << "\nredefined srtPos\n";
         }
-        std::cout << "\noutside loop\n"
+        std::cout << "\noutside loop\n";
         modCard += paramCard.substr(srtPos);
         std::cout << "\nadded to modCard outside loop\n";
         return modCard;
