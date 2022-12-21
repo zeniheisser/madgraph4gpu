@@ -62,6 +62,7 @@ namespace PEP::PER
         std::stringstream buffer;
         buffer << fileLoad.rdbuf();
         std::string fileContent = buffer.str();
+        std::transform( fileContent.begin(), fileContent.end(), fileContent.begin(), ::tolower );
         buffer.str(std::string());
         return fileContent;
     }
@@ -77,7 +78,7 @@ namespace PEP::PER
 
     std::string& singleRwgtReader( std::string rwgtCard )
     {
-        std::transform( rwgtCard.begin(), rwgtCard.end(), rwgtCard.begin(), ::tolower );
+        //std::transform( rwgtCard.begin(), rwgtCard.end(), rwgtCard.begin(), ::tolower );
         auto setPos = rwgtCard.find("set");
         auto firstLaunch = rwgtCard.find("\nlaunch", setPos);
         auto nuLine = rwgtCard.find("\n", setPos);
@@ -96,7 +97,7 @@ namespace PEP::PER
     
     std::vector<std::string>& rwgtReader( std::string rwgtCard )
     {
-        std::transform( rwgtCard.begin(), rwgtCard.end(), rwgtCard.begin(), ::tolower );
+        //std::transform( rwgtCard.begin(), rwgtCard.end(), rwgtCard.begin(), ::tolower );
         auto setPos = rwgtCard.find("set");
         auto launchPos = rwgtCard.find("\nlaunch", setPos);
         auto nuLine = rwgtCard.find("\n", setPos);
@@ -119,5 +120,73 @@ namespace PEP::PER
         }
         return rwgtParams;
     }
+
+    std::vector<std::string>& splitByLine( const std::string& parameterSet )
+    {
+        static std::vector<std::string> lines;
+        boost::split(lines, parameterSet, boost::is_any_of("\n"));
+        return lines;
+    }
+
+    std::vector<std::string>& splitByBlank( const std::string& parameterLine )
+    {
+        static std::vector<std::string> words;
+        boost::split( words, parameterLine, boost::is_any_of(" "));
+        return words;
+    }
+
+    std::vector<int>& findBlockPar( const std::vector<std::string>& paramLine, const std::string& paramCard )
+    {
+        static std::vector<int> blockPars;
+        auto blockLock = paramCard.find(paramLine[0]);
+        if( paramLine[1] != "all" )
+        {
+            auto paraLock = paramCard.find(" " + paramLine[2] + " ", blockLock );
+            blockPars.push_back(paraLock + paramLine[2].length() + 2);
+        } else 
+        {
+            auto nuLine = paramCard.find( "\n", blockLock );
+            auto blockEnd = paramCard.find( "###", blockLock );
+            while( nuLine < blockEnd )
+            {
+                auto tuLine = paramCard.find( "\n", nuLine + 1 );
+                auto parNam = paramCard.find_first_not_of( " ", nuLine + 1 );
+                auto parPlac = paramCard.find_first_not_of( " ", parNam + 1 );
+                if( tuLine < blockEnd ){
+                    blockPars.push_back( parPlac );
+                }
+                nuLine = tuLine;
+            }
+        }
+        return blockPars;
+    }
+    
+    std::vector<int>& findParamEnds( const std::vector<int> & blockParLocs, const std::string& paramCard )
+    {
+        static std::vector<int> lineEnds(blockParLocs.size());
+        for( int k = 0; k < blockParLocs.size(); ++k)
+        {
+            lineEnds[k] = paramCard.find( "\n", blockParLocs[k] );
+        }
+        return lineEnds;
+    }
+
+    std::string& replaceBlockPar(const std::vector<std::string>& paramLine, const std::string& paramCard)
+    {
+        //REPLACE SINGLE SPECIFIC PARAMETER IN PARAMCARD
+        auto parLocs = findBlockPar( paramLine, paramCard );
+        static std::string modCard = paramCard.substr(0, parLocs[0] - 1);
+        auto endLocs = findParamEnds( parLocs, paramCard );
+        for( int k = 0; k < parLocs.size(); ++k )
+        {
+            modCard += paramCard.substr(parLocs[k], endLocs[k] - parLocs[k]) + "\n";
+        }
+        return modCard;
+    }
+
+    /* RETURNTYPE paramCardReplacer()
+    {
+        REPLACE ALL GIVEN PARAMETERS IN PARAMCARD
+    } */
 
 }

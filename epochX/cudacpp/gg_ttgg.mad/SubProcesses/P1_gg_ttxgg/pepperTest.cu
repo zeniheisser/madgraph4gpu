@@ -28,5 +28,12 @@ int main()
         std::cout << "\n" << parSet << "\n";
     }
 
+    auto parameterCard = PEP::PER::filePuller( "param_card.dat" );
+    std::vector<std::string> paraKara{"dim6","all","0"};
+    auto modiCard = PEP::PER::replaceBlockPar( paraKara, parameterCard);
+
+    std::cout << "\n\n" << parameterCard << "\n\n" << modiCard << "\n\n";
+
+
     return 0;
 }
