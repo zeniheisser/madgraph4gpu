@@ -174,29 +174,34 @@ namespace PEP::PER
 
     std::string& replaceBlockPar( std::vector<std::string> paramLine, std::string paramCard)
     {
+        std::cout << "\nin replaceBlockPar\n";
         auto parLocs = findBlockPar( paramLine, paramCard );
+        std::cout << "\nfound Block Par\n";
         static std::string modCard = paramCard.substr(0, parLocs[0] - 1);
+        std::cout << "\ninitalised modCard\n";
         unsigned int srtPos = 0;
         auto endLocs = findParamEnds( parLocs, paramCard );
+        std::cout << "\nfound Param Ends\n";
         for( int k = 0; k < parLocs.size(); ++k )
         {
+            std::cout << "\nin inner loop\n";
             modCard +=  paramCard.substr( srtPos, parLocs[k] - srtPos ) + paramLine[2];
+            std::cout << "\nadded to modCard\n";
             srtPos = endLocs[k];
+            std::cout << "\nredefined srtPos\n";
         }
+        std::cout << "\noutside loop\n"
         modCard += paramCard.substr(srtPos);
+        std::cout << "\nadded to modCard outside loop\n";
         return modCard;
     }
 
     std::string& paramCardReplacer( std::string paramSet, std::string paramCard )
     {
-        std::cout << "\nin paramCardReplacer\n";
         static std::string modiCard = paramCard;
-        std::cout << "\ninitialised modiCard\n";
         auto paramSetVec = splitByLine(paramSet);
-        std::cout << "\nsplit paramSet\n";
         for( auto params : paramSetVec )
         {
-            std::cout << "\nin loop\n";
             auto paramVec = splitByBlank( params );
             std::cout << "\nsplit params by blank\n";
             modiCard = replaceBlockPar( paramVec, modiCard );
