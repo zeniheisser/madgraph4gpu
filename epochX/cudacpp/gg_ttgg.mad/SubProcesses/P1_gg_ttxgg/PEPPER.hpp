@@ -177,6 +177,8 @@ namespace PEP::PER
         std::cout << "\nin replaceBlockPar\n";
         auto parLocs = findBlockPar( paramLine, paramCard );
         std::cout << "\nthrough findBlockPar\n";
+        std::cout << "\nparamCard is long " << paramCard.length() << "\n";
+        std::cout << "\nparLocs[0] is long " << parLocs[0];
         static std::string modCard = paramCard.substr(0, parLocs[0] - 1);
         std::cout << "\ninitialised modCard\n";
         auto endLocs = findParamEnds( parLocs, paramCard );
