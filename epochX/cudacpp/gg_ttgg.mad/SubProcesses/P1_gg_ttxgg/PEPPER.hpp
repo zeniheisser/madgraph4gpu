@@ -159,7 +159,7 @@ namespace PEP::PER
             {
                 auto tuLine = paramCard.find( "\n", nuLine + 1 );
                 auto parNam = paramCard.find_first_not_of( " ", nuLine + 1 );
-                auto parPlac = paramCard.find_first_not_of( " ", parNam + 1 );
+                auto parPlac = paramCard.find_first_not_of( " ", parNam + 2 );
                 if( tuLine < blockEnd ){
                     blockPars.push_back( parPlac );
                 }
