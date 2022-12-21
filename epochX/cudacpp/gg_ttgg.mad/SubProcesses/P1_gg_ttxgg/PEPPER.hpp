@@ -206,6 +206,7 @@ namespace PEP::PER
         auto paramSetVec = splitByLine(paramSet);
         for( auto params : paramSetVec )
         {
+            std::cout << "\n" << params << "\n";
             auto paramVec = splitByBlank( params );
             std::cout << "\nsplit params by blank\n";
             modiCard = replaceBlockPar( paramVec, modiCard );
