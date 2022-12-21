@@ -174,13 +174,18 @@ namespace PEP::PER
     std::string& replaceBlockPar( std::vector<std::string> paramLine, std::string paramCard)
     {
         //REPLACE SINGLE SPECIFIC PARAMETER IN PARAMCARD
+        std::cout << "\nin replaceBlockPar\n";
         auto parLocs = findBlockPar( paramLine, paramCard );
+        std::cout << "\nthrough findBlockPar\n";
         static std::string modCard = paramCard.substr(0, parLocs[0] - 1);
+        std::cout << "\ninitialised modCard\n";
         auto endLocs = findParamEnds( parLocs, paramCard );
+        std::cout << "\n through findParamEnds\n";
         for( int k = 0; k < parLocs.size(); ++k )
         {
             modCard += paramCard.substr(parLocs[k], endLocs[k] - parLocs[k]) + "\n";
         }
+        std::cout << "\ngot through loop\n";
         return modCard;
     }
 
