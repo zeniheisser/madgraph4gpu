@@ -189,13 +189,20 @@ namespace PEP::PER
 
     std::string& paramCardReplacer( std::string paramSet, std::string paramCard )
     {
+        std::cout << "\nin paramCardReplacer\n";
         static std::string modiCard = paramCard;
+        std::cout << "\ninitialised modiCard\n";
         auto paramSetVec = splitByLine(paramSet);
+        std::cout << "\nsplit paramSet\n";
         for( auto params : paramSetVec )
         {
+            std::cout << "\nin loop\n";
             auto paramVec = splitByBlank( params );
+            std::cout << "\nsplit params by blank\n";
             modiCard = replaceBlockPar( paramVec, modiCard );
+            std::cout << "\nreplaced modiCard w replaceBlockPar\n";
         }
+        std::cout << "\nexited loop\n";
         return modiCard;
     }
 
