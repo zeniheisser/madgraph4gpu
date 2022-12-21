@@ -175,6 +175,10 @@ namespace PEP::PER
     std::string& replaceBlockPar( std::vector<std::string> paramLine, std::string paramCard)
     {
         std::cout << "\nin replaceBlockPar\n";
+        for( auto params : paramLine )
+        {
+            std::cout << "\n" + params + "\n";
+        }
         auto parLocs = findBlockPar( paramLine, paramCard );
         std::cout << "\nfound Block Par\n";
         static std::string modCard = paramCard.substr(0, parLocs[0] - 1);
