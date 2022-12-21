@@ -171,7 +171,7 @@ namespace PEP::PER
         return lineEnds;
     }
 
-    std::string& replaceBlockPar(const std::vector<std::string>& paramLine, const std::string& paramCard)
+    std::string& replaceBlockPar( std::vector<std::string> paramLine, std::string paramCard)
     {
         //REPLACE SINGLE SPECIFIC PARAMETER IN PARAMCARD
         auto parLocs = findBlockPar( paramLine, paramCard );
