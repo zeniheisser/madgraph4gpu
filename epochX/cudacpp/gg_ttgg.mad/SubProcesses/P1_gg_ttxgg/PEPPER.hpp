@@ -143,6 +143,7 @@ namespace PEP::PER
         }
         static std::vector<int> blockPars;
         auto blockLock = paramCard.find(paramLine[0]);
+        std::cout << "\nblockLock is  " << blockLock << "\n";
         if( paramLine[1] != "all" )
         {
             std::cout << "\nin if\n";
