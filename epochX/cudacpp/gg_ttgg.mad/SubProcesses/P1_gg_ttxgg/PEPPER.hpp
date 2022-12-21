@@ -158,6 +158,10 @@ namespace PEP::PER
                 nuLine = tuLine;
             }
         }
+        for( int vals : blockPars )
+        {
+            std::cout << "\n" << vals << "\n";
+        }
         return blockPars;
     }
     
@@ -178,7 +182,7 @@ namespace PEP::PER
         auto parLocs = findBlockPar( paramLine, paramCard );
         std::cout << "\nthrough findBlockPar\n";
         std::cout << "\nparamCard is long " << paramCard.length() << "\n";
-        std::cout << "\nparLocs is long " << parLocs.size();
+        std::cout << "\nparLocs is long " << parLocs.size() << "\n";
         static std::string modCard = paramCard.substr(0, parLocs[0] - 1);
         std::cout << "\ninitialised modCard\n";
         auto endLocs = findParamEnds( parLocs, paramCard );
