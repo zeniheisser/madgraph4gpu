@@ -22,7 +22,9 @@ change mode NLO    # Define type of Reweighting. For LO sample this command
                    # has no effect since only "LO" mode is allowed.
                    
 launch
- set dim6 all 0
+set dim6 5 3.14
+launch
+set dim6 all 0
 launch
 set dim6 all 0
 set dim6 1
