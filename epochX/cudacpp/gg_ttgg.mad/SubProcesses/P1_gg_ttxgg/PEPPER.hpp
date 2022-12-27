@@ -180,7 +180,7 @@ namespace PEP::PER
         //std::cout << "\nin replaceBlockPar\n";
         for( auto params : paramLine )
         {
-            std::cout << "\n" + params + "\n";
+            std::cout << "\ncurr paramelem:" + params + "\n";
         }
         auto parLocs = findBlockPar( paramLine, paramCard );
         //std::cout << "\nfound Block Par\n";
