@@ -125,6 +125,8 @@ namespace PEP::PER
     {
         static std::vector<std::string> lines;
         boost::split(lines, parameterSet, boost::is_any_of("\n"));
+        //vec.erase(std::remove(vec.begin(), vec.end(), 8), vec.end());
+        lines.erase(std::remove(lines.begin(), lines.end(), ""), lines.end());
         return lines;
     }
 
@@ -132,6 +134,7 @@ namespace PEP::PER
     {
         static std::vector<std::string> words;
         boost::split( words, parameterLine, boost::is_any_of(" "));
+        words.erase(std::remove(words.begin(), words.end(), ""), words.end());
         return words;
     }
 
