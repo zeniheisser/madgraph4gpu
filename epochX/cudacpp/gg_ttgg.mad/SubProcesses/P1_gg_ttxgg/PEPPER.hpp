@@ -193,12 +193,14 @@ namespace PEP::PER
             std::cout << "\ncurr paramelem:" + params + "\n";
         }
         auto parLocs = findBlockPar( paramLine, paramCard );
+        std::cout << "\ngot past findBlockPar\n";
         //std::cout << "\nfound Block Par\n";
         static std::string modCard = paramCard.substr(0, parLocs[0]);
+        std::cout << "\ninitialised modCard\n";
         //std::cout << "\ninitalised modCard\n";
         unsigned int srtPos = 0;
         auto endLocs = findParamEnds( parLocs, paramCard );
-        auto lineLocs = findParamEnds( parLocs, paramCard );
+        auto lineLocs = findParamLines( parLocs, paramCard );
         //std::cout << "\nfound Param Ends\n";
         for( int k = 0; k < parLocs.size(); ++k )
         {
