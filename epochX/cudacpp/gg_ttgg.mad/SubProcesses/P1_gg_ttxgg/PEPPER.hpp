@@ -200,20 +200,22 @@ namespace PEP::PER
         //std::cout << "\ninitalised modCard\n";
         unsigned int srtPos = 0;
         auto endLocs = findParamEnds( parLocs, paramCard );
+        std::cout << "\ngot past findParamEnds\n";
         auto lineLocs = findParamLines( parLocs, paramCard );
+        std::cout << "\ngot past findParamLines\n";
         //std::cout << "\nfound Param Ends\n";
         for( int k = 0; k < parLocs.size(); ++k )
         {
-            //std::cout << "\n\nk is " << k << " and parLocs is " << parLocs[k] << " and srtPos is " << srtPos << "and endLocs is " << endLocs[k] << "\n\n";
+            std::cout << "\n\nk is " << k << " and parLocs is " << parLocs[k] << " and endLocs is " << endLocs[k] << "\n\n";
             //std::cout << "\nin inner loop\n";
             srtPos = endLocs[k];
             modCard += paramLine[2] + paramCard.substr( endLocs[k], lineLocs[k] - endLocs[k]);
-            //std::cout << "\nadded to modCard\n";
+            std::cout << "\nadded to modCard\n";
             //std::cout << "\nredefined srtPos\n";
         }
         //std::cout << "\noutside loop\n";
         modCard += paramCard.substr(endLocs[endLocs.size() - 1]);
-        //std::cout << "\nadded to modCard outside loop\n";
+        std::cout << "\nadded to modCard outside loop\n";
         //std::cout << "\n\n" << paramCard << "\n\n" << modCard << "\n\n";
         return modCard;
     }
