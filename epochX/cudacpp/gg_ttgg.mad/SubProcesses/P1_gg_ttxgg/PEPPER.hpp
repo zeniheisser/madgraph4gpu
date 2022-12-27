@@ -177,29 +177,30 @@ namespace PEP::PER
 
     std::string& replaceBlockPar( std::vector<std::string> paramLine, std::string paramCard)
     {
-        std::cout << "\nin replaceBlockPar\n";
-        for( auto params : paramLine )
-        {
+        //std::cout << "\nin replaceBlockPar\n";
+        //for( auto params : paramLine )
+        //{
             //std::cout << "\n" + params + "\n";
-        }
+        //}
         auto parLocs = findBlockPar( paramLine, paramCard );
-        std::cout << "\nfound Block Par\n";
+        //std::cout << "\nfound Block Par\n";
         static std::string modCard = paramCard.substr(0, parLocs[0] - 1);
-        std::cout << "\ninitalised modCard\n";
+        //std::cout << "\ninitalised modCard\n";
         unsigned int srtPos = 0;
         auto endLocs = findParamEnds( parLocs, paramCard );
-        std::cout << "\nfound Param Ends\n";
+        //std::cout << "\nfound Param Ends\n";
         for( int k = 0; k < parLocs.size(); ++k )
         {
-            std::cout << "\nin inner loop\n";
+            //std::cout << "\nin inner loop\n";
             modCard +=  paramCard.substr( srtPos, parLocs[k] - srtPos ) + paramLine[2];
-            std::cout << "\nadded to modCard\n";
+            //std::cout << "\nadded to modCard\n";
             srtPos = endLocs[k];
-            std::cout << "\nredefined srtPos\n";
+            //std::cout << "\nredefined srtPos\n";
         }
         //std::cout << "\noutside loop\n";
         modCard += paramCard.substr(srtPos);
         //std::cout << "\nadded to modCard outside loop\n";
+        std::cout << "\n\n" << paramCard << "\n\n" << modCard << "\n\n";
         return modCard;
     }
 
