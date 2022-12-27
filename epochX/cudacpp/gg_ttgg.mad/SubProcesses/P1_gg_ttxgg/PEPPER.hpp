@@ -206,7 +206,7 @@ namespace PEP::PER
         //std::cout << "\nfound Param Ends\n";
         for( int k = 0; k < parLocs.size(); ++k )
         {
-            std::cout << "\n\nk is " << k << " and parLocs is " << parLocs[k] << " and endLocs is " << endLocs[k] << "\n\n";
+            std::cout << "\n\nk is " << k << " and parLocs is " << parLocs[k] << " and endLocs is " << endLocs[k] << " and lineLocs is " << lineLocs[k] << "\n\n";
             //std::cout << "\nin inner loop\n";
             srtPos = endLocs[k];
             modCard += paramLine[2] + paramCard.substr( endLocs[k], lineLocs[k] - endLocs[k]);
