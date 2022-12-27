@@ -178,10 +178,10 @@ namespace PEP::PER
     std::string& replaceBlockPar( std::vector<std::string> paramLine, std::string paramCard)
     {
         //std::cout << "\nin replaceBlockPar\n";
-        //for( auto params : paramLine )
-        //{
-            //std::cout << "\n" + params + "\n";
-        //}
+        for( auto params : paramLine )
+        {
+            std::cout << "\n" + params + "\n";
+        }
         auto parLocs = findBlockPar( paramLine, paramCard );
         //std::cout << "\nfound Block Par\n";
         static std::string modCard = paramCard.substr(0, parLocs[0] - 1);
@@ -200,7 +200,7 @@ namespace PEP::PER
         //std::cout << "\noutside loop\n";
         modCard += paramCard.substr(srtPos);
         //std::cout << "\nadded to modCard outside loop\n";
-        std::cout << "\n\n" << paramCard << "\n\n" << modCard << "\n\n";
+        //std::cout << "\n\n" << paramCard << "\n\n" << modCard << "\n\n";
         return modCard;
     }
 
