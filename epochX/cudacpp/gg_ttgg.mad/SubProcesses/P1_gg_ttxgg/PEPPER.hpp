@@ -184,7 +184,7 @@ namespace PEP::PER
         }
         auto parLocs = findBlockPar( paramLine, paramCard );
         //std::cout << "\nfound Block Par\n";
-        static std::string modCard = paramCard.substr(0, parLocs[0] - 1);
+        static std::string modCard = paramCard.substr(0, parLocs[0]);
         //std::cout << "\ninitalised modCard\n";
         unsigned int srtPos = 0;
         auto endLocs = findParamEnds( parLocs, paramCard );
@@ -194,12 +194,12 @@ namespace PEP::PER
             std::cout << "\n\nk is " << k << " and parLocs is " << parLocs[k] << " and srtPos is " << srtPos << "and endLocs is " << endLocs[k] << "\n\n";
             //std::cout << "\nin inner loop\n";
             srtPos = endLocs[k];
-            modCard +=  paramCard.substr( srtPos, parLocs[k] - srtPos ) + paramLine[2];
+            modCard += paramLine[2] + paramCard.substr( parLocs[k], endLocs[k] - parLocs[k]);
             //std::cout << "\nadded to modCard\n";
             //std::cout << "\nredefined srtPos\n";
         }
         //std::cout << "\noutside loop\n";
-        modCard += paramCard.substr(srtPos);
+        modCard += paramCard.substr(endLocs[endLocs.size() - 1]);
         //std::cout << "\nadded to modCard outside loop\n";
         //std::cout << "\n\n" << paramCard << "\n\n" << modCard << "\n\n";
         return modCard;
