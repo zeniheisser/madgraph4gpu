@@ -138,7 +138,7 @@ namespace PEP::PER
         return words;
     }
 
-    std::vector<int>& findBlockPar( std::vector<std::string> paramLine, std::string paramCard )
+    std::vector<int> findBlockPar( std::vector<std::string> paramLine, std::string paramCard )
     {
         static std::vector<int> blockPars;
         auto blockLock = paramCard.find("block " + paramLine[0]);
@@ -165,7 +165,7 @@ namespace PEP::PER
         return blockPars;
     }
     
-    std::vector<int>& findParamEnds( std::vector<int> blockParLocs, std::string paramCard )
+    std::vector<int> findParamEnds( std::vector<int> blockParLocs, std::string paramCard )
     {
         static std::vector<int> lineEnds(blockParLocs.size());
         for( int k = 0; k < blockParLocs.size(); ++k)
@@ -175,7 +175,7 @@ namespace PEP::PER
         return lineEnds;
     }
 
-    std::string& replaceBlockPar( std::vector<std::string> paramLine, std::string paramCard)
+    std::string replaceBlockPar( std::vector<std::string> paramLine, std::string paramCard)
     {
         //std::cout << "\nin replaceBlockPar\n";
         for( auto params : paramLine )
@@ -205,7 +205,7 @@ namespace PEP::PER
         return modCard;
     }
 
-    std::string& paramCardReplacer( std::string paramSet, std::string paramCard )
+    std::string paramCardReplacer( std::string paramSet, std::string paramCard )
     {
         static std::string modiCard = paramCard;
         auto paramSetVec = splitByLine(paramSet);
