@@ -24,13 +24,13 @@ int main()
     std::cout << "\n" << rwgtparams << "\n\n";
 
     auto rwgtvector = PEP::PER::rwgtReader( rwgtCard );
-    for(std::string parSet : rwgtvector){
+    /* for(std::string parSet : rwgtvector){
         std::cout << "\n" << parSet << "\n";
-    }
+    } */
 
     auto parameterCard = PEP::PER::filePuller( "param_card.dat" );
 
-    auto nuParamCard = PEP::PER::paramCardReplacer( rwgtvector[rwgtvector.size() - 1], parameterCard );
+    auto nuParamCard = PEP::PER::paramCardReplacer( rwgtvector[2], parameterCard );
 
     std::cout << "\n\n" << nuParamCard << "\n\n";
 
