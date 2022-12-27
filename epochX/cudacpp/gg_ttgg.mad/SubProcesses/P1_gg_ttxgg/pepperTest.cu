@@ -30,9 +30,11 @@ int main()
 
     auto parameterCard = PEP::PER::filePuller( "param_card.dat" );
 
-    auto nuParamCard = PEP::PER::paramCardReplacer( rwgtvector[4], parameterCard );
+    auto nuParamCard = PEP::PER::paramCardReplacer( rwgtvector[0], parameterCard );
 
-    std::cout << "\n\n" << nuParamCard << "\n\n";
+    auto tuParamCard = PEP::PER::paramCardReplacer( rwgtvector[1], parameterCard );
+
+    std::cout << "\n\n" << nuParamCard << "\n\n" << tuParamCard << "\n\n";
 
 
     return 0;

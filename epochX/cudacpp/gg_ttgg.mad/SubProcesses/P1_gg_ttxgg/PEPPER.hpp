@@ -148,14 +148,14 @@ namespace PEP::PER
             blockPars.push_back(paraLock + paramLine[1].length() + 2);
         } else if( paramLine[1] == "all" )
         {
-            auto nuLine = paramCard.find( "\n", blockLock );
-            auto blockEnd = paramCard.find( "###", blockLock );
+            auto nuLine = paramCard.find( "\n", blockLock + 5 );
+            auto blockEnd = paramCard.find( "####", blockLock  + 5);
             while( nuLine < blockEnd )
             {
                 auto tuLine = paramCard.find( "\n", nuLine + 1 );
                 auto parNam = paramCard.find_first_not_of( " ", nuLine + 1 );
-                auto parSpac = paramCard.find( " ", parNam );
-                auto parPlac = paramCard.find_first_not_of( " ", parSpac );
+                auto parSpac = paramCard.find( " ", parNam + 1 );
+                auto parPlac = paramCard.find_first_not_of( " ", parSpac +1 );
                 if( tuLine < blockEnd ){
                     blockPars.push_back( parPlac );
                 }
