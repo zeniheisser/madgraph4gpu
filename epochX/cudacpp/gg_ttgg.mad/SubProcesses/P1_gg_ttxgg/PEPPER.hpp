@@ -144,8 +144,8 @@ namespace PEP::PER
         auto blockLock = paramCard.find("block " + paramLine[0]);
         if( paramLine[1] != "all" )
         {
-            auto paraLock = paramCard.find(" " + paramLine[2] + " ", blockLock );
-            blockPars.push_back(paraLock + paramLine[2].length() + 2);
+            auto paraLock = paramCard.find(" " + paramLine[1] + " ", blockLock );
+            blockPars.push_back(paraLock + paramLine[1].length() + 2);
         } else 
         {
             auto nuLine = paramCard.find( "\n", blockLock );
@@ -180,7 +180,7 @@ namespace PEP::PER
         std::cout << "\nin replaceBlockPar\n";
         for( auto params : paramLine )
         {
-            std::cout << "\n" + params + "\n";
+            //std::cout << "\n" + params + "\n";
         }
         auto parLocs = findBlockPar( paramLine, paramCard );
         std::cout << "\nfound Block Par\n";
@@ -197,9 +197,9 @@ namespace PEP::PER
             srtPos = endLocs[k];
             std::cout << "\nredefined srtPos\n";
         }
-        std::cout << "\noutside loop\n";
+        //std::cout << "\noutside loop\n";
         modCard += paramCard.substr(srtPos);
-        std::cout << "\nadded to modCard outside loop\n";
+        //std::cout << "\nadded to modCard outside loop\n";
         return modCard;
     }
 
