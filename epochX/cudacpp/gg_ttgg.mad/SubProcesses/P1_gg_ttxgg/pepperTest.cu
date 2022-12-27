@@ -32,7 +32,7 @@ int main()
 
     auto nuParamCard = PEP::PER::paramCardReplacer( rwgtvector[2], parameterCard );
 
-    //std::cout << "\n\n" << nuParamCard << "\n\n";
+    std::cout << "\n\n" << nuParamCard << "\n\n";
 
 
     return 0;

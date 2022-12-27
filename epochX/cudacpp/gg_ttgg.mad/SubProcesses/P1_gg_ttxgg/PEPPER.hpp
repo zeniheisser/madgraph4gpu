@@ -146,7 +146,7 @@ namespace PEP::PER
         {
             auto paraLock = paramCard.find(" " + paramLine[1] + " ", blockLock );
             blockPars.push_back(paraLock + paramLine[1].length() + 2);
-        } else 
+        } else if( paramLine[1] == "all" )
         {
             auto nuLine = paramCard.find( "\n", blockLock );
             auto blockEnd = paramCard.find( "###", blockLock );
