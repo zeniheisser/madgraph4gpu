@@ -209,7 +209,7 @@ namespace PEP::PER
         std::vector<std::string> paramSet;
         for( auto parPos : paramLocs )
         {
-            auto startPos = paramCard.rfind( "\n", parPos );
+            auto startPos = paramCard.rfind( "\n", parPos ) + 1;
             paramSet.push_back(paramCard.substr( startPos, parPos - startPos ));
         }
         return paramSet;
@@ -226,7 +226,8 @@ namespace PEP::PER
         auto parNames = paramNameVec( parLocs, paramCard );
         std::cout << "\ngot past findBlockPar\n";
         //std::cout << "\nfound Block Par\n";
-        std::string modCard = paramCard.substr(0, parLocs[0]);
+        auto startPos = paramCard.rfind( "\n", parLocs[0] );
+        std::string modCard = paramCard.substr(0, startPos);
         std::cout << "\ninitialised modCard\n";
         //std::cout << "\ninitalised modCard\n";
         unsigned int srtPos = 0;
