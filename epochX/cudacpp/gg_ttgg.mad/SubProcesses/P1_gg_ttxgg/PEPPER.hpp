@@ -82,7 +82,7 @@ namespace PEP::PER
         auto setPos = rwgtCard.find("set");
         auto firstLaunch = rwgtCard.find("\nlaunch", setPos);
         auto nuLine = rwgtCard.find("\n", setPos);
-        static std::string rwgtParams = "";
+        std::string rwgtParams = "";
         while( setPos < firstLaunch )
         {
             if( setPos == std::string::npos ){
@@ -101,7 +101,7 @@ namespace PEP::PER
         auto setPos = rwgtCard.find("set");
         auto launchPos = rwgtCard.find("\nlaunch", setPos);
         auto nuLine = rwgtCard.find("\n", setPos);
-        static std::vector<std::string> rwgtParams;
+        std::vector<std::string> rwgtParams;
         while( launchPos != std::string::npos )
         {
             auto firstLaunch = rwgtCard.find("\nlaunch", setPos);
@@ -123,7 +123,7 @@ namespace PEP::PER
 
     std::vector<std::string> splitByLine( const std::string& parameterSet )
     {
-        static std::vector<std::string> lines;
+        std::vector<std::string> lines;
         boost::split(lines, parameterSet, boost::is_any_of("\n"));
         //vec.erase(std::remove(vec.begin(), vec.end(), 8), vec.end());
         lines.erase(std::remove(lines.begin(), lines.end(), ""), lines.end());
@@ -132,7 +132,7 @@ namespace PEP::PER
 
     std::vector<std::string> splitByBlank( const std::string& parameterLine )
     {
-        static std::vector<std::string> words;
+        std::vector<std::string> words;
         boost::split( words, parameterLine, boost::is_any_of(" "));
         words.erase(std::remove(words.begin(), words.end(), ""), words.end());
         return words;
