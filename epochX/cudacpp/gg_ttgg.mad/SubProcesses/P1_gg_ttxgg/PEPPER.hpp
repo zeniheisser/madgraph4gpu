@@ -226,7 +226,7 @@ namespace PEP::PER
         auto parNames = paramNameVec( parLocs, paramCard );
         std::cout << "\ngot past findBlockPar\n";
         //std::cout << "\nfound Block Par\n";
-        auto startPos = paramCard.rfind( "\n", parLocs[0] );
+        auto startPos = paramCard.rfind( "\n", parLocs[0] ) + 1;
         std::string modCard = paramCard.substr(0, startPos);
         std::cout << "\ninitialised modCard\n";
         //std::cout << "\ninitalised modCard\n";
