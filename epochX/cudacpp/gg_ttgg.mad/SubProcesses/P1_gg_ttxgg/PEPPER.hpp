@@ -163,6 +163,9 @@ namespace PEP::PER
                 nuLine = tuLine;
             }
         }
+        for( auto elements : blockPars ){
+            std::cout << "\nNext element: " << elements; 
+        }
         return blockPars;
     }
     
