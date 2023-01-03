@@ -209,8 +209,8 @@ namespace PEP::PER
         std::vector<std::string> paramSet;
         for( auto parPos : paramLocs )
         {
-            auto endPos = paramCard.find_first_of( " ", parPos );
-            paramSet.push_back(paramCard.substr( parPos, endPos - parPos + 1));
+            auto startPos = paramCard.rfind( "\n", parPos );
+            paramSet.push_back(paramCard.substr( startPos, parPos - startPos ));
         }
         return paramSet;
     }
