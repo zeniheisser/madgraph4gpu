@@ -214,7 +214,7 @@ namespace PEP::PER
         auto parLocs = findBlockPar( paramLine, paramCard );
         std::cout << "\ngot past findBlockPar\n";
         //std::cout << "\nfound Block Par\n";
-        static std::string modCard = paramCard.substr(0, parLocs[0]);
+        std::string modCard = paramCard.substr(0, parLocs[0]);
         std::cout << "\ninitialised modCard\n";
         //std::cout << "\ninitalised modCard\n";
         unsigned int srtPos = 0;
@@ -241,7 +241,7 @@ namespace PEP::PER
 
     std::string paramCardReplacer( std::string paramSet, std::string paramCard )
     {
-        static std::string modiCard = paramCard;
+        std::string modiCard = paramCard;
         auto paramSetVec = splitByLine(paramSet);
         for( auto params : paramSetVec )
         {
