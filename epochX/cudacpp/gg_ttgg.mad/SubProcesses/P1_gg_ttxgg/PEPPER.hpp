@@ -153,9 +153,10 @@ namespace PEP::PER
             while( nuLine < blockEnd )
             {
                 auto tuLine = paramCard.find( "\n", nuLine + 1 );
-                auto parNam = paramCard.find_first_not_of( " ", nuLine + 1 );
+                auto parNam = paramCard.find_first_not_of( " ", nuLine + 2 );
                 auto parSpac = paramCard.find( " ", parNam + 1 );
                 auto parPlac = paramCard.find_first_not_of( " ", parSpac +1 );
+                std::cout << "\n\nnuLine " << nuLine << ", blockEnd " << blockEnd << ", tuLine " << tuLine << ", parNam " << parNam << ", parSpac " << parSpac << ", parPlac " << parPlac << "\n\n";
                 if( tuLine < blockEnd ){
                     blockPars.push_back( parPlac );
                 }
