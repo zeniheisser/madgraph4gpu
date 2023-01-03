@@ -170,6 +170,21 @@ namespace PEP::PER
         static std::vector<int> lineEnds(blockParLocs.size());
         for( int k = 0; k < blockParLocs.size(); ++k)
         {
+            auto endLinePos = paramCard.find( "\n", blockParLocs[k] );
+            auto endWordPos = paramCard.find( " ", blockParLocs[k] );
+            if( endLinePos == endWordPos ){
+                std::cout << "\n\nnext endl and blankspace have the same position, which should not be possible. check that\n\n";
+                lineEnds[k] = std::string::npos;
+                continue;
+            } else if ( endWordPos == std::string::npos ) {
+                lineEnds[k] = endLinePos;
+                continue;
+            } else if ( endLinePos == std::string::npos ) {
+                lineEnds[k] = endWordPos;
+                continue;
+            }
+            // ZW: making sure we don't accidentally append std::string::npos, which is defined as unsigned integer -1,
+            // meaning for comparison depending on algo may be treated as smaller than proper unsigned integers
             lineEnds[k] = std::min(paramCard.find( "\n", blockParLocs[k] ), paramCard.find( " ", blockParLocs[k] ));
         }
         return lineEnds;
