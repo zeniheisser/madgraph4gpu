@@ -140,7 +140,7 @@ namespace PEP::PER
 
     std::vector<int> findBlockPar( std::vector<std::string> paramLine, std::string paramCard )
     {
-        static std::vector<int> blockPars;
+        std::vector<int> blockPars;
         auto blockLock = paramCard.find("block " + paramLine[0]);
         if( paramLine[1] != "all" )
         {
