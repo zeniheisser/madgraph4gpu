@@ -40,7 +40,7 @@
 
 namespace PEP::PER
 {
-    std::vector<double>& matrixCalculation( const std::string& lheFile )
+    std::vector<double> matrixCalculation( const std::string& lheFile )
     {
         auto vecPtr = PEP::lheParser( lheFile );
         const int nEvt = vecPtr[1]->size();
@@ -95,7 +95,7 @@ namespace PEP::PER
         return rwgtParams;
     }
     
-    std::vector<std::string>& rwgtReader( std::string rwgtCard )
+    std::vector<std::string> rwgtReader( std::string rwgtCard )
     {
         //std::transform( rwgtCard.begin(), rwgtCard.end(), rwgtCard.begin(), ::tolower );
         auto setPos = rwgtCard.find("set");
@@ -121,7 +121,7 @@ namespace PEP::PER
         return rwgtParams;
     }
 
-    std::vector<std::string>& splitByLine( const std::string& parameterSet )
+    std::vector<std::string> splitByLine( const std::string& parameterSet )
     {
         static std::vector<std::string> lines;
         boost::split(lines, parameterSet, boost::is_any_of("\n"));
@@ -130,7 +130,7 @@ namespace PEP::PER
         return lines;
     }
 
-    std::vector<std::string>& splitByBlank( const std::string& parameterLine )
+    std::vector<std::string> splitByBlank( const std::string& parameterLine )
     {
         static std::vector<std::string> words;
         boost::split( words, parameterLine, boost::is_any_of(" "));
