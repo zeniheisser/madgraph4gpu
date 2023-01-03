@@ -204,6 +204,17 @@ namespace PEP::PER
         return lineEnds;
     }
 
+    std::vector<std::string> paramNameVec( std::vector<int> paramLocs, std::string paramCard )
+    {
+        std::vector<std::string> paramSet;
+        for( auto parPos : paramLocs )
+        {
+            auto endPos = paramCard.find_first_of( " ", parPos );
+            paramSet.push_back(paramCard.substr( parPos, endPos - parPos + 1));
+        }
+        return paramSet;
+    }
+
     std::string replaceBlockPar( std::vector<std::string> paramLine, std::string paramCard)
     {
         //std::cout << "\nin replaceBlockPar\n";
@@ -212,6 +223,7 @@ namespace PEP::PER
             std::cout << "\ncurr paramelem:" + params + "\n";
         }
         auto parLocs = findBlockPar( paramLine, paramCard );
+        auto parNames = paramNameVec( parLocs, paramCard );
         std::cout << "\ngot past findBlockPar\n";
         //std::cout << "\nfound Block Par\n";
         std::string modCard = paramCard.substr(0, parLocs[0]);
@@ -227,8 +239,8 @@ namespace PEP::PER
         {
             std::cout << "\n\nk is " << k << " and parLocs is " << parLocs[k] << " and endLocs is " << endLocs[k] << " and lineLocs is " << lineLocs[k] << "\n\n";
             //std::cout << "\nin inner loop\n";
-            srtPos = endLocs[k];
-            modCard += paramLine[2] + paramCard.substr( endLocs[k], lineLocs[k] - endLocs[k]);
+            //srtPos = endLocs[k];
+            modCard += parNames[k] + paramLine[2] + paramCard.substr( endLocs[k], lineLocs[k] - endLocs[k]);
             std::cout << "\nadded to modCard\n";
             //std::cout << "\nredefined srtPos\n";
         }
