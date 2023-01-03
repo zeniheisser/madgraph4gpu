@@ -82,7 +82,7 @@ namespace PEP::PER
         auto setPos = rwgtCard.find("set");
         auto firstLaunch = rwgtCard.find("\nlaunch", setPos);
         auto nuLine = rwgtCard.find("\n", setPos);
-        std::string rwgtParams = "";
+        static std::string rwgtParams = "";
         while( setPos < firstLaunch )
         {
             if( setPos == std::string::npos ){
@@ -101,7 +101,7 @@ namespace PEP::PER
         auto setPos = rwgtCard.find("set");
         auto launchPos = rwgtCard.find("\nlaunch", setPos);
         auto nuLine = rwgtCard.find("\n", setPos);
-        std::vector<std::string> rwgtParams;
+        static std::vector<std::string> rwgtParams;
         while( launchPos != std::string::npos )
         {
             auto firstLaunch = rwgtCard.find("\nlaunch", setPos);
