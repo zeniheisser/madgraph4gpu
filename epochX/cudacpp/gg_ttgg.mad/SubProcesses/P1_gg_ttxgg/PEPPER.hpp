@@ -171,7 +171,7 @@ namespace PEP::PER
     
     std::vector<int> findParamEnds( std::vector<int> blockParLocs, std::string paramCard )
     {
-        static std::vector<int> lineEnds(blockParLocs.size());
+        std::vector<int> lineEnds(blockParLocs.size());
         for( int k = 0; k < blockParLocs.size(); ++k)
         {
             auto endLinePos = paramCard.find( "\n", blockParLocs[k] );
@@ -196,7 +196,7 @@ namespace PEP::PER
 
     std::vector<int> findParamLines( std::vector<int> blockParLocs, std::string paramCard )
     {
-        static std::vector<int> lineEnds(blockParLocs.size());
+        std::vector<int> lineEnds(blockParLocs.size());
         for( int k = 0; k < blockParLocs.size(); ++k)
         {
             lineEnds[k] = paramCard.find( "\n", blockParLocs[k] ) + 1;
