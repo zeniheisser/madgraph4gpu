@@ -138,7 +138,7 @@ namespace PEP::PER
         return words;
     }
 
-    std::vector<int>& findBlockPar( const std::vector<std::string>& paramLine, cosnt std::string& paramCard )
+    std::vector<int>& findBlockPar( const std::vector<std::string>& paramLine, const std::string& paramCard )
     {
         static std::vector<int> blockPars;
         auto blockLock = paramCard.find("block " + paramLine[0]);
