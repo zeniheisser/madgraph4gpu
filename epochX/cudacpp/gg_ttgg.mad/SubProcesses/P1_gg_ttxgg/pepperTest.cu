@@ -30,11 +30,10 @@ int main()
 
     auto parameterCard = PEP::PER::filePuller( "param_card.dat" );
 
-    auto nuParamCard = PEP::PER::paramCardReplacer( rwgtvector[0], parameterCard );
 
     auto tuParamCard = PEP::PER::paramCardReplacer( rwgtvector[1], parameterCard );
 
-    std::cout << "\n\n" << nuParamCard << "\n\n" << tuParamCard << "\n\n";
+    std::cout << "\n\n" << tuParamCard << "\n\n";
 
 
     for( auto rwgtsets : rwgtvector ){
