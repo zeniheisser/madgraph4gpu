@@ -67,6 +67,13 @@ namespace PEP::PER
         return fileContent;
     }
 
+    void filePusher( const std::string& fileLoc, const std::string& fileCont )
+    {
+        std::ofstream fileWrite( fileLoc );
+        fileWrite << fileCont;
+        fileWrite.close();
+    }
+
     void paramReplacer( const std::string& parCardLoc, const std::string& paramCard )
     {
         const char *parChardLoc = parCardLoc.c_str();
