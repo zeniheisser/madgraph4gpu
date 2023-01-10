@@ -222,7 +222,7 @@ namespace PEP::PER
         return paramSet;
     }
 
-    std::string& replaceBlockPar( const std::vector<std::string>& paramLine, const std::string& paramCard)
+    std::string replaceBlockPar( const std::vector<std::string>& paramLine, const std::string& paramCard)
     {
         //std::cout << "\nin replaceBlockPar\n";
         /* for( auto params : paramLine )
@@ -234,7 +234,7 @@ namespace PEP::PER
         std::cout << "\ngot past findBlockPar\n";
         //std::cout << "\nfound Block Par\n";
         auto startPos = paramCard.rfind( "\n", parLocs[0] ) + 1;
-        static std::string modCard = paramCard.substr(0, startPos);
+        std::string modCard = paramCard.substr(0, startPos);
         std::cout << "\ninitialised modCard\n";
         //std::cout << "\ninitalised modCard\n";
         unsigned int srtPos = 0;
@@ -259,9 +259,9 @@ namespace PEP::PER
         return modCard;
     }
 
-    std::string& paramCardReplacer( const std::string& paramSet, const std::string& paramCard )
+    std::string paramCardReplacer( const std::string& paramSet, const std::string& paramCard )
     {
-        static std::string modiCard = paramCard;
+        std::string modiCard = paramCard;
         auto paramSetVec = splitByLine(paramSet);
         for( auto params : paramSetVec )
         {
