@@ -28,7 +28,7 @@ int main()
         std::cout << "\n" << parSet << "\n";
     } */
 
-    auto parameterCard = PEP::PER::filePuller( "param_card.dat" );
+    auto parameterCard = PEP::PER::filePuller( "../../Cards/param_card.dat" );
 
     auto nuParamCard = PEP::PER::paramCardReplacer( rwgtvector[0], parameterCard );
 
