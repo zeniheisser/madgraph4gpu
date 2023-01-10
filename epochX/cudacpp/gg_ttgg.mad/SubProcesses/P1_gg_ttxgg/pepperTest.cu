@@ -28,7 +28,9 @@ int main()
         std::cout << "\n" << parSet << "\n";
     } */
 
-    auto parameterCard = PEP::PER::filePuller( "../../Cards/param_card.dat" );
+    std::string cardLoc = "../../Cards/param_card.dat";
+
+    auto parameterCard = PEP::PER::filePuller( cardLoc );
 
     auto nuParamCard = PEP::PER::paramCardReplacer( rwgtvector[0], parameterCard );
 
@@ -40,6 +42,13 @@ int main()
     for( auto rwgtsets : rwgtvector ){
         std::cout << "\n\n" << rwgtsets << "\n\n";
     }
+
+    PEP::PER::filePusher( cardLoc, nuParamCard );
+    auto resVector = PEP::PER::matrixCalculation( eventFile );
+    PEP::PER::filePusher( cardLoc, tuParamCard );
+    auto tesVector = PEP::PER::matrixCalculation( eventFile );
+    PEP::PER::filePusher( cardLoc, parameterCard );
+
 
     return 0;
 }
