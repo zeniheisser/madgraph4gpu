@@ -95,13 +95,13 @@ namespace PEP::PER
         return rwgtParams;
     }
     
-    std::vector<std::string>& rwgtReader( std::string rwgtCard )
+    std::vector<std::string> rwgtReader( const std::string& rwgtCard )
     {
         //std::transform( rwgtCard.begin(), rwgtCard.end(), rwgtCard.begin(), ::tolower );
         auto setPos = rwgtCard.find("set");
         auto launchPos = rwgtCard.find("\nlaunch", setPos);
         auto nuLine = rwgtCard.find("\n", setPos);
-        static std::vector<std::string> rwgtParams;
+        std::vector<std::string> rwgtParams;
         while( launchPos != std::string::npos )
         {
             auto firstLaunch = rwgtCard.find("\nlaunch", setPos);
@@ -121,26 +121,26 @@ namespace PEP::PER
         return rwgtParams;
     }
 
-    std::vector<std::string>& splitByLine( const std::string& parameterSet )
+    std::vector<std::string> splitByLine( const std::string& parameterSet )
     {
-        static std::vector<std::string> lines;
+        std::vector<std::string> lines;
         boost::split(lines, parameterSet, boost::is_any_of("\n"));
         //vec.erase(std::remove(vec.begin(), vec.end(), 8), vec.end());
         lines.erase(std::remove(lines.begin(), lines.end(), ""), lines.end());
         return lines;
     }
 
-    std::vector<std::string>& splitByBlank( const std::string& parameterLine )
+    std::vector<std::string> splitByBlank( const std::string& parameterLine )
     {
-        static std::vector<std::string> words;
+        std::vector<std::string> words;
         boost::split( words, parameterLine, boost::is_any_of(" "));
         words.erase(std::remove(words.begin(), words.end(), ""), words.end());
         return words;
     }
 
-    std::vector<int>& findBlockPar( const std::vector<std::string>& paramLine, const std::string& paramCard )
+    std::vector<int> findBlockPar( const std::vector<std::string>& paramLine, const std::string& paramCard )
     {
-        static std::vector<int> blockPars;
+        std::vector<int> blockPars;
         auto blockLock = paramCard.find("block " + paramLine[0]);
         if( paramLine[1] != "all" )
         {
@@ -169,9 +169,9 @@ namespace PEP::PER
         return blockPars;
     }
     
-    std::vector<int>& findParamEnds( const std::vector<int>& blockParLocs, const std::string& paramCard )
+    std::vector<int> findParamEnds( const std::vector<int>& blockParLocs, const std::string& paramCard )
     {
-        static std::vector<int> lineEnds(blockParLocs.size());
+        std::vector<int> lineEnds(blockParLocs.size());
         for( int k = 0; k < blockParLocs.size(); ++k)
         {
             auto endLinePos = paramCard.find( "\n", blockParLocs[k] );
@@ -194,9 +194,9 @@ namespace PEP::PER
         return lineEnds;
     }
 
-    std::vector<int>& findParamLines( const std::vector<int>& blockParLocs, const std::string& paramCard )
+    std::vector<int> findParamLines( const std::vector<int>& blockParLocs, const std::string& paramCard )
     {
-        static std::vector<int> lineEnds(blockParLocs.size());
+        std::vector<int> lineEnds(blockParLocs.size());
         for( int k = 0; k < blockParLocs.size(); ++k)
         {
             lineEnds[k] = paramCard.find( "\n", blockParLocs[k] ) + 1;
@@ -204,9 +204,9 @@ namespace PEP::PER
         return lineEnds;
     }
 
-    std::vector<std::string>& paramNameVec( const std::vector<int>& paramLocs, const std::string& paramCard )
+    std::vector<std::string> paramNameVec( const std::vector<int>& paramLocs, const std::string& paramCard )
     {
-        static std::vector<std::string> paramSet;
+        std::vector<std::string> paramSet;
         for( auto parPos : paramLocs )
         {
             auto startPos = paramCard.rfind( "\n", parPos ) + 1;
