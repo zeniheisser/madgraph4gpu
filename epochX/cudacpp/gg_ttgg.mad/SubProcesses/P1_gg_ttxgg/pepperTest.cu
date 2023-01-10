@@ -37,5 +37,9 @@ int main()
     std::cout << "\n\n" << nuParamCard << "\n\n" << tuParamCard << "\n\n";
 
 
+    for( auto rwgtsets ; rwgtvector ){
+        std::cout << "\n\n" << rwgtsets << "\n\n";
+    }
+
     return 0;
 }
