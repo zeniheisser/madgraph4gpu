@@ -3,12 +3,14 @@
 int main()
 {
     std::string eventFile = "gg2ttgg_10k.lhe";
-    auto mesVector = PEP::PER::matrixCalculation( eventFile );
-    std::cout << "\n\n" << mesVector[9999] << "\n";
+    //auto mesVector = PEP::PER::matrixCalculation( eventFile );
+    //std::cout << "\n\n" << mesVector[9999] << "\n";
 
-    std::string fileLoc = "../../Cards/param_card.dat";
+    std::string cardLoc = "../../Cards/param_card.dat";
 
-    auto parametercard = PEP::PER::filePuller(fileLoc);
+    std::string rwgtLoc = "reCard.dat";
+
+    /* auto parametercard = PEP::PER::filePuller(fileLoc);
     PEP::PER::paramReplacer( fileLoc, parametercard );
     auto nuParams = PEP::PER::filePuller( fileLoc );
     if(parametercard == nuParams){
@@ -24,9 +26,9 @@ int main()
     std::cout << "\n" << rwgtparams << "\n\n";
 
     auto rwgtvector = PEP::PER::rwgtReader( rwgtCard );
-    /* for(std::string parSet : rwgtvector){
+    for(std::string parSet : rwgtvector){
         std::cout << "\n" << parSet << "\n";
-    } */
+    } 
 
     std::string cardLoc = "../../Cards/param_card.dat";
 
@@ -47,7 +49,9 @@ int main()
     auto resVector = PEP::PER::matrixCalculation( eventFile );
     PEP::PER::filePusher( cardLoc, tuParamCard );
     auto tesVector = PEP::PER::matrixCalculation( eventFile );
-    PEP::PER::filePusher( cardLoc, parameterCard );
+    PEP::PER::filePusher( cardLoc, parameterCard ); */
+
+    auto nuWgts = PEP::PER::rwgtRunner( eventFile, rwgtLoc, cardLoc );
 
 
     return 0;

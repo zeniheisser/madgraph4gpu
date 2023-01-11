@@ -44,7 +44,7 @@ namespace PEP::PER
     {
         auto vecPtr = PEP::lheParser( lheFile );
         const int nEvt = vecPtr[1]->size();
-        static std::vector<double> meVector( nEvt );
+        std::vector<double> meVector( nEvt );
         const unsigned int chanId = 0;
         const int nMom = 4;
         const int nPrts = (vecPtr[0]->size()) / ( nMom * nEvt );
@@ -163,15 +163,11 @@ namespace PEP::PER
                 auto parNam = paramCard.find_first_not_of( " ", nuLine + 2 );
                 auto parSpac = paramCard.find( " ", parNam + 1 );
                 auto parPlac = paramCard.find_first_not_of( " ", parSpac +1 );
-                std::cout << "\n\nnuLine " << nuLine << ", blockEnd " << blockEnd << ", tuLine " << tuLine << ", parNam " << parNam << ", parSpac " << parSpac << ", parPlac " << parPlac << "\n\n";
                 if( tuLine < blockEnd ){
                     blockPars.push_back( parPlac );
                 }
                 nuLine = tuLine;
             }
-        }
-        for( auto elements : blockPars ){
-            std::cout << "\nNext element: " << elements; 
         }
         return blockPars;
     }
@@ -224,38 +220,18 @@ namespace PEP::PER
 
     std::string replaceBlockPar( const std::vector<std::string>& paramLine, const std::string& paramCard)
     {
-        //std::cout << "\nin replaceBlockPar\n";
-        /* for( auto params : paramLine )
-        {
-            std::cout << "\ncurr paramelem:" + params + "\n";
-        } */
         auto parLocs = findBlockPar( paramLine, paramCard );
         auto parNames = paramNameVec( parLocs, paramCard );
-        std::cout << "\ngot past findBlockPar\n";
-        //std::cout << "\nfound Block Par\n";
         auto startPos = paramCard.rfind( "\n", parLocs[0] ) + 1;
         std::string modCard = paramCard.substr(0, startPos);
-        std::cout << "\ninitialised modCard\n";
-        //std::cout << "\ninitalised modCard\n";
         unsigned int srtPos = 0;
         auto endLocs = findParamEnds( parLocs, paramCard );
-        std::cout << "\ngot past findParamEnds\n";
         auto lineLocs = findParamLines( parLocs, paramCard );
-        std::cout << "\ngot past findParamLines\n";
-        //std::cout << "\nfound Param Ends\n";
         for( int k = 0; k < parLocs.size(); ++k )
         {
-            std::cout << "\n\nk is " << k << " and parLocs is " << parLocs[k] << " and endLocs is " << endLocs[k] << " and lineLocs is " << lineLocs[k] << "\n\n";
-            //std::cout << "\nin inner loop\n";
-            //srtPos = endLocs[k];
             modCard += parNames[k] + paramLine[2] + paramCard.substr( endLocs[k], lineLocs[k] - endLocs[k]);
-            std::cout << "\nadded to modCard\n";
-            //std::cout << "\nredefined srtPos\n";
         }
-        //std::cout << "\noutside loop\n";
         modCard += paramCard.substr(lineLocs[lineLocs.size() - 1]);
-        std::cout << "\nadded to modCard outside loop\n";
-        //std::cout << "\n\n" << paramCard << "\n\n" << modCard << "\n\n";
         return modCard;
     }
 
@@ -265,14 +241,61 @@ namespace PEP::PER
         auto paramSetVec = splitByLine(paramSet);
         for( auto params : paramSetVec )
         {
-            std::cout << "\n" << params << "\n";
             auto paramVec = splitByBlank( params );
-            std::cout << "\nsplit params by blank\n";
             modiCard = replaceBlockPar( paramVec, modiCard );
-            std::cout << "\nreplaced modiCard w replaceBlockPar\n";
         }
-        std::cout << "\nexited loop\n";
         return modiCard;
+    }
+
+    std::vector<double> rwgtRunner( const std::string& lheFile, const std::string& rwgtCard, const std::string& paramCard )
+    {
+        /* auto vecPtr = PEP::lheParser( lheFile );
+        const int nEvt = vecPtr[1]->size();
+        std::vector<double> meVector( nEvt );
+        const unsigned int chanId = 0;
+        const int nMom = 4;
+        const int nPrts = (vecPtr[0]->size()) / ( nMom * nEvt );
+        CppObjectInFortran *fortrPoint;
+        fbridgecreate_( &fortrPoint, &nEvt, &nPrts, &nMom );
+        fbridgesequence_( &fortrPoint, &vecPtr[0]->at(0), &vecPtr[1]->at(0), &meVector[0], &chanId );
+        fbridgedelete_( &fortrPoint ); */
+
+        auto vecPtr = PEP::lheParser( lheFile );
+        auto origParams = PEP::PER::filePuller( paramCard );
+        auto rwgtParams = rwgtReader( filePuller( rwgtCard ) );
+        const int nEvt = vecPtr[1]->size();
+        std::vector<std::vector<double>*> mesPtrVec;
+        const unsigned int chanId = 0;
+        const int nMom = 4;
+        const int nPrts = (vecPtr[0]->size()) / ( nMom * nEvt );
+        std::vector<double> ogMEs( nEvt );
+        CppObjectInFortran *fortrPoint;
+        fbridgecreate_( &fortrPoint, &nEvt, &nPrts, &nMom );
+        fbridgesequence_( &fortrPoint, &vecPtr[0]->at(0), &vecPtr[1]->at(0), &ogMEs[0], &chanId );
+        for( auto parSets : rwgtParams )
+        {
+        filePusher( paramCard, paramCardReplacer( parSets, origParams ) );
+        for( int k = 0 ; k < vecPtr.size() ; k = k + 3 );
+        {
+            std::vector<double> meVector( nEvt );
+            fbridgesequence_( &fortrPoint, &vecPtr[k]->at(0), &vecPtr[k+1]->at(0), &meVector[0], &chanId );
+            mesPtrVec.push_back( &meVector );
+        }
+        }
+        fbridgedelete_( &fortrPoint );
+        filePusher( paramCard, origParams );
+        std::vector<double>& ogWgts = *(vecPtr[2]);
+        std::vector<std::vector<double>*> rwgtVecs( mesPtrVec.size() );
+        for( int k = 0 ; k < mesPtrVec.size() ; ++k )
+        {
+        std::vector<double> nuWgts( nEvt );
+        for( int m = 0 ; m < nEvt ; ++m )
+        {
+            nuWgts[m] = (((*mesPtrVec[k])[m]) / (ogMEs[m])) * ogWgts[k];
+        }
+        rwgtVecs[k] = &nuWgts;
+        }
+        return rwgtVecs;
     }
 
 }

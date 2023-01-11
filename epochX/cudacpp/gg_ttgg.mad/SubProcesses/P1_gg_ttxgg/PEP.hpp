@@ -479,9 +479,11 @@ std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, std:
     static std::vector<double> momVector( 4 * nuEvt * nPrt);
     // ZW: alphaVector is the returned vector of alphas or gs
     static std::vector<double> alphaVector( nuEvt );
+    static std::vector<double> wgtVector( nEvt );
     // ZW: dummy indices to keep track of RELEVANT momenta, alphas, and event
     unsigned int momIndex = 0;
     unsigned int alphaIndex = 0;
+    unsigned int wgtIndex = 0;
     unsigned int currEvt = 0;
 
     for (auto event : eventFile.get_child("LesHouchesEvents")) {
@@ -510,11 +512,12 @@ std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, std:
             alphaVector[alphaIndex] = std::stod(procElems[5]);
         }
         alphaIndex += 1;
+        wgtVector[ wgtIndex ] = std::stod( procElems[2] );
         }
         currEvt += 1;
     }
     // ZW: declare the vector of pointers to the vectors of momenta and alphas
-    static std::vector<std::vector<double>*> ptrVec{ &momVector, &alphaVector };
+    static std::vector<std::vector<double>*> ptrVec{ &momVector, &alphaVector, &wgtVector };
     return ptrVec;
 }
 
@@ -530,6 +533,7 @@ std::vector<std::vector<double>*>& multiEventParser( pt::ptree& eventFile ){
         numPrts[k] = std::stoi(procList[k].substr(0,1));
     }
     static std::vector<std::vector<double>*> vecPtrs;
+    vecPtrs.clear();
     unsigned int nEvt = noEvt( eventFile );
     std::vector<std::vector<bool>*> procOrdering = procOrder( eventFile, procList, nEvt );
     for (unsigned int k = 0; k < procList.size(); ++k )
