@@ -247,7 +247,7 @@ namespace PEP::PER
         return modiCard;
     }
 
-    std::vector<std::vector<double>*> rwgtRunner( const std::string& lheFile, const std::string& rwgtCard, const std::string& paramCard )
+    std::vector<std::vector<double>*>& rwgtRunner( const std::string& lheFile, const std::string& rwgtCard, const std::string& paramCard )
     {
         /* auto vecPtr = PEP::lheParser( lheFile );
         const int nEvt = vecPtr[1]->size();
@@ -285,7 +285,7 @@ namespace PEP::PER
         fbridgedelete_( &fortrPoint );
         filePusher( paramCard, origParams );
         std::vector<double>& ogWgts = *(vecPtr[2]);
-        std::vector<std::vector<double>*> rwgtVecs( mesPtrVec.size() );
+        static std::vector<std::vector<double>*> rwgtVecs( mesPtrVec.size() );
         for( int k = 0 ; k < mesPtrVec.size() ; ++k )
         {
         std::vector<double> nuWgts( nEvt );
