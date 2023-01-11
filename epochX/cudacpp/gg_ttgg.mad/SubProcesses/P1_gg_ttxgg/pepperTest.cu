@@ -10,7 +10,7 @@ int main()
 
     std::string rwgtLoc = "reCard.dat";
 
-    /* auto parametercard = PEP::PER::filePuller(fileLoc);
+    auto parametercard = PEP::PER::filePuller(fileLoc);
     PEP::PER::paramReplacer( fileLoc, parametercard );
     auto nuParams = PEP::PER::filePuller( fileLoc );
     if(parametercard == nuParams){
@@ -38,18 +38,13 @@ int main()
 
     auto tuParamCard = PEP::PER::paramCardReplacer( rwgtvector[1], parameterCard );
 
-    std::cout << "\n\n" << nuParamCard << "\n\n" << tuParamCard << "\n\n";
-
-
-    for( auto rwgtsets : rwgtvector ){
-        std::cout << "\n\n" << rwgtsets << "\n\n";
-    }
-
     PEP::PER::filePusher( cardLoc, nuParamCard );
     auto resVector = PEP::PER::matrixCalculation( eventFile );
     PEP::PER::filePusher( cardLoc, tuParamCard );
     auto tesVector = PEP::PER::matrixCalculation( eventFile );
-    PEP::PER::filePusher( cardLoc, parameterCard ); */
+    PEP::PER::filePusher( cardLoc, parameterCard );
+
+    std::cout << "\nMEs are   " << resVector[1000] << " and " << tesVector[1000] << "\n\n";
 
     auto nuWgts = PEP::PER::rwgtRunner( eventFile, rwgtLoc, cardLoc );
     for( auto wgtPtrs : nuWgts )
