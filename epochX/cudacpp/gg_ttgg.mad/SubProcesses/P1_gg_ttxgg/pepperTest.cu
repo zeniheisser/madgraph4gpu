@@ -11,7 +11,7 @@ int main()
     std::string rwgtLoc = "reCard.dat";
 
     auto parametercard = PEP::PER::filePuller(cardLoc);
-    PEP::PER::paramReplacer( fileLoc, parametercard );
+    //PEP::PER::paramReplacer( fileLoc, parametercard );
     auto nuParams = PEP::PER::filePuller( fileLoc );
     if(parametercard == nuParams){
         std::cout << "\nboth parameter cards are identical!\n";
