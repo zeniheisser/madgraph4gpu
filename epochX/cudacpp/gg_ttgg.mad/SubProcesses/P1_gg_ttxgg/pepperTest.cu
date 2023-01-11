@@ -52,6 +52,10 @@ int main()
     PEP::PER::filePusher( cardLoc, parameterCard ); */
 
     auto nuWgts = PEP::PER::rwgtRunner( eventFile, rwgtLoc, cardLoc );
+    for( auto wgtPtrs : nuWgts )
+    {
+        std::cout << "\n\n" << wgtPtrs->at(0) << "\n";
+    }
 
 
     return 0;
