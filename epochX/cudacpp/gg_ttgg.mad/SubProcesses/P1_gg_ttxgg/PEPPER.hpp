@@ -277,12 +277,14 @@ namespace PEP::PER
         filePusher( paramCard, paramCardReplacer( parSets, origParams ) );
         for( int k = 0 ; k < vecPtr.size() ; k = k + 3 )
         {
+            std::cout << k << "  ";
             std::vector<double> meVector( nEvt );
             fbridgesequence_( &fortrPoint, &vecPtr[k]->at(0), &vecPtr[k+1]->at(0), &meVector[0], &chanId );
             mesPtrVec.push_back( &meVector );
         }
         }
         fbridgedelete_( &fortrPoint );
+        std::cout << "\n\n";
         filePusher( paramCard, origParams );
         std::vector<double>& ogWgts = *(vecPtr[2]);
         static std::vector<std::vector<double>*> rwgtVecs( mesPtrVec.size() );
