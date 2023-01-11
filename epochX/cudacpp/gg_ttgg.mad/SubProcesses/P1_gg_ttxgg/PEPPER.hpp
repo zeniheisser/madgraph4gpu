@@ -247,7 +247,7 @@ namespace PEP::PER
         return modiCard;
     }
 
-    std::vector<double> rwgtRunner( const std::string& lheFile, const std::string& rwgtCard, const std::string& paramCard )
+    std::vector<std::vector<double>*> rwgtRunner( const std::string& lheFile, const std::string& rwgtCard, const std::string& paramCard )
     {
         /* auto vecPtr = PEP::lheParser( lheFile );
         const int nEvt = vecPtr[1]->size();
@@ -275,7 +275,7 @@ namespace PEP::PER
         for( auto parSets : rwgtParams )
         {
         filePusher( paramCard, paramCardReplacer( parSets, origParams ) );
-        for( int k = 0 ; k < vecPtr.size() ; k = k + 3 );
+        for( int k = 0 ; k < vecPtr.size() ; k = k + 3 )
         {
             std::vector<double> meVector( nEvt );
             fbridgesequence_( &fortrPoint, &vecPtr[k]->at(0), &vecPtr[k+1]->at(0), &meVector[0], &chanId );
