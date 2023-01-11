@@ -10,7 +10,7 @@ int main()
 
     std::string rwgtLoc = "reCard.dat";
 
-    auto parametercard = PEP::PER::filePuller(fileLoc);
+    auto parametercard = PEP::PER::filePuller(cardLoc);
     PEP::PER::paramReplacer( fileLoc, parametercard );
     auto nuParams = PEP::PER::filePuller( fileLoc );
     if(parametercard == nuParams){
@@ -30,7 +30,7 @@ int main()
         std::cout << "\n" << parSet << "\n";
     } 
 
-    std::string cardLoc = "../../Cards/param_card.dat";
+    //std::string cardLoc = "../../Cards/param_card.dat";
 
     auto parameterCard = PEP::PER::filePuller( cardLoc );
 
