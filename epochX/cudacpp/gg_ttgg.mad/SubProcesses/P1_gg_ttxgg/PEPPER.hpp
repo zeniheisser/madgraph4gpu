@@ -288,10 +288,11 @@ namespace PEP::PER
         static std::vector<std::vector<double>*> rwgtVecs( mesPtrVec.size() );
         for( int k = 0 ; k < mesPtrVec.size() ; ++k )
         {
+            std::cout << k << "   ";
         std::vector<double> nuWgts( nEvt );
         for( int m = 0 ; m < nEvt ; ++m )
         {
-            std::cout << "\n" << (((*mesPtrVec[k])[m]) / (ogMEs[m])) * ogWgts[k];
+            //std::cout << "\n" << (((*mesPtrVec[k])[m]) / (ogMEs[m])) * ogWgts[k];
             nuWgts[m] = (((*mesPtrVec[k])[m]) / (ogMEs[m])) * ogWgts[k];
         }
         rwgtVecs[k] = &nuWgts;
