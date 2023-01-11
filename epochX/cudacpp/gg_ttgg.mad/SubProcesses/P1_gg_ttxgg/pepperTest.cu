@@ -55,6 +55,14 @@ int main()
     for( auto wgtPtrs : nuWgts )
     {
         std::cout << "\n\n" << wgtPtrs->at(0) << "\n";
+        std::cout << "\n\n" << wgtPtrs->at(10) << "\n";
+        std::cout << "\n\n" << wgtPtrs->at(110) << "\n";
+        std::cout << "\n\n" << wgtPtrs->at(1230) << "\n";
+        std::cout << "\n\n" << wgtPtrs->at(3210) << "\n";
+        std::cout << "\n\n" << wgtPtrs->at(6420) << "\n";
+        std::cout << "\n\n" << wgtPtrs->at(1946) << "\n";
+        std::cout << "\n\n" << wgtPtrs->at(9990) << "\n";
+        std::cout << "\n\n" << wgtPtrs->at(5050) << "\n";
     }
 
 
