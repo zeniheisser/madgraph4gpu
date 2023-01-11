@@ -291,6 +291,7 @@ namespace PEP::PER
         std::vector<double> nuWgts( nEvt );
         for( int m = 0 ; m < nEvt ; ++m )
         {
+            std::cout << "\n" << (((*mesPtrVec[k])[m]) / (ogMEs[m])) * ogWgts[k];
             nuWgts[m] = (((*mesPtrVec[k])[m]) / (ogMEs[m])) * ogWgts[k];
         }
         rwgtVecs[k] = &nuWgts;
