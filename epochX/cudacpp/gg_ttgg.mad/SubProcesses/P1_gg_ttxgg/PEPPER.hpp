@@ -277,9 +277,9 @@ namespace PEP::PER
         filePusher( paramCard, paramCardReplacer( parSets, origParams ) );
         for( int k = 0 ; k < vecPtr.size() ; k = k + 3 )
         {
-            std::cout << k << "  ";
             std::vector<double> meVector( nEvt );
             fbridgesequence_( &fortrPoint, &vecPtr[k]->at(0), &vecPtr[k+1]->at(0), &meVector[0], &chanId );
+            std::cout << "\n\n" << meVector[1000] << "\n";
             mesPtrVec.push_back( &meVector );
         }
         }
@@ -290,7 +290,6 @@ namespace PEP::PER
         static std::vector<std::vector<double>*> rwgtVecs( mesPtrVec.size() );
         for( int k = 0 ; k < mesPtrVec.size() ; ++k )
         {
-            std::cout << k << "   ";
         std::vector<double> nuWgts( nEvt );
         for( int m = 0 ; m < nEvt ; ++m )
         {
