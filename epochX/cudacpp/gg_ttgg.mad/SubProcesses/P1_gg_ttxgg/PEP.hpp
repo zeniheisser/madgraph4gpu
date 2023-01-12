@@ -445,7 +445,8 @@ std::vector<std::vector<bool>*>& procOrder( pt::ptree& eventFile, std::vector<st
         }
         std::string currProc = procReader( event.second.data() );
         auto corrInd = std::find( evtSet.begin(), evtSet.end(), currProc );
-        (*corrInd) = true;
+        (*eventBools[std::distance( evtSet.begin(), corrInd )])[currEv] = true;
+        //(*corrInd) = true;
         /* for ( unsigned int k = 0; k < evtSet.size(); ++k) {
             if ( currProc == evtSet[k] )
             {
