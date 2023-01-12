@@ -381,21 +381,21 @@ std::vector<std::vector<double>*>& eventParser( std::string lheFile ) {
 
 // ZW: turning string into a vector of strings, split by blankspaces and newlines
 // and get rid of any vector entries that are just the null character
-std::vector<std::string>& stringSplitter( std::string& currEvent ){
-    std::vector<std::string> procElems; std::cout << "\n\nline 385\n\n";
+std::vector<std::string>& stringSplitter( std::string currEvent ){
+    std::vector<std::string> procElems;
     std::replace( currEvent.begin(), currEvent.end(), '\n', ' '); std::cout << "\n\nline 386\n\n";
     boost::split(procElems, currEvent, boost::is_any_of(" ")); std::cout << "\n\nline 387\n\n";
-    const int truVal = std::count(procElems.begin(), procElems.end(), ""); std::cout << "\n\nline 388\n\n";
+    const int truVal = std::count(procElems.begin(), procElems.end(), "");
     //procElems.erase(std::remove(procElems.begin(), procElems.end(), ""));
     static std::vector<std::string> trueElems( truVal );
     int currVal = 0;
     for( auto line : procElems )
-    {std::cout << "\n\nline 393\n\n";
+    {
         if( line == "" ){
             continue;
         }
-        trueElems[currVal] = line;std::cout << "\n\nline 397\n\n";
-        ++currVal;std::cout << "\n\nline 398\n\n";
+        trueElems[currVal] = line;
+        ++currVal;
     }
     return trueElems;
 }
