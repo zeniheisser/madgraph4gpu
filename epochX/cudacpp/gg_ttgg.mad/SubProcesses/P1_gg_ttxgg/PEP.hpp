@@ -391,7 +391,7 @@ std::vector<std::string>& stringSplitter( std::string& currEvent ){
     static std::vector<std::string> procElems;
     std::replace( currEvent.begin(), currEvent.end(), '\n', ' ');
     boost::split(procElems, currEvent, boost::is_any_of(" "));
-    procElems.erase(std::remove(procElems.begin(), procElems.end(), ""));
+    procElems.erase(std::remove(procElems.begin(), procElems.end() + 1, ""));
     return procElems;
 }
 
