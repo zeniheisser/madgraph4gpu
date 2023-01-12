@@ -554,6 +554,7 @@ std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, cons
         alphaIndex += 1;
         std::cout << "\n\nline 555\n\n";
         wgtVector[ wgtIndex ] = std::stod( procElems[2] );
+        ++wgtIndex;
         std::cout << "\n\nline 557\n\n";
         }
         std::cout << "\n\nline 559\n\n";
