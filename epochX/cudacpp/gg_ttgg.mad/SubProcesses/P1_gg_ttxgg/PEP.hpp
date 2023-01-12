@@ -563,7 +563,7 @@ std::vector<std::vector<double>*>& multiEventParser( pt::ptree& eventFile ){
     {
         numPrts[k] = std::stoi(procList[k].substr(0,1));
     }
-    static std::vector<std::vector<double>*> vecPtrs;
+    static std::vector<std::vector<double>*> vecPtrs( 3 * procList.size() );
     vecPtrs.clear();
     unsigned int nEvt = noEvt( eventFile );
     std::vector<std::vector<bool>*> procOrdering = procOrder( eventFile, procList, nEvt );
@@ -571,7 +571,9 @@ std::vector<std::vector<double>*>& multiEventParser( pt::ptree& eventFile ){
     {
         auto processVecs = singleEventParser( eventFile, *procOrdering[k], numPrts[k] );
         std::cout << "\nnr of rel procs is  " << std::count( procOrdering[k]->begin(), procOrdering[k]->end(), true );
-        vecPtrs.insert(std::end(vecPtrs), std::begin(processVecs), std::end(processVecs) );
+        for( int m = 0 ; m < processVecs.size() ; ++m ){
+            vecPtrs[k*processVecs.size() + m] = processVecs[m];
+        }
     }
     return vecPtrs;
 }
