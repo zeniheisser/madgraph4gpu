@@ -62,7 +62,7 @@ int main()
 
     auto attempVec = PEP::lheParser( "testLHE.lhe" );
     int totWgts = 0;
-    for( int k = 2 ; k < totWgts.size() ; k = k+3 )
+    for( int k = 2 ; k < attempVec.size() ; k = k+3 )
     {
         totWgts += attempVec[k]->size();
     }
