@@ -411,8 +411,6 @@ std::vector<std::string>& stringSplitter( std::string& currEvent ){
 // ie the process g g to t tbar would be "4: 21 21 > 6 -6"
 std::string procReader( std::string currEvent ){
     std::vector<std::string> eventElems = stringSplitter( currEvent );
-    for ( auto strang : eventElems ){
-    }
     std::string process = eventElems[0] + ":";
     unsigned int nPrt = std::stoi(eventElems[0]);
     bool prtStatus = true;
@@ -422,7 +420,9 @@ std::string procReader( std::string currEvent ){
         if ( prtStatus ){
             if ( eventElems[7 + 13*prtcl] != eventElems[7 + 13*(prtcl+1)]){
                 process += " >";
-                prtStatus = false;
+                if( eventElems[7 + 13*(prtcl+1)] == "1" ){
+                    prtStatus = false;
+                }
             }
         }
     } 
@@ -513,32 +513,26 @@ std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, std:
         // ZW: appending the momenta, ordered as (E,px,py,pz)
         for ( auto prts = 0; prts < nPrt; ++prts )
         {
-            std::cout << "\nline 505   :" << procElems[6 + 13*prts + 9] << ":\n";
             momVector[momIndex] = std::stod(procElems[6 + 13*prts + 9]);
             momIndex += 1;
             for ( auto momComp = 0; momComp < 3; ++momComp )
             {
-                std::cout << "\nline 510\n";
                 momVector[momIndex] = std::stod(procElems[6 + 13*prts + 6 + momComp]);
                 momIndex += 1;
             }
         }
         // ZW: append the alphas or gs
         if( getGs ){
-            std::cout << "\nline 517\n";
             alphaVector[alphaIndex] = std::sqrt( 4.0 * M_PI * std::stod(procElems[5]));
         } else {
-            std::cout << "\nline 520\n";
             alphaVector[alphaIndex] = std::stod(procElems[5]);
         }
         alphaIndex += 1;
-        std::cout << "\nline 524\n";
         wgtVector[ wgtIndex ] = std::stod( procElems[2] );
         }
         currEvt += 1;
     }
     // ZW: declare the vector of pointers to the vectors of momenta and alphas
-    std::cout << "\n\nCURREV IS  " << currEvt << "   AND ALPHAINDEX IS   " << alphaIndex << "\n\n";
     static std::vector<std::vector<double>*> ptrVec{ &momVector, &alphaVector, &wgtVector };
     return ptrVec;
 }
@@ -549,6 +543,9 @@ std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, std:
 // in the LHEF
 std::vector<std::vector<double>*>& multiEventParser( pt::ptree& eventFile ){
     std::vector<std::string> procList = processExtractor( eventFile );
+    for( auto procs : procList ){
+        std::cout << "\n" << procs << "\n";
+    }
     std::vector<unsigned int> numPrts(procList.size());
     for ( unsigned int k = 0; k < procList.size(); ++k )
     {
