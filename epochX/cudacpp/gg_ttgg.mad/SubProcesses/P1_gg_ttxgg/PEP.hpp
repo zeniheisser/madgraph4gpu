@@ -434,12 +434,12 @@ std::vector<std::vector<bool>*>& procOrder( pt::ptree& eventFile, std::vector<st
     std::cout << "\n434\n";
     static std::vector<std::vector<bool>*> eventBools( evtSet.size() );
     std::cout << "\n436\n";
-    for (auto boolVecPtr : eventBools )
+    for ( int k = 0 ; k < eventBools.size() ; ++k )
     {
         std::cout << "\n439\n";
-        boolVecPtr->reserve( nEvt );
+        eventBools[k]->reserve( nEvt );
         std::cout << "\n441\n";
-        std::fill( boolVecPtr->begin(), boolVecPtr->end(), false );
+        std::fill( eventBools[k]->begin(), eventBools[k]->end(), false );
         std::cout << "\n443\n";
     }
 
