@@ -434,7 +434,7 @@ std::vector<std::vector<bool>*>& procOrder( pt::ptree& eventFile, std::vector<st
     static std::vector<std::vector<bool>*> eventBools;
     for (unsigned int k = 0; k < evtSet.size(); ++k )
     {
-        static std::vector<bool> procBools( nEvt );
+        std::vector<bool> procBools( nEvt );
         eventBools.push_back(&procBools);
     }
 
@@ -444,6 +444,7 @@ std::vector<std::vector<bool>*>& procOrder( pt::ptree& eventFile, std::vector<st
             continue;
         }
         std::string currProc = procReader( event.second.data() );
+        //auto corrInd = std::find( evtSet.begin(), evtSet.end(), currProc );
         for ( unsigned int k = 0; k < evtSet.size(); ++k) {
             if ( currProc == evtSet[k] )
             {
