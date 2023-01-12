@@ -569,9 +569,12 @@ std::vector<std::vector<double>*>& multiEventParser( pt::ptree& eventFile ){
     std::vector<std::vector<bool>*> procOrdering = procOrder( eventFile, procList, nEvt );
     for (unsigned int k = 0; k < procList.size(); ++k )
     {
+        std::cout << "\n\nNOT YET CRASHED\n\n";
         auto processVecs = singleEventParser( eventFile, *procOrdering[k], numPrts[k] );
+        std::cout << "\n\nSTILL NOT CRASHED\n\n";
         std::cout << "\nnr of rel procs is  " << std::count( procOrdering[k]->begin(), procOrdering[k]->end(), true );
         for( int m = 0 ; m < processVecs.size() ; ++m ){
+            std::cout << "\n\nABOUT TO ADD SOME SHIT TO THE VECTOR\n\n";
             vecPtrs[k*processVecs.size() + m] = processVecs[m];
         }
     }
