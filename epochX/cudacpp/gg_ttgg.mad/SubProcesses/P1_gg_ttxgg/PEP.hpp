@@ -374,7 +374,6 @@ std::vector<std::vector<double>*>& eventParser( std::string lheFile ) {
         }
         alphaIndex += 1;
     }
-    std::cout << "\n\n" << alphaVector.size() << "\n";
     static std::vector<std::vector<double>*> ptrVec{ &eventVector, &momVector, &alphaVector };
     return ptrVec;
 }
@@ -481,11 +480,12 @@ std::vector<std::string>& processExtractor( pt::ptree& eventFile ) {
 // relEv is a vector of bools which states which of the events to parse (ie which have the considered process)
 // nEvt is an integer of the number of event corresponding to the given process
 // nPrt is the number of external particles within the given process
-std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, std::vector<bool>& relEv, unsigned int nEvt, unsigned int nPrt ) {
+std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, cost std::vector<bool>& relEv, const unsigned int nPrt ) {
     // ZW: getGs says whether to return the g_S (true) or the alpha_S(false)
     bool getGs = true;
     // ZW: nuEvt is the total number of relevant events rounded up
     // to the nearest multiple of 32
+    int nEvt = std::count( relEv.begin(), relEv.end(), true );
     unsigned int nuEvt = nEvt + ((32 - ( nEvt % 32 )) % 32);
     // ZW: momVector is the returned vector of 4-momenta,
     // (currently) ordered as (E, px, py, pz)
@@ -529,6 +529,7 @@ std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, std:
         }
         currEvt += 1;
     }
+    std::cout << "\n\n" << alphaVector.size() << "\n";
     // ZW: declare the vector of pointers to the vectors of momenta and alphas
     static std::vector<std::vector<double>*> ptrVec{ &momVector, &alphaVector, &wgtVector };
     return ptrVec;
@@ -553,7 +554,7 @@ std::vector<std::vector<double>*>& multiEventParser( pt::ptree& eventFile ){
     std::vector<std::vector<bool>*> procOrdering = procOrder( eventFile, procList, nEvt );
     for (unsigned int k = 0; k < procList.size(); ++k )
     {
-        auto processVecs = singleEventParser( eventFile, *procOrdering[k], nEvt, numPrts[k] );
+        auto processVecs = singleEventParser( eventFile, *procOrdering[k], numPrts[k] );
         vecPtrs.insert(std::end(vecPtrs), std::begin(processVecs), std::end(processVecs) );
     }
     return vecPtrs;
