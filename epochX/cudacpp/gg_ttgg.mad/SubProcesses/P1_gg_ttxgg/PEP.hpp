@@ -355,22 +355,27 @@ std::vector<std::vector<double>*>& eventParser( std::string lheFile ) {
         int totNumElems = 6 + 13 * noPrt;
         for (auto currElem = 0; currElem < totNumElems; ++currElem)
         {
+            std::cout << "\nline 358\n";
             eventVector[indexElement] = std::stod(procElems[currElem]);
             indexElement += 1;
         }
         for ( auto prts = 0; prts < noPrt; ++prts )
         {
+            std::cout << "\nline 364\n";
             momVector[momIndex] = std::stod(procElems[6 + 13*prts + 9]);
             momIndex += 1;
             for ( auto momComp = 0; momComp < 3; ++momComp )
             {
+                std::cout << "\nline 369\n";
                 momVector[momIndex] = std::stod(procElems[6 + 13*prts + 6 + momComp]);
                 momIndex += 1;
             }
         }
         if( getGs ){
+            std::cout << "\nline 375\n";
             alphaVector[alphaIndex] = std::sqrt( 4.0 * M_PI * std::stod(procElems[5]));
         } else {
+            std::cout << "\nline 378\n";
             alphaVector[alphaIndex] = std::stod(procElems[5]);
         }
         alphaIndex += 1;
@@ -497,21 +502,26 @@ std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, std:
         // ZW: appending the momenta, ordered as (E,px,py,pz)
         for ( auto prts = 0; prts < nPrt; ++prts )
         {
+            std::cout << "\nline 505\n";
             momVector[momIndex] = std::stod(procElems[6 + 13*prts + 9]);
             momIndex += 1;
             for ( auto momComp = 0; momComp < 3; ++momComp )
             {
+                std::cout << "\nline 510\n";
                 momVector[momIndex] = std::stod(procElems[6 + 13*prts + 6 + momComp]);
                 momIndex += 1;
             }
         }
         // ZW: append the alphas or gs
         if( getGs ){
+            std::cout << "\nline 517\n";
             alphaVector[alphaIndex] = std::sqrt( 4.0 * M_PI * std::stod(procElems[5]));
         } else {
+            std::cout << "\nline 520\n";
             alphaVector[alphaIndex] = std::stod(procElems[5]);
         }
         alphaIndex += 1;
+        std::cout << "\nline 524\n";
         wgtVector[ wgtIndex ] = std::stod( procElems[2] );
         }
         currEvt += 1;
