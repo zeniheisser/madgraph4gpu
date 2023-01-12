@@ -374,6 +374,7 @@ std::vector<std::vector<double>*>& eventParser( std::string lheFile ) {
         }
         alphaIndex += 1;
     }
+    std::cout << "\n\n" << alphaVector.size() << "\n";
     static std::vector<std::vector<double>*> ptrVec{ &eventVector, &momVector, &alphaVector };
     return ptrVec;
 }
