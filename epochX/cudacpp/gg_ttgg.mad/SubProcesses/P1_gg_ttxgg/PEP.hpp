@@ -504,7 +504,8 @@ std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, cons
     // ZW: nuEvt is the total number of relevant events rounded up
     // to the nearest multiple of 32
     std::cout << "\n\nline 508\n\n";
-    int nEvt = std::count( relEv.begin(), relEv.end(), true );
+    //int nEvt = std::count( relEv.begin(), relEv.end(), true );
+    int nEvt = 10000;
     std::cout << "\n\nline 510\n\n";
     unsigned int nuEvt = nEvt + ((32 - ( nEvt % 32 )) % 32);
     // ZW: momVector is the returned vector of 4-momenta,
