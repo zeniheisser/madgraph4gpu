@@ -62,6 +62,8 @@ int main()
 
     auto attempVec = PEP::lheParser( "testLHE.lhe" );
 
+    std::cout << "\n\nattVec has elems  " << attempVec.size() << "\n\n";
+
 
     return 0;
 }
