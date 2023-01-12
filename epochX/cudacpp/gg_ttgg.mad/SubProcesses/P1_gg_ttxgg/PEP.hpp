@@ -382,20 +382,20 @@ std::vector<std::vector<double>*>& eventParser( std::string lheFile ) {
 // ZW: turning string into a vector of strings, split by blankspaces and newlines
 // and get rid of any vector entries that are just the null character
 std::vector<std::string>& stringSplitter( std::string& currEvent ){
-    std::vector<std::string> procElems;
-    std::replace( currEvent.begin(), currEvent.end(), '\n', ' ');
-    boost::split(procElems, currEvent, boost::is_any_of(" "));
-    const int truVal = std::count(procElems.begin(), procElems.end(), "");
+    std::vector<std::string> procElems; std::cout << "\n\nline 385\n\n";
+    std::replace( currEvent.begin(), currEvent.end(), '\n', ' '); std::cout << "\n\nline 386\n\n";
+    boost::split(procElems, currEvent, boost::is_any_of(" ")); std::cout << "\n\nline 387\n\n";
+    const int truVal = std::count(procElems.begin(), procElems.end(), ""); std::cout << "\n\nline 388\n\n";
     //procElems.erase(std::remove(procElems.begin(), procElems.end(), ""));
     static std::vector<std::string> trueElems( truVal );
     int currVal = 0;
     for( auto line : procElems )
-    {
+    {std::cout << "\n\nline 393\n\n";
         if( line == "" ){
             continue;
         }
-        trueElems[currVal] = line;
-        ++currVal;
+        trueElems[currVal] = line;std::cout << "\n\nline 397\n\n";
+        ++currVal;std::cout << "\n\nline 398\n\n";
     }
     return trueElems;
 }
@@ -530,7 +530,7 @@ std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, cons
         if (relEv[currEvt] ) {
         // ZW: turning event block into a vector of strings
         std::cout << "\n\nline 532\n\n" << event.second.data() << "\n\n";
-        auto procElems = stringSplitter(event.second.data());
+        auto procElems = stringSplitter(event.second.data()); std::cout << "\n\nline 533\n\n";
         // ZW: appending the momenta, ordered as (E,px,py,pz)
         for ( auto prts = 0; prts < nPrt; ++prts )
         {
