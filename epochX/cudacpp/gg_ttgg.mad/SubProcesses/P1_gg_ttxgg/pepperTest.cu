@@ -2,7 +2,7 @@
 
 int main()
 {
-    std::string eventFile = "gg2ttgg_10k.lhe";
+    /* std::string eventFile = "gg2ttgg_10k.lhe";
     //auto mesVector = PEP::PER::matrixCalculation( eventFile );
     //std::cout << "\n\n" << mesVector[9999] << "\n";
 
@@ -17,7 +17,7 @@ int main()
         std::cout << "\nboth parameter cards are identical!\n";
     } else{
         std::cout <<"\nTHE PARAMCARDS DIFFER\n" << parametercard << "\n\n" << nuParams << "\n\n";
-    } */
+    } 
 
     std::string rwgtCard = PEP::PER::filePuller( "reCard.dat" );
 
@@ -58,7 +58,9 @@ int main()
         std::cout << "\n\n" << wgtPtrs->at(1946) << "\n";
         std::cout << "\n\n" << wgtPtrs->at(9990) << "\n";
         std::cout << "\n\n" << wgtPtrs->at(5050) << "\n";
-    }
+    } */
+
+    auto attempVec = PEP::lheParser( "testLHE.lhe" );
 
 
     return 0;

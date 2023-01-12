@@ -247,6 +247,11 @@ namespace PEP::PER
         return modiCard;
     }
 
+    // ZENNY YOU DUMBDUMB
+    // REWRITE THIS ENTIRE THING
+    // AND SPLIT EVERYTHING INTO SINGULAR FCNS
+    // LASO FIX MATRIX EVAL FCN SO THAT IT CAN ACTUALLY DEAL W MULTIPLE
+    // PROCESSES PROPERLY
     std::vector<std::vector<double>*>& rwgtRunner( const std::string& lheFile, const std::string& rwgtCard, const std::string& paramCard )
     {
         /* auto vecPtr = PEP::lheParser( lheFile );
@@ -300,5 +305,23 @@ namespace PEP::PER
         }
         return rwgtVecs;
     }
+
+/*     std::vector<std::vector<double>*>& rwgtWrap( const std::string& lheFile, const std::string& rwgtCard, const std::string& paramCard )
+    {
+        PARSE LHE FILE
+        RERUN MATRIX ELEM CALC
+        CALC (WEIGHT/ME) FOR ALL MES
+        READ PARAM CARD (and save)
+        READ AND PARSE RWGTCARD
+        FOR EACH RWGTPARAMSET:
+            {
+                GET NEW PARAMCARD 
+                OVERWRITE PARAMCARD 
+                RUN ME CALC 
+                MULTIPLY NUME BY (WEIGHT/ME)
+                SAVE VECTOR OF NEW VALS 
+            }
+        return nuwgts
+    } */
 
 }

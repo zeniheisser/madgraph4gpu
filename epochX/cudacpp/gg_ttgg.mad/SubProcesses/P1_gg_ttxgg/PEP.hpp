@@ -517,6 +517,7 @@ std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, std:
         currEvt += 1;
     }
     // ZW: declare the vector of pointers to the vectors of momenta and alphas
+    std::cout << "\n\nCURREV IS  " << currEvt << "   AND ALPHAINDEX IS   " << alphaIndex << "\n\n";
     static std::vector<std::vector<double>*> ptrVec{ &momVector, &alphaVector, &wgtVector };
     return ptrVec;
 }
