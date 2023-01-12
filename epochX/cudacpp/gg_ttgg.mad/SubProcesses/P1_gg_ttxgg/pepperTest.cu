@@ -69,7 +69,7 @@ int main()
         totWgts += attempVec[k]->size();
     }
 
-    std::cout << "\n\nattVec has elems  " << attempVec.size() << "   and tot no wgts is   " << totWgts << "\n\n";
+    std::cout << "\n\nattVec has elems  " << attempVec.size() << "   and tot no wgts is   " << totWgts << "   and tot no as is   " << totAlfs << "\n\n";
 
 
     return 0;
