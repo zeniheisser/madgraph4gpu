@@ -480,7 +480,7 @@ std::vector<std::string>& processExtractor( pt::ptree& eventFile ) {
 // relEv is a vector of bools which states which of the events to parse (ie which have the considered process)
 // nEvt is an integer of the number of event corresponding to the given process
 // nPrt is the number of external particles within the given process
-std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, cost std::vector<bool>& relEv, const unsigned int nPrt ) {
+std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, const std::vector<bool>& relEv, const unsigned int nPrt ) {
     // ZW: getGs says whether to return the g_S (true) or the alpha_S(false)
     bool getGs = true;
     // ZW: nuEvt is the total number of relevant events rounded up
