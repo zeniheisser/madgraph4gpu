@@ -499,8 +499,8 @@ std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, cons
     bool getGs = true;
     // ZW: nuEvt is the total number of relevant events rounded up
     // to the nearest multiple of 32
-    //int nEvt = std::count( relEv.begin(), relEv.end(), true );
-    int nEvt = 10000; //THIS IS THE FUCKER
+    int nEvt = std::count( relEv.begin(), relEv.end(), true );
+    //int nEvt = 10000; //THIS IS THE FUCKER
     unsigned int nuEvt = nEvt + ((32 - ( nEvt % 32 )) % 32);
     // ZW: momVector is the returned vector of 4-momenta,
     // (currently) ordered as (E, px, py, pz)
@@ -539,12 +539,11 @@ std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, cons
             alphaVector[alphaIndex] = std::stod(procElems[5]);
         }
         alphaIndex += 1;
-        wgtVector[ wgtIndex ] = std::stod( procElems[2] );
-        ++wgtIndex;
+        //wgtVector[ wgtIndex ] = std::stod( procElems[2] );
+        //++wgtIndex;
         }
         currEvt += 1;
     }
-    //std::cout << "\n\n" << alphaVector.size() << "\n";
     // ZW: declare the vector of pointers to the vectors of momenta and alphas
     static std::vector<std::vector<double>*> ptrVec{ &momVector, &alphaVector, &wgtVector };
     return ptrVec;
