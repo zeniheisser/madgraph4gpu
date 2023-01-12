@@ -388,11 +388,22 @@ std::vector<std::vector<double>*>& eventParser( std::string lheFile ) {
 // ZW: turning string into a vector of strings, split by blankspaces and newlines
 // and get rid of any vector entries that are just the null character
 std::vector<std::string>& stringSplitter( std::string& currEvent ){
-    static std::vector<std::string> procElems;
+    std::vector<std::string> procElems;
     std::replace( currEvent.begin(), currEvent.end(), '\n', ' ');
     boost::split(procElems, currEvent, boost::is_any_of(" "));
-    procElems.erase(std::remove(procElems.begin(), procElems.end(), ""));
-    return procElems;
+    const int truVal = std::count(procElems.begin(), procElems.end(), "");
+    //procElems.erase(std::remove(procElems.begin(), procElems.end(), ""));
+    static std::vector<std::string> trueElems( truVal );
+    int currVal = 0;
+    for( auto line : procElems )
+    {
+        if( line == "" ){
+            continue;
+        }
+        trueElems[currVal] = line;
+        ++currVal;
+    }
+    return trueElems;
 }
 
 // ZW: function for extracting the process from an LHE event block
