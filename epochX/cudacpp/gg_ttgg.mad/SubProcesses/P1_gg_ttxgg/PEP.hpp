@@ -432,9 +432,7 @@ std::string procReader( std::string currEvent ){
 // true means a given event is of the given process
 std::vector<std::vector<bool>*>& procOrder( pt::ptree& eventFile, std::vector<std::string> evtSet, unsigned int nEvt ) {
     std::cout << "\n434\n";
-    static std::vector<std::vector<bool>*> eventBools( evtSet.size(), std::vector<bool> (nEvt) );
-    std::cout << "\n436\n";
-    std::cout << "\n\n" << eventBools[0]->size() << "\n\n";
+    static std::vector<std::vector<bool>*> eventBools( evtSet.size());
     /* for ( int k = 0 ; k < eventBools.size() ; ++k )
     {
         std::cout << "\n439\n";
@@ -443,6 +441,12 @@ std::vector<std::vector<bool>*>& procOrder( pt::ptree& eventFile, std::vector<st
         std::fill( eventBools[k]->begin(), eventBools[k]->end(), false );
         std::cout << "\n443\n";
     } */
+
+
+    static std::vector<std::vector<bool>> pracBools( evtSet.size(), std::vector<bool> ( nEvt ));
+    for( auto boolSets : pracBools ){
+        std::fill( boolSets.begin(), boolSets.end(), false );
+    }
 
     unsigned int currEv = 0;
     for (auto event : eventFile.get_child("LesHouchesEvents")) {
@@ -453,7 +457,7 @@ std::vector<std::vector<bool>*>& procOrder( pt::ptree& eventFile, std::vector<st
         std::cout << "\n452\n";
         auto corrInd = std::find( evtSet.begin(), evtSet.end(), currProc );
         std::cout << "\n454\n";
-        (*eventBools[std::distance( evtSet.begin(), corrInd )])[currEv] = true;
+        pracBools[std::distance( evtSet.begin(), corrInd )][currEv] = true;
         std::cout << "\n456\n";
         //(*corrInd) = true;
         /* for ( unsigned int k = 0; k < evtSet.size(); ++k) {
@@ -465,6 +469,10 @@ std::vector<std::vector<bool>*>& procOrder( pt::ptree& eventFile, std::vector<st
             }
         } */
         currEv += 1;
+    }
+    for( int k = 0 ; k < eventBools.size() ; ++k )
+    {
+        eventBools[k] = &pracBools[k];
     }
     return eventBools;
 }
