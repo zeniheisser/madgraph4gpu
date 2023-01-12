@@ -574,7 +574,9 @@ std::vector<std::vector<double>*>& multiEventParser( pt::ptree& eventFile ){
     std::vector<std::vector<bool>*> procOrdering = procOrder( eventFile, procList, nEvt );
     for (unsigned int k = 0; k < procList.size(); ++k )
     {
+        std::cout << "\n\nSTART OF NEW LOOP\n\n";
         auto processVecs = singleEventParser( eventFile, *procOrdering[k], numPrts[k] );
+        std::cout << "\n\ncrashed AFTER parsing BEFORE inserting\n\n";
         std::cout << "\nnr of rel procs is  " << std::count( procOrdering[k]->begin(), procOrdering[k]->end(), true );
         vecPtrs.insert(std::end(vecPtrs), std::begin(processVecs), std::end(processVecs) );
         std::cout << "\n\nwe crashed AFTER inserting\n\n";
