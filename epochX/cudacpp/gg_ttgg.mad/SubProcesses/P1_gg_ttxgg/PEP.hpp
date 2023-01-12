@@ -432,7 +432,7 @@ std::string procReader( std::string currEvent ){
 // true means a given event is of the given process
 std::vector<std::vector<bool>*>& procOrder( pt::ptree& eventFile, std::vector<std::string> evtSet, unsigned int nEvt ) {
     std::cout << "\n434\n";
-    static std::vector<std::vector<bool>*> eventBools( evtSet.size(), std::vector<bool>* (nEvt) );
+    static std::vector<std::vector<bool>*> eventBools( evtSet.size(), &std::vector<bool> (nEvt) );
     std::cout << "\n436\n";
     std::cout << "\n\n" << eventBools[0]->size() << "\n\n";
     /* for ( int k = 0 ; k < eventBools.size() ; ++k )
