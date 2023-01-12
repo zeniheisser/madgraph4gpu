@@ -382,7 +382,7 @@ std::vector<std::vector<double>*>& eventParser( std::string lheFile ) {
 // ZW: turning string into a vector of strings, split by blankspaces and newlines
 // and get rid of any vector entries that are just the null character
 std::vector<std::string>& stringSplitter( std::string currEvent ){
-    std::vector<std::string> procElems;
+    std::vector<std::string> procElems;"\n\nline 385\n\n";
     std::replace( currEvent.begin(), currEvent.end(), '\n', ' '); std::cout << "\n\nline 386\n\n";
     boost::split(procElems, currEvent, boost::is_any_of(" ")); std::cout << "\n\nline 387\n\n";
     const int truVal = std::count(procElems.begin(), procElems.end(), "");
