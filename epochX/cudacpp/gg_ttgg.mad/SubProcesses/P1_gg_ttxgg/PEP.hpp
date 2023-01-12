@@ -382,9 +382,9 @@ std::vector<std::vector<double>*>& eventParser( std::string lheFile ) {
 // ZW: turning string into a vector of strings, split by blankspaces and newlines
 // and get rid of any vector entries that are just the null character
 std::vector<std::string>& stringSplitter( std::string& currEvent ){
-    std::vector<std::string> procElems; std::cout << "\n\nline 385\n\n";
-    std::replace( currEvent.begin(), currEvent.end(), '\n', ' '); std::cout << "\n\nline 386\n\n";
-    boost::split(procElems, currEvent, boost::is_any_of(" ")); std::cout << "\n\nline 387\n\n";
+    std::vector<std::string> procElems;
+    std::replace( currEvent.begin(), currEvent.end(), '\n', ' ');
+    boost::split(procElems, currEvent, boost::is_any_of(" "));
     const int truVal = std::count(procElems.begin(), procElems.end(), "");
     //procElems.erase(std::remove(procElems.begin(), procElems.end(), ""));
     static std::vector<std::string> trueElems( truVal );
@@ -431,7 +431,6 @@ std::string procReader( std::string currEvent ){
 // to which events of the LHE corresponds to which process, where
 // true means a given event is of the given process
 std::vector<std::vector<bool>*>& procOrder( pt::ptree& eventFile, std::vector<std::string> evtSet, unsigned int nEvt ) {
-    std::cout << "\n434\n";
     static std::vector<std::vector<bool>*> eventBools( evtSet.size());
     /* for ( int k = 0 ; k < eventBools.size() ; ++k )
     {
@@ -453,11 +452,8 @@ std::vector<std::vector<bool>*>& procOrder( pt::ptree& eventFile, std::vector<st
             continue;
         }
         std::string currProc = procReader( event.second.data() );
-        std::cout << "\n452\n";
         auto corrInd = std::find( evtSet.begin(), evtSet.end(), currProc );
-        std::cout << "\n454\n";
         pracBools[std::distance( evtSet.begin(), corrInd )][currEv] = true;
-        std::cout << "\n456\n";
         //(*corrInd) = true;
         /* for ( unsigned int k = 0; k < evtSet.size(); ++k) {
             if ( currProc == evtSet[k] )
@@ -503,10 +499,9 @@ std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, cons
     bool getGs = true;
     // ZW: nuEvt is the total number of relevant events rounded up
     // to the nearest multiple of 32
-    std::cout << "\n\nline 508\n\n";
     //int nEvt = std::count( relEv.begin(), relEv.end(), true );
     int nEvt = 10000;
-    std::cout << "\n\nline 510\n\n";
+    std::cout << "\n\nnyayayaya" << relEv.size() << "\n\n";
     unsigned int nuEvt = nEvt + ((32 - ( nEvt % 32 )) % 32);
     // ZW: momVector is the returned vector of 4-momenta,
     // (currently) ordered as (E, px, py, pz)
@@ -519,23 +514,17 @@ std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, cons
     unsigned int alphaIndex = 0;
     unsigned int wgtIndex = 0;
     unsigned int currEvt = 0;
-    std::cout << "\n\nline 521\n\n";
     for (auto event : eventFile.get_child("LesHouchesEvents")) {
-        std::cout << "\n\nline 523\n\n";
         if (event.first != "event"){
-        std::cout << "\n\nline 525\n\n";
             continue;
         }
         // ZW: check if event should be considered 
-        std::cout << "\n\nline 529\n\n";
         if (relEv[currEvt] ) {
         // ZW: turning event block into a vector of strings
-        std::cout << "\n\nline 532\n\n" << event.second.data() << "\n\n";
-        auto procElems = stringSplitter(event.second.data()); std::cout << "\n\nline 533\n\n";
+        auto procElems = stringSplitter(event.second.data());
         // ZW: appending the momenta, ordered as (E,px,py,pz)
         for ( auto prts = 0; prts < nPrt; ++prts )
         {
-            std::cout << "\n\nline 537\n\n";
             momVector[momIndex] = std::stod(procElems[6 + 13*prts + 9]);
             momIndex += 1;
             for ( auto momComp = 0; momComp < 3; ++momComp )
@@ -543,7 +532,6 @@ std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, cons
                 momVector[momIndex] = std::stod(procElems[6 + 13*prts + 6 + momComp]);
                 momIndex += 1;
             }
-            std::cout << "\n\nline 545\n\n";
         }
         // ZW: append the alphas or gs
         if( getGs ){
@@ -551,19 +539,14 @@ std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, cons
         } else {
             alphaVector[alphaIndex] = std::stod(procElems[5]);
         }
-        std::cout << "\n\nline 553\n\n";
         alphaIndex += 1;
-        std::cout << "\n\nline 555\n\n";
         wgtVector[ wgtIndex ] = std::stod( procElems[2] );
         ++wgtIndex;
-        std::cout << "\n\nline 557\n\n";
         }
-        std::cout << "\n\nline 559\n\n";
         currEvt += 1;
     }
     //std::cout << "\n\n" << alphaVector.size() << "\n";
     // ZW: declare the vector of pointers to the vectors of momenta and alphas
-    std::cout << "\n\nline 563\n\n";
     static std::vector<std::vector<double>*> ptrVec{ &momVector, &alphaVector, &wgtVector };
     return ptrVec;
 }
