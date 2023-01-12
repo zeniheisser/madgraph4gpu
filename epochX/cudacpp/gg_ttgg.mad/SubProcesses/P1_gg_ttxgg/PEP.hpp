@@ -391,7 +391,7 @@ std::vector<std::string>& stringSplitter( std::string& currEvent ){
     static std::vector<std::string> procElems;
     std::replace( currEvent.begin(), currEvent.end(), '\n', ' ');
     boost::split(procElems, currEvent, boost::is_any_of(" "));
-    procElems.erase(std::remove(procElems.begin(), procElems.end() + 1, ""));
+    procElems.erase(std::remove(procElems.begin(), procElems.end(), ""));
     return procElems;
 }
 
@@ -502,7 +502,7 @@ std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, std:
         // ZW: appending the momenta, ordered as (E,px,py,pz)
         for ( auto prts = 0; prts < nPrt; ++prts )
         {
-            std::cout << "\nline 505   " << procElems[6 + 13*prts + 9] << "\n";
+            std::cout << "\nline 505   :" << procElems[6 + 13*prts + 9] << ":\n";
             momVector[momIndex] = std::stod(procElems[6 + 13*prts + 9]);
             momIndex += 1;
             for ( auto momComp = 0; momComp < 3; ++momComp )
