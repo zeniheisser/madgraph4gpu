@@ -434,7 +434,7 @@ std::vector<std::vector<bool>*>& procOrder( pt::ptree& eventFile, std::vector<st
     std::cout << "\n434\n";
     static std::vector<std::vector<bool>*> eventBools( evtSet.size() );
     std::cout << "\n436\n";
-    std::cout << "\n\n" << (*eventBools[0]).size() << "\n\n";
+    std::cout << "\n\n" << eventBools[0]->size() << "\n\n";
     for ( int k = 0 ; k < eventBools.size() ; ++k )
     {
         std::cout << "\n439\n";
