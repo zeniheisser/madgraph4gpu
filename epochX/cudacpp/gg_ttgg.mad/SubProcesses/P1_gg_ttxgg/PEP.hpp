@@ -500,8 +500,7 @@ std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, cons
     // ZW: nuEvt is the total number of relevant events rounded up
     // to the nearest multiple of 32
     //int nEvt = std::count( relEv.begin(), relEv.end(), true );
-    int nEvt = 10000;
-    std::cout << "\n\nnyayayaya" << relEv.size() << "\n\n";
+    int nEvt = 10000; //THIS IS THE FUCKER
     unsigned int nuEvt = nEvt + ((32 - ( nEvt % 32 )) % 32);
     // ZW: momVector is the returned vector of 4-momenta,
     // (currently) ordered as (E, px, py, pz)
@@ -570,12 +569,9 @@ std::vector<std::vector<double>*>& multiEventParser( pt::ptree& eventFile ){
     std::vector<std::vector<bool>*> procOrdering = procOrder( eventFile, procList, nEvt );
     for (unsigned int k = 0; k < procList.size(); ++k )
     {
-        std::cout << "\n\nSTART OF NEW LOOP\n\n";
         auto processVecs = singleEventParser( eventFile, *procOrdering[k], numPrts[k] );
-        std::cout << "\n\ncrashed AFTER parsing BEFORE inserting\n\n";
         std::cout << "\nnr of rel procs is  " << std::count( procOrdering[k]->begin(), procOrdering[k]->end(), true );
         vecPtrs.insert(std::end(vecPtrs), std::begin(processVecs), std::end(processVecs) );
-        std::cout << "\n\nwe crashed AFTER inserting\n\n";
     }
     return vecPtrs;
 }
