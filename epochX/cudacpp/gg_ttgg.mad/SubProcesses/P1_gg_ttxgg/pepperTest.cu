@@ -61,8 +61,13 @@ int main()
     } */
 
     auto attempVec = PEP::lheParser( "testLHE.lhe" );
+    int totWgts = 0;
+    for( int k = 2 ; k < totWgts.size() ; k = k+3 )
+    {
+        totWgts += attempVec[k]->std::size();
+    }
 
-    std::cout << "\n\nattVec has elems  " << attempVec.size() << "\n\n";
+    std::cout << "\n\nattVec has elems  " << attempVec.size() << "   and tot no wgts is   " << totWgts << "\n\n";
 
 
     return 0;

@@ -192,7 +192,6 @@ std::set<std::pair<std::string, int>>& procExtractor ( pt::ptree &eventFile ) {
         std::string thisLine = "";
         bool toPtNFnd = true;
         auto prtState = std::stoi(event.second.data().substr(startPos + 11));
-        //std::cout << "in an event\n";
         // ZW: loop over all particles in current event
         for (int currPrt = 0; currPrt < noPrts; currPrt++ ) {
             // ZW: loop over each momentum component of current particle
@@ -355,27 +354,22 @@ std::vector<std::vector<double>*>& eventParser( std::string lheFile ) {
         int totNumElems = 6 + 13 * noPrt;
         for (auto currElem = 0; currElem < totNumElems; ++currElem)
         {
-            std::cout << "\nline 358\n";
             eventVector[indexElement] = std::stod(procElems[currElem]);
             indexElement += 1;
         }
         for ( auto prts = 0; prts < noPrt; ++prts )
         {
-            std::cout << "\nline 364\n";
             momVector[momIndex] = std::stod(procElems[6 + 13*prts + 9]);
             momIndex += 1;
             for ( auto momComp = 0; momComp < 3; ++momComp )
             {
-                std::cout << "\nline 369\n";
                 momVector[momIndex] = std::stod(procElems[6 + 13*prts + 6 + momComp]);
                 momIndex += 1;
             }
         }
         if( getGs ){
-            std::cout << "\nline 375\n";
             alphaVector[alphaIndex] = std::sqrt( 4.0 * M_PI * std::stod(procElems[5]));
         } else {
-            std::cout << "\nline 378\n";
             alphaVector[alphaIndex] = std::stod(procElems[5]);
         }
         alphaIndex += 1;
@@ -407,7 +401,9 @@ std::vector<std::string>& stringSplitter( std::string& currEvent ){
 }
 
 // ZW: function for extracting the process from an LHE event block
-// in terms of the PDG codes, starting with the number of external particles
+// in terms of the PDG codes, starting with the number of particles
+// (which is not necessarily no of external particles, if propagators
+// are specified)
 // ie the process g g to t tbar would be "4: 21 21 > 6 -6"
 std::string procReader( std::string currEvent ){
     std::vector<std::string> eventElems = stringSplitter( currEvent );
@@ -544,7 +540,6 @@ std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, std:
 std::vector<std::vector<double>*>& multiEventParser( pt::ptree& eventFile ){
     std::vector<std::string> procList = processExtractor( eventFile );
     for( auto procs : procList ){
-        std::cout << "\n" << procs << "\n";
     }
     std::vector<unsigned int> numPrts(procList.size());
     for ( unsigned int k = 0; k < procList.size(); ++k )
