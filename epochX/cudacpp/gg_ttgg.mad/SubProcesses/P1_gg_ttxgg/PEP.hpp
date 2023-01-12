@@ -520,6 +520,7 @@ std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, cons
         // ZW: check if event should be considered 
         if (relEv[currEvt] ) {
         // ZW: turning event block into a vector of strings
+        if( alphaIndex > nuEvt ){std::cout << "\n\nINDEX TOO DAMN BIG\n\n";}
         auto procElems = stringSplitter(event.second.data());
         // ZW: appending the momenta, ordered as (E,px,py,pz)
         for ( auto prts = 0; prts < nPrt; ++prts )
