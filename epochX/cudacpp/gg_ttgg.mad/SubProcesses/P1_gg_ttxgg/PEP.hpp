@@ -442,7 +442,6 @@ std::vector<std::vector<bool>*>& procOrder( pt::ptree& eventFile, std::vector<st
         std::cout << "\n443\n";
     } */
 
-
     static std::vector<std::vector<bool>> pracBools( evtSet.size(), std::vector<bool> ( nEvt ));
     for( auto boolSets : pracBools ){
         std::fill( boolSets.begin(), boolSets.end(), false );
@@ -476,7 +475,6 @@ std::vector<std::vector<bool>*>& procOrder( pt::ptree& eventFile, std::vector<st
     }
     return eventBools;
 }
-
 // ZW: extracts which processes occur in an LHEF, ordered by where the first
 // instance of an process occurs in the LHEF, ie the first event is of process 1,
 // the first event (in order) of a different process is process 2 etc
@@ -520,9 +518,11 @@ std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, cons
     unsigned int alphaIndex = 0;
     unsigned int wgtIndex = 0;
     unsigned int currEvt = 0;
-    std::cout << "\n\nline 523\n\n";
+    std::cout << "\n\nline 521\n\n";
     for (auto event : eventFile.get_child("LesHouchesEvents")) {
+        std::cout << "\n\nline 523\n\n";
         if (event.first != "event"){
+        std::cout << "\n\nline 525\n\n";
             continue;
         }
         // ZW: check if event should be considered 
