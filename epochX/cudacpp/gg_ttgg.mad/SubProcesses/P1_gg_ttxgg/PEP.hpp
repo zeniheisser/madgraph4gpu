@@ -577,6 +577,7 @@ std::vector<std::vector<double>*>& multiEventParser( pt::ptree& eventFile ){
         auto processVecs = singleEventParser( eventFile, *procOrdering[k], numPrts[k] );
         std::cout << "\nnr of rel procs is  " << std::count( procOrdering[k]->begin(), procOrdering[k]->end(), true );
         vecPtrs.insert(std::end(vecPtrs), std::begin(processVecs), std::end(processVecs) );
+        std::cout << "\n\nwe crashed AFTER inserting\n\n";
     }
     return vecPtrs;
 }
