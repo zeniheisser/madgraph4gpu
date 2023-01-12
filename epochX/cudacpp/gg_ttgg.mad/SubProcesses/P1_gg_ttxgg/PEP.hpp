@@ -530,7 +530,7 @@ std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, cons
         if (relEv[currEvt] ) {
         // ZW: turning event block into a vector of strings
         std::cout << "\n\nline 532\n\n";
-        auto procElems = stringSplitter(event.second.data());
+        auto procElems = stringSplitter(event.second.data()); std::cout << "\n\nline 533\n\n";
         // ZW: appending the momenta, ordered as (E,px,py,pz)
         for ( auto prts = 0; prts < nPrt; ++prts )
         {
