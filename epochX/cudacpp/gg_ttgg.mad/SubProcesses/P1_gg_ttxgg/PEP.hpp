@@ -432,17 +432,17 @@ std::string procReader( std::string currEvent ){
 // true means a given event is of the given process
 std::vector<std::vector<bool>*>& procOrder( pt::ptree& eventFile, std::vector<std::string> evtSet, unsigned int nEvt ) {
     std::cout << "\n434\n";
-    static std::vector<std::vector<bool>*> eventBools( evtSet.size() );
+    static std::vector<std::vector<bool>*> eventBools( evtSet.size(), std::vector<bool>* (nEvt) );
     std::cout << "\n436\n";
     std::cout << "\n\n" << eventBools[0]->size() << "\n\n";
-    for ( int k = 0 ; k < eventBools.size() ; ++k )
+    /* for ( int k = 0 ; k < eventBools.size() ; ++k )
     {
         std::cout << "\n439\n";
         (*eventBools[k]).reserve( nEvt );
         std::cout << "\n441\n";
         std::fill( eventBools[k]->begin(), eventBools[k]->end(), false );
         std::cout << "\n443\n";
-    }
+    } */
 
     unsigned int currEv = 0;
     for (auto event : eventFile.get_child("LesHouchesEvents")) {
