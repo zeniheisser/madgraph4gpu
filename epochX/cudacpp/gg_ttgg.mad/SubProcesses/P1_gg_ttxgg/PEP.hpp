@@ -431,11 +431,11 @@ std::string procReader( std::string currEvent ){
 // to which events of the LHE corresponds to which process, where
 // true means a given event is of the given process
 std::vector<std::vector<bool>*>& procOrder( pt::ptree& eventFile, std::vector<std::string> evtSet, unsigned int nEvt ) {
-    static std::vector<std::vector<bool>*> eventBools;
-    for (unsigned int k = 0; k < evtSet.size(); ++k )
+    static std::vector<std::vector<bool>*> eventBools( evtSet.size() );
+    for (auto boolVecPtr : eventBools )
     {
-        std::vector<bool> procBools( nEvt );
-        eventBools.push_back(&procBools);
+        boolVecPtr->reserve( nEvt );
+        std::fill( boolVecPtr->begin(), boolVecPtr->end(), false );
     }
 
     unsigned int currEv = 0;
@@ -444,15 +444,16 @@ std::vector<std::vector<bool>*>& procOrder( pt::ptree& eventFile, std::vector<st
             continue;
         }
         std::string currProc = procReader( event.second.data() );
-        //auto corrInd = std::find( evtSet.begin(), evtSet.end(), currProc );
-        for ( unsigned int k = 0; k < evtSet.size(); ++k) {
+        auto corrInd = std::find( evtSet.begin(), evtSet.end(), currProc );
+        (*corrInd) = true;
+        /* for ( unsigned int k = 0; k < evtSet.size(); ++k) {
             if ( currProc == evtSet[k] )
             {
                 (*eventBools[k])[currEv] = true;
             } else {
                 (*eventBools[k])[currEv] = false;
             }
-        }
+        } */
         currEv += 1;
     }
     return eventBools;
