@@ -521,12 +521,12 @@ std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, cons
     unsigned int wgtIndex = 0;
     unsigned int currEvt = 0;
     std::cout << "\n\nline 523\n\n";
-
     for (auto event : eventFile.get_child("LesHouchesEvents")) {
         if (event.first != "event"){
             continue;
         }
         // ZW: check if event should be considered 
+        std::cout << "\n\nline 529\n\n";
         if (relEv[currEvt] ) {
         // ZW: turning event block into a vector of strings
         std::cout << "\n\nline 532\n\n";
@@ -556,6 +556,7 @@ std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, cons
         wgtVector[ wgtIndex ] = std::stod( procElems[2] );
         std::cout << "\n\nline 557\n\n";
         }
+        std::cout << "\n\nline 559\n\n";
         currEvt += 1;
     }
     //std::cout << "\n\n" << alphaVector.size() << "\n";
