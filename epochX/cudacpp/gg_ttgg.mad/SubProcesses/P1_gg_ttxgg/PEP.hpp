@@ -505,7 +505,9 @@ std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, cons
     bool getGs = true;
     // ZW: nuEvt is the total number of relevant events rounded up
     // to the nearest multiple of 32
+    std::cout << "\n\nline 508\n\n";
     int nEvt = std::count( relEv.begin(), relEv.end(), true );
+    std::cout << "\n\nline 510\n\n";
     unsigned int nuEvt = nEvt + ((32 - ( nEvt % 32 )) % 32);
     // ZW: momVector is the returned vector of 4-momenta,
     // (currently) ordered as (E, px, py, pz)
@@ -518,6 +520,7 @@ std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, cons
     unsigned int alphaIndex = 0;
     unsigned int wgtIndex = 0;
     unsigned int currEvt = 0;
+    std::cout << "\n\nline 523\n\n";
 
     for (auto event : eventFile.get_child("LesHouchesEvents")) {
         if (event.first != "event"){
@@ -526,10 +529,12 @@ std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, cons
         // ZW: check if event should be considered 
         if (relEv[currEvt] ) {
         // ZW: turning event block into a vector of strings
+        std::cout << "\n\nline 532\n\n";
         auto procElems = stringSplitter(event.second.data());
         // ZW: appending the momenta, ordered as (E,px,py,pz)
         for ( auto prts = 0; prts < nPrt; ++prts )
         {
+            std::cout << "\n\nline 537\n\n";
             momVector[momIndex] = std::stod(procElems[6 + 13*prts + 9]);
             momIndex += 1;
             for ( auto momComp = 0; momComp < 3; ++momComp )
@@ -537,6 +542,7 @@ std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, cons
                 momVector[momIndex] = std::stod(procElems[6 + 13*prts + 6 + momComp]);
                 momIndex += 1;
             }
+            std::cout << "\n\nline 545\n\n";
         }
         // ZW: append the alphas or gs
         if( getGs ){
@@ -544,13 +550,17 @@ std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, cons
         } else {
             alphaVector[alphaIndex] = std::stod(procElems[5]);
         }
+        std::cout << "\n\nline 553\n\n";
         alphaIndex += 1;
+        std::cout << "\n\nline 555\n\n";
         wgtVector[ wgtIndex ] = std::stod( procElems[2] );
+        std::cout << "\n\nline 557\n\n";
         }
         currEvt += 1;
     }
     //std::cout << "\n\n" << alphaVector.size() << "\n";
     // ZW: declare the vector of pointers to the vectors of momenta and alphas
+    std::cout << "\n\nline 563\n\n";
     static std::vector<std::vector<double>*> ptrVec{ &momVector, &alphaVector, &wgtVector };
     return ptrVec;
 }
