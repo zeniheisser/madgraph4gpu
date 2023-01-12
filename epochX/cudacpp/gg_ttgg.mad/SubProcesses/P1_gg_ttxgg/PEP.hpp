@@ -529,8 +529,8 @@ std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, cons
         std::cout << "\n\nline 529\n\n";
         if (relEv[currEvt] ) {
         // ZW: turning event block into a vector of strings
-        std::cout << "\n\nline 532\n\n";
-        auto procElems = stringSplitter(event.second.data()); std::cout << "\n\nline 533\n\n";
+        std::cout << "\n\nline 532\n\n" << event.second.data() << "\n\n";
+        auto procElems = stringSplitter(event.second.data());
         // ZW: appending the momenta, ordered as (E,px,py,pz)
         for ( auto prts = 0; prts < nPrt; ++prts )
         {
