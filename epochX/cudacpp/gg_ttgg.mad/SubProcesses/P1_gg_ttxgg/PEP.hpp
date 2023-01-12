@@ -529,7 +529,7 @@ std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, cons
         }
         currEvt += 1;
     }
-    std::cout << "\n\n" << alphaVector.size() << "\n";
+    //std::cout << "\n\n" << alphaVector.size() << "\n";
     // ZW: declare the vector of pointers to the vectors of momenta and alphas
     static std::vector<std::vector<double>*> ptrVec{ &momVector, &alphaVector, &wgtVector };
     return ptrVec;
@@ -555,6 +555,7 @@ std::vector<std::vector<double>*>& multiEventParser( pt::ptree& eventFile ){
     for (unsigned int k = 0; k < procList.size(); ++k )
     {
         auto processVecs = singleEventParser( eventFile, *procOrdering[k], numPrts[k] );
+        std::cout << "\nnr of rel procs is  " << std::count( procOrdering[k]->begin(), procOrdering[k]->end(), true );
         vecPtrs.insert(std::end(vecPtrs), std::begin(processVecs), std::end(processVecs) );
     }
     return vecPtrs;
