@@ -502,7 +502,7 @@ std::vector<std::vector<double>*>& singleEventParser( pt::ptree& eventFile, std:
         // ZW: appending the momenta, ordered as (E,px,py,pz)
         for ( auto prts = 0; prts < nPrt; ++prts )
         {
-            std::cout << "\nline 505   " << procElems[6 + 13*prts + 9] "\n";
+            std::cout << "\nline 505   " << procElems[6 + 13*prts + 9] << "\n";
             momVector[momIndex] = std::stod(procElems[6 + 13*prts + 9]);
             momIndex += 1;
             for ( auto momComp = 0; momComp < 3; ++momComp )
