@@ -6,6 +6,7 @@ import os
 import subprocess
 import re
 import sys
+import time
 import importlib.util
 SPEC_EXPORTCPP = importlib.util.find_spec('madgraph.iolibs.export_cpp')
 PLUGIN_export_cpp = importlib.util.module_from_spec(SPEC_EXPORTCPP)
@@ -254,6 +255,10 @@ class TREX_ReweightInterface(rwgt_interface.ReweightInterface):
         super().__init__(*args, **kwargs)
         self.debug_output = 'tREX_debug'
         self.param_card = None
+        self.launches = 0
+        self.nb_events = 0
+        self.run_time = 0.0
+        self.compile_time = 0.0
         self.reweight_card = []
         self.reweight_names = []
         
@@ -316,7 +321,7 @@ class TREX_ReweightInterface(rwgt_interface.ReweightInterface):
             target = pjoin(self.mother.me_dir, 'Events', self.mother.run_name, 'events.lhe')
         else:
             target = self.lhe_input.path
-
+        self.run_time = time.time()
         #ZW: rwgt_driver is written and compiled properly, now just to figure out how to run it through MG
         subprocess.call([driver, '-lhe=%s' % input_file, '-slha=%s' % param_card, '-rwgt=%s' % rwgt_card, '-out=%s' % output_file], cwd=run_path)
 
@@ -326,12 +331,13 @@ class TREX_ReweightInterface(rwgt_interface.ReweightInterface):
             iters = csv.reader(results)
             for row in iters:
                 self.all_cross_section[(row[0],'')] = (float(row[1]), float(row[2]))
-
+        self.run_time = time.time() - self.run_time
         return
     
     def compile(self):
         """override compile to use the TREX makefiles"""
-        
+        if self.compile_time == 0.0:
+            self.compile_time = time.time()
         if self.multicore=='wait':
             return
         
@@ -351,6 +357,7 @@ class TREX_ReweightInterface(rwgt_interface.ReweightInterface):
                 nb_core = 1
             files.cp(pjoin(pdir, 'cudacpp_driver.mk'),pjoin(pdir, 'makefile'))
             misc.compile(cwd=pdir, nb_core=nb_core,mode='cpp')
+        self.compile_time = time.time() - self.compile_time
         return
     
     def load_module(self):
@@ -400,6 +407,10 @@ class TREX_ReweightInterface(rwgt_interface.ReweightInterface):
         param_card_iterator, tag_name = self.handle_param_card(model_line, args, type_rwgt)
 
         self.reweight_names.append(tag_name)
+        
+        if self.nb_events == 0:
+            self.nb_events = len(self.lhe_input)
+        self.launches += 1
         
         # perform the scanning
         if param_card_iterator:
@@ -645,6 +656,9 @@ class TREX_ReweightInterface(rwgt_interface.ReweightInterface):
         self.launch_actual_reweighting()
         
         self.exitted = True
+        
+        with (open(os.path.join(self.me_dir, '..', 'rwgt_times.txt'), 'a')) as file:
+            file.write('[%s,%s,%s,%s]\n' %(self.launches, self.nb_events, self.compile_time, self.run_time) )
         
         if 'init' in self.banner:
             cross = 0 
