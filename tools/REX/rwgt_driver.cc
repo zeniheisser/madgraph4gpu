@@ -16,6 +16,9 @@
 #include <cstdlib>
 #include <typeinfo>
 #include <memory>
+#include <chrono>
+#include <iostream>
+#include <ratio>
 %(include_lines)s
 
 int usage( char* argv0, int ret = 1 )
@@ -45,6 +48,17 @@ void writeRwgtCsv( std::string path, std::shared_ptr<std::vector<std::string>> n
     return;
 }
 
+void writeRwgtTime( std::chrono::duration<double> time )
+{
+    std::ofstream outFile;
+    outFile.open( "../../../rwgt_times.txt", std::ios::app );
+    if( !outFile.is_open() )
+        throw std::runtime_error( "Failed to open rwgt_times.txt file for writing." );
+    outFile << time.count() << ",";
+    outFile.close();
+    return;
+}
+
 void writeRwgtCsv( std::string path, std::vector<std::string> names, std::vector<double> xSecs, std::vector<double> errXSecs )
 {
     std::ofstream outFile;
@@ -67,6 +81,8 @@ int main( int argc, char** argv ){
     std::string rwgtCardPath;
     std::string outputPath;
     std::string slhaPath;
+
+    const auto t1 = std::chrono::high_resolution_clock::now();
 
     if (argc < 2){
         return usage( argv[0] );
@@ -186,10 +202,14 @@ int main( int argc, char** argv ){
 
     bool lheWritten = REX::filePusher( outputPath, *lheRun.nodeWriter() );
 
+    const auto t2 = std::chrono::high_resolution_clock::now();
+
     if( !lheWritten )
         throw std::runtime_error( "Failed to write LHE file." );
 
     writeRwgtCsv( "rwgt_results.csv", *rwgtRun.getNames(), runner.xSecs, runner.xErrs );
+
+    writeRwgtTime( std::chrono::duration_cast<std::chrono::duration<double>>( t2 - t1 ) );
 
     return 0;
 
