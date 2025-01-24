@@ -382,7 +382,11 @@ namespace REX::teaw
             amp->normalise();
         }
         std::vector<size_t> evInd = std::vector<size_t>( this->amps.size(), 0 );
-        this->wgts = std::vector<std::shared_ptr<std::vector<double>>>( noWgts, std::make_shared<std::vector<double>>() );
+        this->wgts = std::vector<std::shared_ptr<std::vector<double>>>(); // Clear existing weights
+        this->wgts.reserve(noWgts); // Reserve memory to avoid reallocations
+        for (size_t i = 0; i < noWgts; ++i) {
+            this->wgts.emplace_back(std::make_shared<std::vector<double>>());
+        }
         for( auto ind : this->eventGrouping ){
             if( ind == REX::npos ){
                 for( auto wgt : this->wgts ){
