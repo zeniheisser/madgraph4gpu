@@ -1,0 +1,4 @@
+set stdout_level DEBUG
+set zerowidth_tchannel F
+generate p p > l+ l-
+output standalone_trex drell_yan.trex

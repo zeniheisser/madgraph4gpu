@@ -8,7 +8,7 @@
  *                                              
  ***/
 //
-// *t*ensorial *e*vent *a*daption with *Rex* Version 0.9.0
+// *t*ensorial *e*vent *a*daption with *Rex* Version 0.9.1
 // teaRex is an extension to the Rex C++ library for parsing and manipulating Les Houches Event-format (LHE) files,
 // designed for leading order event reweighting based on input LHE file(s) and (relative) weight evaluation functions.
 // teaRex is in development and may not contain all features necessary for all desired features,
