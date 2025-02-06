@@ -2,7 +2,7 @@
 # Copyright (C) 2020-2024 CERN and UCLouvain.
 # Licensed under the GNU Lesser General Public License (version 3 or later).
 # Created by: A. Valassi (Sep 2021) for the MG5aMC CUDACPP plugin.
-# Further modified by: A. Valassi (2021-2024) for the MG5aMC CUDACPP plugin.
+# Further modified by: A. Valassi, Z. Wettersten (2021-2025) for the MG5aMC CUDACPP plugin.
 
 set -e # fail on error
 
@@ -61,6 +61,9 @@ function codeGenAndDiff()
       generate p p > t t~ @0
       add process p p > t t~ j @1
       add process p p > t t~ j j @2"
+      ;;
+    drell_yan)
+      cmd="generate p p > l+ l-"
       ;;
     pp_ttW) # TEMPORARY! until no_b_mass #695 and/or #696 are fixed
       cmd="define p = p b b~
@@ -281,6 +284,8 @@ function codeGenAndDiff()
       echo "output madevent_simd ${outproc} ${helrecopt} --vector_size=32" >> ${outproc}.mg
     elif [ "${OUTBCK}" == "madgpu" ]; then # $SCRBCK=cudacpp and $OUTBCK=madgpu
       echo "output madevent ${outproc} ${helrecopt} --vector_size=32 --me_exporter=standalone_gpu" >> ${outproc}.mg
+    elif [ "${OUTBCK}" == "trex" ]; then # $SCRBCK=cudacpp and $OUTBCK=trex
+      echo "output standalone_trex ${outproc}" >> ${outproc}.mg
     else # $SCRBCK=cudacpp and $OUTBCK=cudacpp, cpp or gpu
       echo "output standalone_${OUTBCK} ${outproc}" >> ${outproc}.mg
     fi
@@ -410,7 +415,7 @@ function codeGenAndDiff()
     autosuffix=cpp # no special suffix for the 311 branch any longer
   elif [ "${OUTBCK}" == "gpu" ]; then
     autosuffix=gpu # no special suffix for the 311 branch any longer
-  elif [ "${OUTBCK}" == "madnovec" ] || [ "${OUTBCK}" == "madonly" ] || [ "${OUTBCK}" == "mad" ] || [ "${OUTBCK}" == "madcpp" ] || [ "${OUTBCK}" == "madgpu" ]; then
+  elif [ "${OUTBCK}" == "madnovec" ] || [ "${OUTBCK}" == "madonly" ] || [ "${OUTBCK}" == "mad" ] || [ "${OUTBCK}" == "madcpp" ] || [ "${OUTBCK}" == "madgpu" ] || [ "${OUTBCK}" == "trex" ]; then
     autosuffix=${OUTBCK}
   fi
   # Replace the existing generated code in the output source code directory by the newly generated code and create a .BKP
@@ -603,6 +608,8 @@ while [ "$1" != "" ]; do
   elif [ "$1" == "--madcpp" ] && [ "${SCRBCK}" == "cudacpp" ]; then
     export OUTBCK=${1#--}
   elif [ "$1" == "--madgpu" ] && [ "${SCRBCK}" == "cudacpp" ]; then
+    export OUTBCK=${1#--}
+  elif [ "$1" == "--trex" ] && [ "${SCRBCK}" == "cudacpp" ]; then
     export OUTBCK=${1#--}
   elif [ "$1" == "-c" ] && [ "$2" != "" ]; then
     cmd="$2"

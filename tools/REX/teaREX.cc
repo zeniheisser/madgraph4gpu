@@ -386,6 +386,7 @@ namespace REX::tea
         size_t noWgts = this->amps[0]->weights.size();
         for( auto amp : this->amps )
         {
+            if( amp->weights.size() == 0 ) continue;
             if( amp->weights.size() != noWgts ) throw std::runtime_error("reweightor::flattenWeights(): Number of weights in amplitudes differ.");
             amp->normalise();
         }
