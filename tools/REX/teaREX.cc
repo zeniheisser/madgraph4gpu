@@ -390,18 +390,22 @@ namespace REX::tea
             if( amp->weights.size() != noWgts ) throw std::runtime_error("reweightor::flattenWeights(): Number of weights in amplitudes differ.");
             amp->normalise();
         }
-        std::vector<size_t> evInd = std::vector<size_t>( this->amps.size(), 0 );
+        std::vector<size_t> evInd = std::vector<size_t>( this->amps.size() + 1, 0 );
+        this->originalWgts = std::vector<double>();
         this->wgts = std::vector<std::shared_ptr<std::vector<double>>>();
         for( size_t k = 0 ; k < noWgts ; ++k ){
             this->wgts.push_back( std::make_shared<std::vector<double>>() );
         }
         for( auto ind : this->eventGrouping ){
             if( ind == REX::npos ){
+                this->originalWgts.push_back( this->sortedEvents.back()[evInd.back()]->getHead().getWeight() );
                 for( auto wgt : this->wgts ){
                     wgt->push_back( 0.0 );
                 }
+                ++evInd.back();
                 continue;
             }
+            this->originalWgts.push_back( this->amps[ind]->proc->xWgtUp[evInd[ind]] );
             for( size_t k = 0 ; k < noWgts ; ++k ){
                 this->wgts[k]->push_back( this->amps[ind]->weights[k]->at( evInd[ind]));
             }
@@ -462,6 +466,26 @@ namespace REX::tea
         }
     }
 
+    // double reweightor::getSummedRatio(std::vector<double>& numerator, std::vector<double>& denominator){
+    //     if( numerator.size() != denominator.size() ) throw std::runtime_error("reweightor::getSummedRatio(): Numerator and denominator vectors are not the same size.");
+    //     double ratio = 0.0;
+    //     for( size_t k = 0 ; k < numerator.size() ; ++k ){
+    //         if( denominator[k] == 0.0 ) throw std::runtime_error("reweightor::getSummedRatio(): Division by zero.");
+    //         ratio += numerator[k] / denominator[k];
+    //     }
+    //     return ratio;
+    // }
+
+    // double reweightor::getSummedSquareRatio(std::vector<double>& numerator, std::vector<double>& denominator){
+    //     if( numerator.size() != denominator.size() ) throw std::runtime_error("reweightor::getSummedSquareRatio(): Numerator and denominator vectors are not the same size.");
+    //     double ratio = 0.0;
+    //     for( size_t k = 0 ; k < numerator.size() ; ++k ){
+    //         if( denominator[k] == 0.0 ) throw std::runtime_error("reweightor::getSummedSquareRatio(): Division by zero.");
+    //         ratio += std::pow( numerator[k] / denominator[k], 2 );
+    //     }
+    //     return ratio;
+    // }
+
     void reweightor::calcXErrs(){
         if( this->xSecs.size() == 0 ) this->calcXSecs();
         double xSec = 0.0;
@@ -484,14 +508,24 @@ namespace REX::tea
         for( size_t k = 0 ; k < this->xSecs.size() ; ++k ){
             double omega = 0.0;
             double omegaSq = 0.0;
-            for( auto wgt : *(this->wgts[k]) ){
-                double invWgt = 1. / wgt;
-                omega += invWgt;
-                omegaSq += std::pow( invWgt, 2 );
+            // if( this->originalWgts.size() != 0 ){
+            for( size_t j = 0 ; j < this->wgts[k]->size() ; ++j ){
+                double ratio = this->wgts[k]->at(j) / this->originalWgts[j];
+                omega += ratio;
+                omegaSq += std::pow( ratio, 2 );
             }
-            double var = (omegaSq - std::pow(omega, 2) * invNoEvs) * invNoEvs * std::pow( this->xSecs[k], 2 );
+            // } else {
+            //     for( auto wgt : *(this->wgts[k]) ){
+            //        //double invWgt = 1. / wgt;
+            //         omega += wgt;
+            //         omegaSq += std::pow( wgt, 2 );
+            //     }
+            //     omega = omega/xSec;
+            //     omegaSq = omegaSq/std::pow(xSec, 2);
+            // }
+            double var = (omegaSq - std::pow(omega, 2) * invNoEvs) * invNoEvs;
             double err = std::sqrt( std::max( 0., sqrtInvNoEvs * var) )*xSec;
-            err += xErr * this->xSecs[k] * omega * invNoEvs;
+            err += xErr * omega * invNoEvs;
             if(  std::isnan(err) || std::isinf(err) ){
                 REX::warning("reweightor::calcXErrs(): Error propagation failed for weight " + std::to_string(k) + ". Approximating the error at cross section level.");
                 err = xErr * std::max( xSec / this->xSecs[k], this->xSecs[k] / xSec );

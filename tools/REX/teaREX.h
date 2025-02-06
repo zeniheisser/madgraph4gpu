@@ -79,6 +79,7 @@ namespace REX::tea
         std::vector<iterator> iterators;
         iterator originator;
         iterator terminator;
+        std::vector<double> originalWgts;
         std::vector<std::shared_ptr<std::vector<double>>> wgts;
         std::vector<double> xSecs;
         std::vector<double> xErrs;
