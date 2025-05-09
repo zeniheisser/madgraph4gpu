@@ -335,8 +335,6 @@ def grouped_relative_diff_histogram(relative_diff_dict, process: str = None):
 
     :param relative_diff_dict: Dict of {label: relative_diff_array}
     """
-    import numpy as np
-    import matplotlib.pyplot as plt
 
     bin_edges = np.arange(-15, 1)           # 15 edges => 14 bins
     bin_centers = bin_edges[:-1] + 0.5      # Midpoints for 14 bins
@@ -360,7 +358,6 @@ def grouped_relative_diff_histogram(relative_diff_dict, process: str = None):
     offsets = np.linspace(-0.4, 0.4, n_labels, endpoint=False)
 
     plot_name = process_to_name(process) if process else "relative_diff"
-    plot_name += ".pdf"
     plot_dir = Path.cwd() / "plots"
     if not plot_dir.exists():
         os.makedirs(plot_dir)
@@ -368,7 +365,7 @@ def grouped_relative_diff_histogram(relative_diff_dict, process: str = None):
     if not plot_dir.is_dir():
         print(f"Error: {plot_dir} is not a directory.")
         return
-    plot_path = plot_dir / plot_name
+    plot_path = plot_dir / (plot_name + "_lin.pdf")
     if plot_path.exists():
         print(f"Warning: {plot_path} already exists. Overwriting.")
     plot_title = "Relative difference to double precision evaluation"
@@ -391,7 +388,13 @@ def grouped_relative_diff_histogram(relative_diff_dict, process: str = None):
     plt.grid(axis='y', linestyle='--', linewidth=0.5)
     plt.tight_layout()
     plt.savefig(plot_path, format="pdf")
-    print(f"Saved plot to {plot_path}")
+    print(f"Saved lin-scaled plot to {plot_path}")
+    plot_path = plot_dir / (plot_name + "_log.pdf")
+    if plot_path.exists():
+        print(f"Warning: {plot_path} already exists. Overwriting.")
+    plt.yscale("log")
+    plt.savefig(plot_path, format="pdf")
+    print(f"Saved log-scaled plot to {plot_path}")
 
 def process_to_name(process: str) -> str:
     """Converts a process string to a valid filename."""
@@ -440,6 +443,73 @@ def generate_and_run_madevent(run_card_path: Path):
         subprocess.run(cmd, stdin=infile, check=True)
         print(f"Finished running MadEvent with input from {run_card_path}.")
 
+def plot_difference_heatmaps(ref, abs_diff, rel_diff, bins=100, label="", process: str = None):
+    """
+    Plots two heatmaps:
+    1. Relative difference vs absolute difference
+    2. Relative difference vs reference amplitude
+
+    Safely applies log scale by mapping zeros to smallest positive non-zero value.
+    Keeps arrays aligned and uses absolute values as needed.
+    """
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    # Ensure non-negative input
+    abs_diff = np.abs(abs_diff)
+    rel_diff = np.abs(rel_diff)
+    ref = np.abs(ref)
+    proc_name = process_to_name(process) if process else "relative_diff"
+    plot_dir = Path.cwd() / "plots"
+    if not plot_dir.exists():
+        os.makedirs(plot_dir)
+        print(f"Created directory {plot_dir}.")
+    if not plot_dir.is_dir():
+        print(f"Error: {plot_dir} is not a directory.")
+        return
+    plot_path = plot_dir / (proc_name + "_heatmap.pdf")
+    if plot_path.exists():
+        print(f"Warning: {plot_path} already exists. Overwriting.")
+    # Avoid log(0) by replacing zeros with min non-zero value in each array
+    def safe_log(data, label):
+        positive_mask = data > 0
+        if not np.any(positive_mask):
+            raise ValueError(f"All values in {label} are zero or negative.")
+        min_nonzero = data[positive_mask].min()
+        safe_data = np.where(data == 0, min_nonzero, data)
+        return np.log10(safe_data)
+
+    log_abs_diff = safe_log(abs_diff, "abs_diff")
+    log_rel_diff = safe_log(np.clip(rel_diff, 1e-15, None), "rel_diff")  # clip large relative errors, keep min=1e-15
+    log_ref = safe_log(ref, "ref")
+
+    fig, axs = plt.subplots(1, 2, figsize=(14, 5))
+
+    # 1. Relative vs Absolute Difference
+    h1 = axs[0].hist2d(
+        log_abs_diff, log_rel_diff,
+        bins=bins, cmap="viridis", cmin=1
+    )
+    axs[0].set_xlabel("log10(Absolute Difference)")
+    axs[0].set_ylabel("log10(Relative Difference)")
+    axs[0].set_title(f"Rel. vs Abs. Difference {f'({label})' if label else ''}")
+    fig.colorbar(h1[3], ax=axs[0])
+
+    # 2. Relative Difference vs Reference Amplitude
+    h2 = axs[1].hist2d(
+        log_ref, log_rel_diff,
+        bins=bins, cmap="plasma", cmin=1
+    )
+    axs[1].set_xlabel("log10(Reference Amplitude)")
+    axs[1].set_ylabel("log10(Relative Difference)")
+    axs[1].set_title(f"Rel. Diff vs Ref. Amplitude {f'({label})' if label else ''}")
+    fig.colorbar(h2[3], ax=axs[1])
+
+    plt.tight_layout()
+    plt.savefig(plot_path, format="pdf")
+    print(f"Saved heatmap plot to {plot_path}")
+
+
 def main():
     if len(sys.argv) != 2:
         print("Usage: python script.py <input_filename>")
@@ -461,6 +531,12 @@ def main():
         print("Error: No processes found in the input file.")
         sys.exit(1)
 
+    for process in processes:
+        process = process.strip()
+        if not process:
+            print("Error: Empty process found in the input file.")
+            sys.exit(1)
+    
     # clear_amps_files()
     curr_path = Path.cwd()
     run_cards = curr_path / "run_cards"
@@ -524,6 +600,7 @@ def main():
                 min_rel_diff = np.min(rel_diff)
                 print(f"Min relative difference for {label}: {min_rel_diff}")
                 print("\n")
+                plot_relative_diff_histogram(double, abs_diff, rel_diff, label=label, process=process)
         #         # avg = np.mean(data)
         #         # print(f"Average of {label}: {avg}")
         #     else:
