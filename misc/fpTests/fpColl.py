@@ -400,7 +400,7 @@ def process_to_name(process: str) -> str:
     """Converts a process string to a valid filename."""
     if not process:
         raise ValueError("Process name is empty.")
-    return process.replace(" ", "_").replace(">", "2").replace("+", "p").replace("-", "m").replace("~", "x")
+    return process.replace(" ", "_").replace(">", "2").replace("+", "p").replace("-", "m").replace("~", "x").replace("\n", "").replace("\r", "")
 
 def write_run_card( card_dir: Path, process: str ):
     """Writes the run card content to a file."""
@@ -503,6 +503,74 @@ def plot_difference_heatmaps(ref, abs_diff, rel_diff, bins=100, label="", proces
     axs[1].set_xlabel("log10(Reference Amplitude)")
     axs[1].set_ylabel("log10(Relative Difference)")
     axs[1].set_title(f"Rel. Diff vs Ref. Amplitude {f'({label})' if label else ''}")
+    fig.colorbar(h2[3], ax=axs[1])
+
+    plt.tight_layout()
+    plt.savefig(plot_path, format="pdf")
+    print(f"Saved heatmap plot to {plot_path}")
+
+def plot_comp_difference_heatmaps(ref, rel_diff_1, rel_diff_2, bins=100, label1="", label2="", process: str = None):
+    """
+    Plots two heatmaps:
+    1. Relative difference vs absolute difference
+    2. Relative difference vs reference amplitude
+
+    Safely applies log scale by mapping zeros to smallest positive non-zero value.
+    Keeps arrays aligned and uses absolute values as needed.
+    """
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    # Ensure non-negative input
+    abs_diff = np.abs(abs_diff)
+    rel_diff_1 = np.abs(rel_diff_1)
+    rel_diff_2 = np.abs(rel_diff_2)
+    ref = np.abs(ref)
+    proc_name = process_to_name(process) if process else "relative_diff"
+    plot_dir = Path.cwd() / "plots"
+    if not plot_dir.exists():
+        os.makedirs(plot_dir)
+        print(f"Created directory {plot_dir}.")
+    if not plot_dir.is_dir():
+        print(f"Error: {plot_dir} is not a directory.")
+        return
+    plot_path = plot_dir / (proc_name + "_comp_heatmap.pdf")
+    if plot_path.exists():
+        print(f"Warning: {plot_path} already exists. Overwriting.")
+    # Avoid log(0) by replacing zeros with min non-zero value in each array
+    def safe_log(data, label):
+        positive_mask = data > 0
+        if not np.any(positive_mask):
+            raise ValueError(f"All values in {label} are zero or negative.")
+        min_nonzero = data[positive_mask].min()
+        safe_data = np.where(data == 0, min_nonzero, data)
+        return np.log10(safe_data)
+
+    log_abs_diff = safe_log(abs_diff, "abs_diff")
+    log_rel_diff_1 = safe_log(np.clip(rel_diff_1, 1e-15, None), "rel_diff_1")  # clip large relative errors, keep min=1e-15
+    log_rel_diff_2 = safe_log(np.clip(rel_diff_2, 1e-15, None), "rel_diff_2")
+    log_ref = safe_log(ref, "ref")
+
+    fig, axs = plt.subplots(1, 2, figsize=(14, 5))
+
+    # 1. Relative vs Absolute Difference
+    h1 = axs[0].hist2d(
+        log_ref, log_rel_diff_1,
+        bins=bins, cmap="plasma", cmin=1
+    )
+    axs[0].set_xlabel("Scattering amplitude")
+    axs[0].set_ylabel("Relative difference")
+    axs[0].set_title(f"Relative difference {f'({label1})' if label1 else ''}")
+    fig.colorbar(h1[3], ax=axs[0])
+
+    # 2. Relative Difference vs Reference Amplitude
+    h2 = axs[1].hist2d(
+        log_ref, log_rel_diff_2,
+        bins=bins, cmap="plasma", cmin=1
+    )
+    axs[1].set_xlabel("Scattering amplitude")
+    axs[1].set_ylabel("Relative difference")
+    axs[1].set_title(f"Relative difference {f'({label2})' if label2 else ''}")
     fig.colorbar(h2[3], ax=axs[1])
 
     plt.tight_layout()
@@ -694,6 +762,7 @@ def main():
         # # Plot histograms of relative differences
         # # compare_relative_diff_histograms(reldiffs)
         grouped_relative_diff_histogram(reldiffs, process=process)
+        plot_comp_difference_heatmaps(double, reldiffs["m"], reldiffs["f"], label1="mixed", label2="FP32", process=process)
 
 if __name__ == "__main__":
     main()
