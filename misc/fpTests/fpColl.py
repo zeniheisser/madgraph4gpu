@@ -509,6 +509,91 @@ def plot_difference_heatmaps(ref, abs_diff, rel_diff, bins=100, label="", proces
     plt.savefig(plot_path, format="pdf")
     print(f"Saved heatmap plot to {plot_path}")
 
+def signed_difference_histogram(ref_amps, new_amps, label: str = "new", process: str = None):
+    """
+    Plots a grouped bar histogram showing the sign of differences (new - ref) 
+    binned by the order of magnitude of the reference amplitude.
+
+    :param ref_amps: Reference amplitude values (1D array)
+    :param new_amps: New amplitude values to compare (1D array)
+    :param label: Label for the new amplitude set (e.g., "m" or "f")
+    :param process: Optional process name to include in the plot title and filename
+    """
+
+    # Take absolute of ref, and signed diff between new and ref
+    ref = np.abs(ref_amps)
+    diff = new_amps - ref_amps
+    sign = np.sign(diff)
+
+    # Handle zeros in reference (map to smallest nonzero)
+    ref_safe = np.where(ref == 0, np.min(ref[ref > 0]), ref)
+    log_ref = np.log10(ref_safe)
+
+    # Bin setup based on reference amplitudes
+    min_log = np.floor(log_ref.min())
+    max_log = np.ceil(log_ref.max())
+    bin_edges = np.arange(min_log, max_log + 1)
+    bin_centers = bin_edges[:-1] + 0.5
+    n_bins = len(bin_centers)
+
+    # Count signs in each bin
+    neg_counts = np.zeros(n_bins)
+    pos_counts = np.zeros(n_bins)
+
+    bin_indices = np.digitize(log_ref, bin_edges) - 1  # adjust for 0-based indexing
+
+    for i in range(len(sign)):
+        bin_idx = bin_indices[i]
+        if 0 <= bin_idx < n_bins:
+            if sign[i] < 0:
+                neg_counts[bin_idx] += 1
+            elif sign[i] > 0:
+                pos_counts[bin_idx] += 1
+    
+    for i in range(n_bins):
+        #Normalise each bin to the total number of events in that bin
+        total = neg_counts[i] + pos_counts[i]
+        if total > 0:
+            neg_counts[i] /= total
+            pos_counts[i] /= total
+
+    # Plot setup
+    bar_width = 0.4
+    offsets = [-bar_width / 2, bar_width / 2]
+
+    plot_name = process_to_name(process) + f"_{label}" if process else f"{label}_sign_diff"
+    plot_dir = Path.cwd() / "plots"
+    plot_dir.mkdir(parents=True, exist_ok=True)
+    plot_title = f"Sign of amplitude difference per amplitude"
+    if process:
+        plot_title += f" for process: {process}"
+
+    xtick_labels = [f"$10^{{{int(b)}}}$" for b in bin_edges[:-1]]
+
+    # --- Linear scale plot ---
+    plt.figure(figsize=(10, 6))
+    plt.bar(bin_centers + offsets[0], neg_counts, width=bar_width, label="Negative diff")
+    plt.bar(bin_centers + offsets[1], pos_counts, width=bar_width, label="Positive diff")
+
+    plt.xticks(bin_centers, xtick_labels, rotation=45)
+    plt.xlabel("Amplitude evaluated with FP64")
+    plt.ylabel("Fraction of events per bin")
+    plt.title(plot_title)
+    plt.legend()
+    plt.grid(axis='y', linestyle='--', linewidth=0.5)
+    plt.tight_layout()
+
+    plot_path = plot_dir / f"{plot_name}_lin.pdf"
+    plt.savefig(plot_path, format="pdf")
+    print(f"Saved linear-scale plot to {plot_path}")
+
+    # --- Log scale plot ---
+    plt.yscale("log")
+    plot_path = plot_dir / f"{plot_name}_log.pdf"
+    plt.savefig(plot_path, format="pdf")
+    print(f"Saved log-scale plot to {plot_path}")
+    plt.close()
+
 
 def main():
     if len(sys.argv) != 2:
@@ -584,6 +669,7 @@ def main():
                 print(f"Warning: Size mismatch for {label} and doubles.")
                 continue
             if data.size > 0:
+                signed_difference_histogram(double, data, label=label, process=process)
                 abs_diff = np.abs(data - double)
                 avg_abs_diff = np.mean(abs_diff)
                 print(f"Average absolute difference for {label}: {avg_abs_diff}")
