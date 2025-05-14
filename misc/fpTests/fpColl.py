@@ -522,7 +522,7 @@ def plot_comp_difference_heatmaps(ref, rel_diff_1, rel_diff_2, bins=100, label1=
     import matplotlib.pyplot as plt
 
     # Ensure non-negative input
-    abs_diff = np.abs(abs_diff)
+    #abs_diff = np.abs(abs_diff)
     rel_diff_1 = np.abs(rel_diff_1)
     rel_diff_2 = np.abs(rel_diff_2)
     ref = np.abs(ref)
@@ -546,7 +546,7 @@ def plot_comp_difference_heatmaps(ref, rel_diff_1, rel_diff_2, bins=100, label1=
         safe_data = np.where(data == 0, min_nonzero, data)
         return np.log10(safe_data)
 
-    log_abs_diff = safe_log(abs_diff, "abs_diff")
+    #log_abs_diff = safe_log(abs_diff, "abs_diff")
     log_rel_diff_1 = safe_log(np.clip(rel_diff_1, 1e-15, None), "rel_diff_1")  # clip large relative errors, keep min=1e-15
     log_rel_diff_2 = safe_log(np.clip(rel_diff_2, 1e-15, None), "rel_diff_2")
     log_ref = safe_log(ref, "ref")
@@ -556,23 +556,24 @@ def plot_comp_difference_heatmaps(ref, rel_diff_1, rel_diff_2, bins=100, label1=
     # 1. Relative vs Absolute Difference
     h1 = axs[0].hist2d(
         log_ref, log_rel_diff_1,
-        bins=bins, cmap="plasma", cmin=1
+        bins=bins, cmap="plasma", cmin=1, density=True, vmin=0, vmax=1
     )
-    axs[0].set_xlabel("Scattering amplitude")
-    axs[0].set_ylabel("Relative difference")
-    axs[0].set_title(f"Relative difference {f'({label1})' if label1 else ''}")
+    axs[0].set_xlabel("log10(Scattering amplitude)")
+    axs[0].set_ylabel("log10(Relative difference)")
+    axs[0].set_title(f"{f'{label1}' if label1 else ''}")
     fig.colorbar(h1[3], ax=axs[0])
 
     # 2. Relative Difference vs Reference Amplitude
     h2 = axs[1].hist2d(
         log_ref, log_rel_diff_2,
-        bins=bins, cmap="plasma", cmin=1
+        bins=bins, cmap="plasma", cmin=1, density=True, vmin=0, vmax=1
     )
-    axs[1].set_xlabel("Scattering amplitude")
-    axs[1].set_ylabel("Relative difference")
-    axs[1].set_title(f"Relative difference {f'({label2})' if label2 else ''}")
+    axs[1].set_xlabel("log10(Scattering amplitude)")
+    axs[1].set_ylabel("log10(Relative difference)")
+    axs[1].set_title(f"{f'{label2}' if label2 else ''}")
     fig.colorbar(h2[3], ax=axs[1])
-
+    
+    plt.suptitle(f"Relative differences across phase space for {label1} and {label2} {f'({process})' if process else ''}")
     plt.tight_layout()
     plt.savefig(plot_path, format="pdf")
     print(f"Saved heatmap plot to {plot_path}")
