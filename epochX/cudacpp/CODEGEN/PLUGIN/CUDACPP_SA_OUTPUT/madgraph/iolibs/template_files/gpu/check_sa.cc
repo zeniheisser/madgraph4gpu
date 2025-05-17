@@ -726,10 +726,10 @@ main( int argc, char** argv )
       }
     }
 
-    if( !( verbose || debug || perf ) )
-    {
-      std::cout << ".";
-    }
+    // if( !( verbose || debug || perf ) )
+    // {
+    //   std::cout << ".";
+    // }
   }
 
   // **************************************
@@ -1083,6 +1083,8 @@ main( int argc, char** argv )
     std::cout << std::string( SEP79, '*' ) << std::endl
               << hstStats;
   }
+
+  std::cout << nevtALL / ( sumgtim + sumrtim + sumwtim );
 
   // --- 9b Dump to json
   const std::string jsonKey = "9b DumpJson";

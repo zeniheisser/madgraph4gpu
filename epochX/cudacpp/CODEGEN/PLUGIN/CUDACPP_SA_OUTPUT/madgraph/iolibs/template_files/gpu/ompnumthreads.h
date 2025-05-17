@@ -49,12 +49,12 @@ ompnumthreadsNotSetMeansOneThread( int debuglevel ) // quiet(-1), info(0), debug
                 << omp_get_max_threads() << std::endl;
     }
   }
-  else if( debuglevel >= 0 )
-    std::cout << "(ompnumthreadsNotSetMeansOneThread) "
-              << "DEBUG: OMP_NUM_THREADS = " << ompnthr << std::endl;
-  if( debuglevel >= 0 )
-    std::cout << "(ompnumthreadsNotSetMeansOneThread) "
-              << "omp_get_max_threads() = " << omp_get_max_threads() << std::endl;
+  // else if( debuglevel >= 0 )
+  //   std::cout << "(ompnumthreadsNotSetMeansOneThread) "
+  //             << "DEBUG: OMP_NUM_THREADS = " << ompnthr << std::endl;
+  // if( debuglevel >= 0 )
+  //   std::cout << "(ompnumthreadsNotSetMeansOneThread) "
+  //             << "omp_get_max_threads() = " << omp_get_max_threads() << std::endl;
   if( debuglevel == 1 )
     std::cout << "DEBUG: exiting ompnumthreadsNotSetMeansOneThread" << std::endl;
 }
