@@ -551,7 +551,7 @@ def plot_comp_difference_heatmaps(ref, rel_diff_1, rel_diff_2, bins=100, label1=
     log_rel_diff_2 = safe_log(np.clip(rel_diff_2, 1e-15, None), "rel_diff_2")
     log_ref = safe_log(ref, "ref")
 
-    fig, axs = plt.subplots(1, 2, figsize=(14, 5))
+    fig, axs = plt.subplots(1, 2, figsize=(10, 4))
 
     # 1. Relative vs Absolute Difference
     h1 = axs[0].hist2d(
