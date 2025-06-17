@@ -90,8 +90,8 @@ def main():
     print(f"Backend files written: {backend_cards}")
 
     # Write the slurm scripts to run gen_gridpack.py for each process and SIMD mode
-    for process in proc_cards:
-        for simd_mode in backend_cards:
+    for process, proc_card in zip(procs,proc_cards):
+        for simd_mode, backend_card in zip(simd_modes, backend_cards):
             slurm_card_path = run_directory / f"grid_{process}_{simd_mode}.sh"
             with open(slurm_card_path, 'w') as f:
                 f.write("#!/bin/bash\n")
@@ -104,7 +104,7 @@ def main():
                 f.write("#SBATCH --mem-per-cpu=1024\n")
                 f.write("\n")
                 f.write("module load Python\n")
-                f.write(f"python gen_gridpack.py {simd_mode} {process} > logs/gen_gridpack_{process}_{simd_mode}.log\n")
+                f.write(f"python gen_gridpack.py {backend_card} {proc_card} > logs/gen_gridpack_{process}_{simd_mode}.log\n")
             print(f"Slurm card written to {slurm_card_path}")
     
     # Write the slurm scripts to run run_gridpack.py for each process and SIMD mode
