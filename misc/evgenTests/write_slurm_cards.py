@@ -79,6 +79,9 @@ def main():
                  "p p > l+ l- j j",
                  "p p > l+ l- j j j",]
 
+    partition = "Def"
+    #partition = "pelican"
+
     procs = [process_to_name(proc) for proc in processes]
     # Write the process files in the grid_input directory
     proc_cards = [write_process(proc) for proc in processes]
@@ -115,11 +118,17 @@ def main():
             with open(slurm_card_path, 'w') as f:
                 f.write("#!/bin/bash\n")
                 f.write(f"#SBATCH --job-name=run_{simd_mode}_{process}\n")
+                f.write(f"#SBATCH --partition={partition}\n")
+                if partition == "pelican":
+                    f.write("#SBATCH --constraints=\"IceLake\"\n")
+                #f.write("#SBATCH --partition=Def\n")
                 f.write(f"#SBATCH --output=logs/log_run_{process}_{simd_mode}.txt\n")
                 f.write(f"#SBATCH --error=logs/error_run_{process}_{simd_mode}.txt\n")
                 f.write("#SBATCH --time=24:00:00\n")
                 f.write("#SBATCH --ntasks=1\n")
                 f.write(f"#SBATCH --cpus-per-task={n_cpus_gridrun}\n")
+                if n_cpus_gridrun > 1:
+                    f.write("#SBATCH --hint=compute_bound\n")
                 f.write("#SBATCH --mem-per-cpu=1024\n")
                 f.write("\n")
                 f.write("module load Python\n")
