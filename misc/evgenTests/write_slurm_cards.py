@@ -134,7 +134,10 @@ def main():
                 f.write("#SBATCH --mem-per-cpu=1024\n")
                 f.write("\n")
                 f.write("module load Python\n")
-                f.write(f"python run_gridpack.py {curr_proc} {seed} > logs/run_gridpack_{process}_{simd_mode}.log\n")
+                if n_cpus_gridrun > 1:
+                    f.write(f"python run_gridpack.py {curr_proc} -s {seed} -p > logs/run_gridpack_{process}_{simd_mode}.log\n")
+                else:
+                    f.write(f"python run_gridpack.py {curr_proc} -s {seed} > logs/run_gridpack_{process}_{simd_mode}.log\n")
             print(f"Slurm card written to {slurm_card_path}")
     print("All slurm cards have been written successfully.")
 if __name__ == "__main__":
