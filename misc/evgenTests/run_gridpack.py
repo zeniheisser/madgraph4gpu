@@ -135,12 +135,12 @@ def main():
         seed = random.randint(1, 2**16 )  # Random seed for each run
     # n_iterations = 10
     n_events = [100*2**i for i in range(0, 11)]
-    n_procs = [1, 2, 4, 6, 8, 12, 16, 24, 32]
+    n_procs = [1, 2, 4, 8, 12, 16, 24, 32, 48, 64]
     
-    if not args.p:
+    if not args.processes:
         run_test_over_events(run_directory, n_events, seed, n_iterations)
     else:
-        run_test_over_processes(run_directory, 10000, seed, n_procs, n_iterations)
+        run_test_over_processes(run_directory, 100000, seed, n_procs, n_iterations, 2000)
 
     print("All gridpack runs completed successfully.")
 
