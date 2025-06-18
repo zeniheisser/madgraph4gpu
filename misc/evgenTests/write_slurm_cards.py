@@ -91,7 +91,7 @@ def main():
     # Write the backend files in the grid_input directory
     simd_modes = ["fortran", "none", "sse4", "avx2", "y512", "z512"]
     simd_modes_explicit = ["fortran", "cppnone", "cppsse4", "cppavx2", "cpp512y", "cpp512z"]
-    backend_cards = [write_backend(simd_mode) for simd_mode in simd_modes]
+    backend_cards = [write_backend(simd_mode) for simd_mode in simd_modes_explicit]
     print(f"Backend files written: {backend_cards}")
 
     # Write the slurm scripts to run gen_gridpack.py for each process and SIMD mode
