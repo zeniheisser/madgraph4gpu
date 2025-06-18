@@ -69,7 +69,7 @@ def run_test_over_events(run_directory: Path, n_events: list, seed: int, n_times
             csv_writer = csv.writer(csvfile)
             csv_writer.writerow([events, mean_time, std_time, min_time, max_time])
 
-def run_test_over_processes(run_directory: Path, n_events: int, seed: int, num_processes: list, n_times: int = 10, max_events: int = None) -> None:
+def run_test_over_processes(run_directory: Path, n_events: int, seed: int, num_processes: list, n_times: int = 5, max_events: int = None) -> None:
     test_dir = Path.cwd() / "results"
     if not test_dir.exists():
         test_dir.mkdir(parents=True)
