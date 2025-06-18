@@ -18,8 +18,10 @@ def write_backend(simd_mode: str) -> Path:
     grid_input_dir = Path.cwd() / "grid_input"
     if not grid_input_dir.exists():
         grid_input_dir.mkdir(parents=True)
-    if simd_mode not in ["fortran", "none", "sse4", "avx2", "y512", "z512", "cuda"]:
-        raise ValueError(f"Invalid SIMD mode: {simd_mode}. Expected 'fortran', 'none', 'sse4', 'avx2', 'y512', 'z512', or 'cuda'.")
+    # if simd_mode not in ["fortran", "none", "sse4", "avx2", "y512", "z512", "cuda"]:
+    #     raise ValueError(f"Invalid SIMD mode: {simd_mode}. Expected 'fortran', 'none', 'sse4', 'avx2', 'y512', 'z512', or 'cuda'.")
+    if simd_mode not in ["fortran", "cppnone", "cppsse4", "cppavx2", "cpp512y", "cpp512z", "cuda"]:
+        raise ValueError(f"Invalid SIMD mode: {simd_mode}. Expected 'fortran', 'cppnone', 'cppsse4', 'cppavx2', 'cpp512y', 'cpp512z', or 'cuda'.")
     # Create the grid_input directory if it doesn't exist
     file_name = f"{simd_mode}.back"
     if not file_name or len(file_name) > 255:
