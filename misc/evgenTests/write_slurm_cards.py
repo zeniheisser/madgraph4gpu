@@ -76,10 +76,10 @@ def main():
     n_cpus_gridgen = 6
     n_cpus_gridrun = 1
 
-    processes = ["p p > l+ l-",
-                 "p p > l+ l- j",
-                 "p p > l+ l- j j",
-                 "p p > l+ l- j j j",]
+    # processes = ["u u~ > e+ e-", "u u~ > e+ e- g", "u u~ > e+ e- g g", "u u~ > e+ e- g g g",]
+    processes = ["g g > t t~", "g g > t t~ g", "g g > t t~ g g", "g g > t t~ g g g",]
+    # processes = ["p p > l+ l-", "p p > l+ l- j", "p p > l+ l- j j", "p p > l+ l- j j j",]
+    # processes = ["p p > t t~", "p p > t t~ j", "p p > t t~ j j", "p p > t t~ j j j",]
 
     partition = "Def"
     #partition = "pelican"
@@ -98,18 +98,19 @@ def main():
     for process, proc_card in zip(procs,proc_cards):
         for simd_mode, backend_card in zip(simd_modes, backend_cards):
             slurm_card_path = run_directory / f"grid_{process}_{simd_mode}.sh"
+            loc_proc = process[process.rfind("_") + 1:]  # Get the last part of the process name
             with open(slurm_card_path, 'w') as f:
                 f.write("#!/bin/bash\n")
-                f.write(f"#SBATCH --job-name=grid_{simd_mode}_{process}\n")
-                f.write(f"#SBATCH --output=logs/log_grid_{process}_{simd_mode}.txt\n")
-                f.write(f"#SBATCH --error=logs/error_grid_{process}_{simd_mode}.txt\n")
+                f.write(f"#SBATCH --job-name={loc_proc}_{simd_mode}\n")
+                f.write(f"#SBATCH --output=logs/log_grid_{loc_proc}_{simd_mode}.txt\n")
+                f.write(f"#SBATCH --error=logs/error_grid_{loc_proc}_{simd_mode}.txt\n")
                 f.write("#SBATCH --time=24:00:00\n")
                 f.write("#SBATCH --ntasks=1\n")
                 f.write(f"#SBATCH --cpus-per-task={n_cpus_gridgen}\n")
                 f.write("#SBATCH --mem-per-cpu=1024\n")
                 f.write("\n")
                 f.write("module load Python\n")
-                f.write(f"python gen_gridpack.py {backend_card} {proc_card} > logs/gen_gridpack_{process}_{simd_mode}.log\n")
+                f.write(f"python gen_gridpack.py {backend_card} {proc_card} > logs/gen_gridpack_{loc_proc}_{simd_mode}.log\n")
             print(f"Slurm card written to {slurm_card_path}")
     
     seed = random.randint(1, 2**16)
@@ -119,27 +120,38 @@ def main():
         for simd_mode, simd_mode_explicit in zip(simd_modes, simd_modes_explicit):
             curr_proc = process + f"_simd_{simd_mode_explicit}"
             slurm_card_path = run_directory / f"run_{process}_{simd_mode}.sh"
+            loc_proc = process[process.rfind("_") + 1:]  # Get the last part of the process name
+            if "g" in loc_proc:
+                # If there are final state gluons, replace name with number of gluons
+                ng = loc_proc.count("g")
+                loc_proc = loc_proc.replace("g", "")
+                loc_proc += str(ng) + "g"
+            if "j" in loc_proc:
+                # If there are final state jets, replace name with number of jets
+                nj = loc_proc.count("j")
+                loc_proc = loc_proc.replace("j", "")
+                loc_proc += str(nj) + "j"
             with open(slurm_card_path, 'w') as f:
                 f.write("#!/bin/bash\n")
-                f.write(f"#SBATCH --job-name=run_{simd_mode}_{process}\n")
+                f.write(f"#SBATCH --job-name={loc_proc}_{simd_mode}\n")
                 f.write(f"#SBATCH --partition={partition}\n")
                 if partition == "pelican":
                     f.write("#SBATCH --constraint=\"IceLake\"\n")
                 #f.write("#SBATCH --partition=Def\n")
-                f.write(f"#SBATCH --output=logs/log_run_{process}_{simd_mode}.txt\n")
-                f.write(f"#SBATCH --error=logs/error_run_{process}_{simd_mode}.txt\n")
+                f.write(f"#SBATCH --output=logs/log_run_{loc_proc}_{simd_mode}.txt\n")
+                f.write(f"#SBATCH --error=logs/error_run_{loc_proc}_{simd_mode}.txt\n")
                 f.write("#SBATCH --time=24:00:00\n")
                 f.write("#SBATCH --ntasks=1\n")
                 f.write(f"#SBATCH --cpus-per-task={n_cpus_gridrun}\n")
-                if n_cpus_gridrun > 1:
-                    f.write("#SBATCH --hint=compute_bound\n")
+                # if n_cpus_gridrun > 1:
+                    # f.write("#SBATCH --hint=compute_bound\n")
                 f.write("#SBATCH --mem-per-cpu=1024\n")
                 f.write("\n")
                 f.write("module load Python\n")
                 if n_cpus_gridrun > 1:
-                    f.write(f"python run_gridpack.py {curr_proc} -s {seed} -p > logs/run_gridpack_{process}_{simd_mode}.log\n")
+                    f.write(f"python run_gridpack.py {curr_proc} -s {seed} -p > logs/run_gridpack_{loc_proc}_{simd_mode}.log\n")
                 else:
-                    f.write(f"python run_gridpack.py {curr_proc} -s {seed} > logs/run_gridpack_{process}_{simd_mode}.log\n")
+                    f.write(f"python run_gridpack.py {curr_proc} -s {seed} > logs/run_gridpack_{loc_proc}_{simd_mode}.log\n")
             print(f"Slurm card written to {slurm_card_path}")
     print("All slurm cards have been written successfully.")
 if __name__ == "__main__":

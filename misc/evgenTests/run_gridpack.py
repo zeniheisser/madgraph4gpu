@@ -56,7 +56,7 @@ def run_test_over_events(run_directory: Path, n_events: list, seed: int, n_times
     elif not test_dir.is_dir():
         print(f"Error: {test_dir} is not a directory.")
         sys.exit(1)
-    outfile = test_dir / f"{run_directory.name}_events_{seed}s.csv"
+    outfile = test_dir / f"events_{seed}_{run_directory.name}.csv"
     if outfile.exists():
         print(f"Warning: {outfile} already exists. It will be overwritten.")
     with open(outfile, 'w', newline='') as csvfile:
@@ -77,7 +77,7 @@ def run_test_over_processes(run_directory: Path, n_events: int, seed: int, num_p
     elif not test_dir.is_dir():
         print(f"Error: {test_dir} is not a directory.")
         sys.exit(1)
-    outfile = test_dir / f"{run_directory.name}_processes_{seed}s.csv"
+    outfile = test_dir / f"processes_{seed}_{run_directory.name}.csv"
     if outfile.exists():
         print(f"Warning: {outfile} already exists. It will be overwritten.")
     with open(outfile, 'w', newline='') as csvfile:
