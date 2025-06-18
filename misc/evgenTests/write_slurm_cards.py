@@ -110,6 +110,8 @@ def main():
                 f.write(f"python gen_gridpack.py {backend_card} {proc_card} > logs/gen_gridpack_{process}_{simd_mode}.log\n")
             print(f"Slurm card written to {slurm_card_path}")
     
+    seed = random.randint(1, 2**16)
+    
     # Write the slurm scripts to run run_gridpack.py for each process and SIMD mode
     for process in procs:
         for simd_mode, simd_mode_explicit in zip(simd_modes, simd_modes_explicit):
@@ -132,7 +134,7 @@ def main():
                 f.write("#SBATCH --mem-per-cpu=1024\n")
                 f.write("\n")
                 f.write("module load Python\n")
-                f.write(f"python run_gridpack.py {curr_proc} > logs/run_gridpack_{process}_{simd_mode}.log\n")
+                f.write(f"python run_gridpack.py {curr_proc} {seed} > logs/run_gridpack_{process}_{simd_mode}.log\n")
             print(f"Slurm card written to {slurm_card_path}")
     print("All slurm cards have been written successfully.")
 if __name__ == "__main__":
