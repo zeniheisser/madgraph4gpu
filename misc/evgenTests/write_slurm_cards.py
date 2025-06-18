@@ -120,7 +120,7 @@ def main():
                 f.write(f"#SBATCH --job-name=run_{simd_mode}_{process}\n")
                 f.write(f"#SBATCH --partition={partition}\n")
                 if partition == "pelican":
-                    f.write("#SBATCH --constraints=\"IceLake\"\n")
+                    f.write("#SBATCH --constraint=\"IceLake\"\n")
                 #f.write("#SBATCH --partition=Def\n")
                 f.write(f"#SBATCH --output=logs/log_run_{process}_{simd_mode}.txt\n")
                 f.write(f"#SBATCH --error=logs/error_run_{process}_{simd_mode}.txt\n")
